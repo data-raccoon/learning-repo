@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<!--
+  Vector Earth — 3D Globe Frontend
+  ==================================
+  Renders country polygons on a CesiumJS globe, fetching GeoJSON from the
+  local FastAPI backend (http://localhost:8000).
+
+  Adding a new layer
+  ------------------
+  1. Ingest the data into the SQLite DB (see ingest/).
+  2. The GET /layers endpoint will auto-discover it.
+  3. Call loadLayer('<layer_name>') below to add it to the globe.
+
+  Enabling satellite imagery
+  --------------------------
+  Find the IMAGERY HOOK section below and call setImageryProvider() with
+  any Cesium-compatible provider. No other changes are needed.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vector Earth</title>
+
+  <!-- CesiumJS -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.116/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.116/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #cesiumContainer { width: 100%; height: 100%; overflow: hidden; }
+
+    /* ---- shared panel style ---- */
+    .panel {
+      position: absolute;
+      background: rgba(22, 28, 36, 0.88);
+      color: #e0e0e0;
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ---- top-left hint ---- */
+    #ui {
+      top: 12px;
+      left: 12px;
+      padding: 10px 14px;
+      pointer-events: none;
+      line-height: 1.6;
+    }
+    #ui strong { color: #ffffff; }
+
+    /* ---- search box (top-right) ---- */
+    #search-wrap {
+      top: 12px;
+      right: 12px;
+      padding: 8px 10px;
+      width: 240px;
+    }
+    #search-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e0e0e0;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    #search-wrap input::placeholder { color: #778; }
+    #suggestions {
+      margin-top: 6px;
+      display: none;
+    }
+    #suggestions div {
+      padding: 4px 2px;
+      cursor: pointer;
+      border-radius: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #suggestions div:hover,
+    #suggestions div.active { background: rgba(168,216,240,0.18); color: #a8d8f0; }
+
+    /* ---- country info panel (bottom-right) ---- */
+    #info {
+      bottom: 12px;
+      right: 12px;
+      padding: 10px 14px;
+      min-width: 190px;
+      display: none;
+      line-height: 1.8;
+    }
+    #info .info-name  { font-size: 15px; font-weight: 600; color: #ffffff; margin-bottom: 4px; }
+    #info .info-row   { display: flex; justify-content: space-between; gap: 16px; }
+    #info .info-label { color: #778899; }
+    #info .info-value { color: #d0e8f8; }
+    #info .info-close {
+      float: right; cursor: pointer; color: #556; font-size: 15px; line-height: 1;
+      margin-left: 8px;
+    }
+    #info .info-close:hover { color: #a8d8f0; }
+
+    /* ---- status bar (bottom-left) ---- */
+    #status {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(22, 28, 36, 0.72);
+      color: #778899;
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="cesiumContainer"></div>
+
+<div id="ui" class="panel">
+  <strong>Vector Earth</strong><br />
+  Drag to rotate &nbsp;·&nbsp; Scroll to zoom<br />
+  Right-drag to tilt
+</div>
+
+<!-- Search -->
+<div id="search-wrap" class="panel">
+  <input id="search-input" type="text" placeholder="Search country…" autocomplete="off" />
+  <div id="suggestions"></div>
+</div>
+
+<!-- Country info -->
+<div id="info" class="panel">
+  <span class="info-close" id="info-close">✕</span>
+  <div class="info-name" id="info-name"></div>
+  <div class="info-row"><span class="info-label">Continent</span>   <span class="info-value" id="info-continent"></span></div>
+  <div class="info-row"><span class="info-label">ISO code</span>    <span class="info-value" id="info-iso"></span></div>
+  <div class="info-row"><span class="info-label">Population</span>  <span class="info-value" id="info-pop"></span></div>
+  <div class="info-row"><span class="info-label">GDP (est.)</span>  <span class="info-value" id="info-gdp"></span></div>
+</div>
+
+<div id="status">Loading countries…</div>
+
+<script>
+  // ---------------------------------------------------------------------------
+  // No Cesium Ion token needed — we use no Ion assets.
+  // ---------------------------------------------------------------------------
+  Cesium.Ion.defaultAccessToken = '';
+
+  // ---------------------------------------------------------------------------
+  // Viewer — no base imagery layer, dark space background.
+  // ---------------------------------------------------------------------------
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+    baseLayer:              false,
+    baseLayerPicker:        false,
+    geocoder:               false,
+    homeButton:             false,
+    sceneModePicker:        false,
+    navigationHelpButton:   false,
+    animation:              false,
+    timeline:               false,
+    fullscreenButton:       false,
+    infoBox:                false,
+    selectionIndicator:     false,
+  });
+
+  viewer.scene.backgroundColor   = Cesium.Color.fromCssColorString('#0d0d0d');
+  viewer.scene.skyBox.show        = false;
+  viewer.scene.sun.show           = false;
+  viewer.scene.moon.show          = false;
+  viewer.scene.skyAtmosphere.show = false;
+  viewer.scene.globe.baseColor    = Cesium.Color.fromCssColorString('#1a2a3a');
+
+  // ---------------------------------------------------------------------------
+  // IMAGERY HOOK
+  // ---------------------------------------------------------------------------
+  // Call this function with any Cesium ImageryProvider to enable a base map.
+  // Example (no token required):
+  //   setImageryProvider(new Cesium.OpenStreetMapImageryProvider({
+  //     url: 'https://tile.openstreetmap.org/'
+  //   }));
+  // ---------------------------------------------------------------------------
+  function setImageryProvider(provider) {
+    viewer.scene.imageryLayers.removeAll();
+    viewer.scene.imageryLayers.addImageryProvider(provider);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Layer loader
+  // ---------------------------------------------------------------------------
+  const API_BASE = 'http://localhost:8000';
+
+  // Index of all loaded features keyed by normalised name.
+  // Each entry: { properties, bbox: {minLon, minLat, maxLon, maxLat} }
+  const featureIndex = {};
+
+  // Continent → fill color (semi-transparent)
+  const CONTINENT_COLORS = {
+    'Africa':                  Cesium.Color.fromCssColorString('#c8a838').withAlpha(0.18),
+    'Antarctica':              Cesium.Color.fromCssColorString('#aaddff').withAlpha(0.15),
+    'Asia':                    Cesium.Color.fromCssColorString('#e07840').withAlpha(0.18),
+    'Europe':                  Cesium.Color.fromCssColorString('#6aaa6a').withAlpha(0.18),
+    'North America':           Cesium.Color.fromCssColorString('#7878d0').withAlpha(0.18),
+    'Oceania':                 Cesium.Color.fromCssColorString('#d06868').withAlpha(0.18),
+    'Seven seas (open ocean)': Cesium.Color.fromCssColorString('#4499bb').withAlpha(0.18),
+    'South America':           Cesium.Color.fromCssColorString('#44b8a0').withAlpha(0.18),
+  };
+  const CONTINENT_OUTLINE = {
+    'Africa':                  Cesium.Color.fromCssColorString('#e8c84a'),
+    'Antarctica':              Cesium.Color.fromCssColorString('#cceeff'),
+    'Asia':                    Cesium.Color.fromCssColorString('#f09050'),
+    'Europe':                  Cesium.Color.fromCssColorString('#88cc88'),
+    'North America':           Cesium.Color.fromCssColorString('#9898e8'),
+    'Oceania':                 Cesium.Color.fromCssColorString('#e88888'),
+    'Seven seas (open ocean)': Cesium.Color.fromCssColorString('#66bbdd'),
+    'South America':           Cesium.Color.fromCssColorString('#55ccb8'),
+  };
+  const DEFAULT_FILL    = Cesium.Color.fromCssColorString('#a8d8f0').withAlpha(0.18);
+  const DEFAULT_OUTLINE = Cesium.Color.fromCssColorString('#a8d8f0');
+
+  // Compute axis-aligned bounding box from a GeoJSON geometry.
+  function geomBbox(geometry) {
+    let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+    function scanRing(ring) {
+      for (const [lon, lat] of ring) {
+        if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
+        if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+      }
+    }
+    if (geometry.type === 'Polygon') {
+      geometry.coordinates.forEach(scanRing);
+    } else if (geometry.type === 'MultiPolygon') {
+      geometry.coordinates.forEach(poly => poly.forEach(scanRing));
+    }
+    return { minLon, minLat, maxLon, maxLat };
+  }
+
+  // Build a PolygonHierarchy (exterior + holes) from a GeoJSON polygon coords array.
+  function buildHierarchy(coords) {
+    const toPos = ring => Cesium.Cartesian3.fromDegreesArray(
+      ring.flatMap(([lon, lat]) => [lon, lat])
+    );
+    const [exterior, ...holes] = coords;
+    const hierarchy = new Cesium.PolygonHierarchy(toPos(exterior));
+    holes.forEach(h => hierarchy.holes.push(new Cesium.PolygonHierarchy(toPos(h))));
+    return { hierarchy, positions: toPos(exterior) };
+  }
+
+  async function loadLayer(layerName) {
+    let geojson;
+    try {
+      const resp = await fetch(`${API_BASE}/layers/${layerName}`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      geojson = await resp.json();
+    } catch (err) {
+      console.error(`Failed to fetch layer '${layerName}':`, err);
+      setStatus(`Error loading layer '${layerName}'. Is the API running?`);
+      return;
+    }
+
+    // Labels live in a CustomDataSource (no geometry pipeline involved)
+    const labelSource = new Cesium.CustomDataSource(layerName + '_labels');
+
+    for (const feature of geojson.features) {
+      if (!feature.geometry) continue;
+      const name      = feature.properties?.name;
+      const continent = feature.properties?.continent;
+
+      // Build feature index for search/focus
+      if (name) {
+        featureIndex[name.toLowerCase()] = {
+          name,
+          properties: feature.properties,
+          bbox: geomBbox(feature.geometry),
+        };
+      }
+
+      const fillColor    = CONTINENT_COLORS[continent] || DEFAULT_FILL;
+      const outlineColor = CONTINENT_OUTLINE[continent] || DEFAULT_OUTLINE;
+
+      // Normalise to array of Polygon coordinate arrays (exterior + holes each)
+      const polygons = feature.geometry.type === 'MultiPolygon'
+        ? feature.geometry.coordinates
+        : [feature.geometry.coordinates];
+
+      for (const coords of polygons) {
+        if (!coords[0] || coords[0].length < 3) continue;
+        const { hierarchy, positions } = buildHierarchy(coords);
+
+        // --- Fill: GroundPrimitive + PolygonGeometry + arcType.NONE
+        //     arcType.NONE disables all edge subdivision (the root cause of all
+        //     previous crashes). asynchronous:false forces sync tessellation so
+        //     any remaining errors throw immediately (catchable) rather than
+        //     crashing the render loop on the next frame.
+        try {
+          viewer.scene.groundPrimitives.add(new Cesium.GroundPrimitive({
+            geometryInstances: new Cesium.GeometryInstance({
+              geometry: new Cesium.PolygonGeometry({
+                polygonHierarchy: hierarchy,
+                arcType: Cesium.ArcType.NONE,
+              }),
+              attributes: {
+                color: Cesium.ColorGeometryInstanceAttribute.fromColor(fillColor),
+              },
+            }),
+            appearance: new Cesium.PerInstanceColorAppearance({ flat: true }),
+            asynchronous: false,
+          }));
+        } catch (e) {
+          console.warn(`Skipping degenerate fill for '${name}':`, e.message);
+        }
+
+        // --- Outline ---
+        viewer.scene.groundPrimitives.add(new Cesium.GroundPolylinePrimitive({
+          geometryInstances: new Cesium.GeometryInstance({
+            geometry: new Cesium.GroundPolylineGeometry({ positions, width: 1.5 }),
+            attributes: {
+              color: Cesium.ColorGeometryInstanceAttribute.fromColor(outlineColor),
+            },
+          }),
+          appearance: new Cesium.PolylineColorAppearance(),
+        }));
+      }
+
+      // --- Label ---
+      if (name && featureIndex[name.toLowerCase()]) {
+        const bbox    = featureIndex[name.toLowerCase()].bbox;
+        const cLon    = (bbox.minLon + bbox.maxLon) / 2;
+        const cLat    = (bbox.minLat + bbox.maxLat) / 2;
+        const spanDeg = Math.max(bbox.maxLon - bbox.minLon, bbox.maxLat - bbox.minLat);
+        const maxDist = Math.min(Math.max(spanDeg * 120000 * 2, 800000), 4000000);
+        labelSource.entities.add({
+          position: Cesium.Cartesian3.fromDegrees(cLon, cLat),
+          label: {
+            text:             name,
+            font:             '12px "Segoe UI", system-ui, sans-serif',
+            fillColor:        Cesium.Color.WHITE,
+            outlineColor:     Cesium.Color.BLACK,
+            outlineWidth:     2,
+            style:            Cesium.LabelStyle.FILL_AND_OUTLINE,
+            verticalOrigin:   Cesium.VerticalOrigin.CENTER,
+            horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+            disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, maxDist),
+            scaleByDistance:  new Cesium.NearFarScalar(200000, 1.0, maxDist, 0.5),
+          },
+        });
+      }
+    }
+
+    await viewer.dataSources.add(labelSource);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Focus — fly camera to a country's bounding box center
+  // ---------------------------------------------------------------------------
+  function focusCountry(key) {
+    const entry = featureIndex[key.toLowerCase()];
+    if (!entry) return;
+
+    const { minLon, minLat, maxLon, maxLat } = entry.bbox;
+    const centerLon = (minLon + maxLon) / 2;
+    const centerLat = (minLat + maxLat) / 2;
+
+    // Scale camera height to bounding box size; clamp to sensible range
+    const spanDeg  = Math.max(maxLon - minLon, maxLat - minLat);
+    const heightM  = Math.min(Math.max(spanDeg * 120000, 400000), 12000000);
+
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(centerLon, centerLat, heightM),
+      duration: 1.8,
+    });
+
+    showInfo(entry.properties);
+    searchInput.value = entry.name;
+    hideSuggestions();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Info panel
+  // ---------------------------------------------------------------------------
+  function showInfo(props) {
+    document.getElementById('info-name').textContent      = props.name      || '—';
+    document.getElementById('info-continent').textContent = props.continent || '—';
+    document.getElementById('info-iso').textContent       = props.iso_a3    || '—';
+    document.getElementById('info-pop').textContent       = props.pop_est
+      ? Number(props.pop_est).toLocaleString()  : '—';
+    document.getElementById('info-gdp').textContent       = props.gdp_md
+      ? '$' + Number(props.gdp_md).toLocaleString() + ' M' : '—';
+    document.getElementById('info').style.display = 'block';
+  }
+
+  document.getElementById('info-close').addEventListener('click', () => {
+    document.getElementById('info').style.display = 'none';
+  });
+
+  // ---------------------------------------------------------------------------
+  // Search
+  // ---------------------------------------------------------------------------
+  const searchInput   = document.getElementById('search-input');
+  const suggestionsEl = document.getElementById('suggestions');
+  let activeSuggestion = -1;
+
+  function hideSuggestions() {
+    suggestionsEl.style.display = 'none';
+    suggestionsEl.innerHTML = '';
+    activeSuggestion = -1;
+  }
+
+  function renderSuggestions(matches) {
+    suggestionsEl.innerHTML = '';
+    activeSuggestion = -1;
+    if (matches.length === 0) { hideSuggestions(); return; }
+    matches.forEach(key => {
+      const entry = featureIndex[key];
+      const div = document.createElement('div');
+      div.textContent = entry.name;
+      div.addEventListener('mousedown', e => {
+        e.preventDefault();   // prevent input blur before click registers
+        focusCountry(key);
+      });
+      suggestionsEl.appendChild(div);
+    });
+    suggestionsEl.style.display = 'block';
+  }
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (q.length < 1) { hideSuggestions(); return; }
+    const matches = Object.keys(featureIndex)
+      .filter(k => k.includes(q))
+      .sort((a, b) => {
+        // Exact prefix matches first
+        const aStarts = a.startsWith(q), bStarts = b.startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return  1;
+        return a.localeCompare(b);
+      })
+      .slice(0, 8);
+    renderSuggestions(matches);
+  });
+
+  // Keyboard navigation in suggestions
+  searchInput.addEventListener('keydown', e => {
+    const items = suggestionsEl.querySelectorAll('div');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeSuggestion = Math.min(activeSuggestion + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeSuggestion = Math.max(activeSuggestion - 1, -1);
+    } else if (e.key === 'Enter') {
+      if (activeSuggestion >= 0 && items[activeSuggestion]) {
+        items[activeSuggestion].dispatchEvent(new Event('mousedown'));
+      } else if (items.length > 0) {
+        items[0].dispatchEvent(new Event('mousedown'));
+      }
+      return;
+    } else if (e.key === 'Escape') {
+      hideSuggestions(); return;
+    } else { return; }
+    items.forEach((el, i) => el.classList.toggle('active', i === activeSuggestion));
+  });
+
+  searchInput.addEventListener('blur', () => setTimeout(hideSuggestions, 150));
+
+  function setStatus(msg) {
+    document.getElementById('status').textContent = msg;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Initial load
+  // ---------------------------------------------------------------------------
+  (async () => {
+    await loadLayer('countries');
+    setStatus('Vector Earth · Natural Earth 1:10m · public domain');
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(10.0, 20.0, 22000000),
+      duration: 2,
+    });
+  })();
+</script>
+
+</body>
+</html>
