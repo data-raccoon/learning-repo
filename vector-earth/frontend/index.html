@@ -339,12 +339,14 @@
       }
 
       const continent = getPropertyValue(entity.properties, 'continent');
-      entity.polygon.material = getContinentFillColor(continent);
+      entity.polygon.fill = true;
+      entity.polygon.material = new Cesium.ColorMaterialProperty(getContinentFillColor(continent));
       entity.polygon.outline = true;
       entity.polygon.outlineColor = getContinentOutlineColor(continent);
       entity.polygon.outlineWidth = 1;
       entity.polygon.height = 0;
       entity.polygon.perPositionHeight = false;
+      entity.polygon.arcType = Cesium.ArcType.GEODESIC;
       styledCount += 1;
     }
 
@@ -378,6 +380,12 @@
         strokeWidth: 1,
         fill: Cesium.Color.fromCssColorString('#8fbfd4').withAlpha(0.6),
       });
+
+      for (const entity of countriesLayerSource.entities.values) {
+        if (entity.polygon) {
+          entity.polygon.fill = true;
+        }
+      }
 
       const styledPolygons = styleCountryEntities(countriesLayerSource);
       await viewer.dataSources.add(countriesLayerSource);
