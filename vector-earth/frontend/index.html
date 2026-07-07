@@ -171,6 +171,16 @@
   let activeSuggestion = -1;
 
   const featureIndex = Object.create(null);
+  const COUNTRY_FILL_PALETTE = [
+    '#d97b66',
+    '#d0a84f',
+    '#95b85f',
+    '#4db08f',
+    '#5ea6cf',
+    '#7b8fe0',
+    '#a678d3',
+    '#cf6fa3',
+  ];
 
   function setStatus(msg) {
     statusEl.textContent = msg;
@@ -213,33 +223,15 @@
     return false;
   }
 
-  function getContinentFillColor(continent) {
-    const colors = {
-      'Africa': '#c8a838',
-      'Antarctica': '#aaddff',
-      'Asia': '#e07840',
-      'Europe': '#6aaa6a',
-      'North America': '#7878d0',
-      'Oceania': '#d06868',
-      'Seven seas (open ocean)': '#4499bb',
-      'South America': '#44b8a0',
-    };
-    const hex = colors[continent] || '#a8d8f0';
-    return Cesium.Color.fromCssColorString(hex).withAlpha(0.62);
+  function getCountryFillColor(colorGroup) {
+    const normalized = Number.isFinite(colorGroup)
+      ? ((colorGroup % COUNTRY_FILL_PALETTE.length) + COUNTRY_FILL_PALETTE.length) % COUNTRY_FILL_PALETTE.length
+      : 0;
+    return Cesium.Color.fromCssColorString(COUNTRY_FILL_PALETTE[normalized]).withAlpha(0.7);
   }
 
-  function getContinentOutlineColor(continent) {
-    const colors = {
-      'Africa': '#e8c84a',
-      'Antarctica': '#cceeff',
-      'Asia': '#f09050',
-      'Europe': '#88cc88',
-      'North America': '#9898e8',
-      'Oceania': '#e88888',
-      'Seven seas (open ocean)': '#66bbdd',
-      'South America': '#55ccb8',
-    };
-    return Cesium.Color.fromCssColorString(colors[continent] || '#a8d8f0');
+  function getCountryOutlineColor(fillColor) {
+    return Cesium.Color.fromAlpha(fillColor.brighten(0.15, new Cesium.Color()), 0.95);
   }
 
   function configureViewer() {
@@ -307,6 +299,8 @@
         name,
         properties: feature.properties,
         bbox: geomBbox(feature.geometry),
+        focusLon: Number(feature.properties?.focus_lon),
+        focusLat: Number(feature.properties?.focus_lat),
       };
     }
   }
@@ -338,11 +332,12 @@
         continue;
       }
 
-      const continent = getPropertyValue(entity.properties, 'continent');
+      const colorGroup = Number(getPropertyValue(entity.properties, 'color_group'));
+      const fillColor = getCountryFillColor(colorGroup);
       entity.polygon.fill = true;
-      entity.polygon.material = new Cesium.ColorMaterialProperty(getContinentFillColor(continent));
+      entity.polygon.material = new Cesium.ColorMaterialProperty(fillColor);
       entity.polygon.outline = true;
-      entity.polygon.outlineColor = getContinentOutlineColor(continent);
+      entity.polygon.outlineColor = getCountryOutlineColor(fillColor);
       entity.polygon.outlineWidth = 1;
       entity.polygon.height = 0;
       entity.polygon.perPositionHeight = false;
@@ -420,8 +415,8 @@
     if (!entry) return;
 
     const { minLon, minLat, maxLon, maxLat } = entry.bbox;
-    const centerLon = (minLon + maxLon) / 2;
-    const centerLat = (minLat + maxLat) / 2;
+    const centerLon = Number.isFinite(entry.focusLon) ? entry.focusLon : (minLon + maxLon) / 2;
+    const centerLat = Number.isFinite(entry.focusLat) ? entry.focusLat : (minLat + maxLat) / 2;
     const spanDeg = Math.max(maxLon - minLon, maxLat - minLat);
     const heightM = Math.min(Math.max(spanDeg * 120000, 400000), 12000000);
 
