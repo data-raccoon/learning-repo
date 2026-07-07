@@ -15,6 +15,7 @@ GET /layers/{layer_name}
 
 from fastapi import APIRouter, HTTPException
 from shapely import wkb
+from shapely.geometry import MultiPolygon, Polygon
 from shapely.geometry import mapping
 from shapely.validation import make_valid
 
@@ -23,6 +24,8 @@ from backend.database import Country, LayerMetadata, get_session
 # Simplification tolerance in degrees (~1 km at equator).
 # Removes near-duplicate vertices that cause Cesium's tessellator to overflow.
 _SIMPLIFY_TOLERANCE = 0.01
+_MAX_SIMPLIFY_TOLERANCE = 0.2
+_MAX_COORDINATES = 6000
 
 router = APIRouter(prefix="/layers", tags=["layers"])
 
@@ -30,6 +33,67 @@ router = APIRouter(prefix="/layers", tags=["layers"])
 _LAYER_MODELS = {
     "countries": Country,
 }
+
+
+def _polygonal_only(geom):
+    """Return only polygonal components from possibly mixed geometry output."""
+    if geom.is_empty:
+        return None
+    if isinstance(geom, (Polygon, MultiPolygon)):
+        return geom
+
+    geoms = getattr(geom, "geoms", None)
+    if not geoms:
+        return None
+
+    polygons = []
+    for part in geoms:
+        if isinstance(part, Polygon):
+            polygons.append(part)
+        elif isinstance(part, MultiPolygon):
+            polygons.extend(list(part.geoms))
+
+    if not polygons:
+        return None
+    if len(polygons) == 1:
+        return polygons[0]
+    return MultiPolygon(polygons)
+
+
+def _coordinate_count(geom) -> int:
+    """Count vertices across polygon exteriors and holes."""
+    if geom.is_empty:
+        return 0
+
+    polygons = geom.geoms if isinstance(geom, MultiPolygon) else [geom]
+    total = 0
+    for poly in polygons:
+        total += len(poly.exterior.coords)
+        total += sum(len(ring.coords) for ring in poly.interiors)
+    return total
+
+
+def _simplify_for_cesium(geom):
+    """Progressively simplify geometry until it is lightweight enough for Cesium."""
+    geom = _polygonal_only(geom)
+    if geom is None or geom.is_empty:
+        return None
+
+    tolerance = _SIMPLIFY_TOLERANCE
+    simplified = geom.simplify(tolerance, preserve_topology=True)
+    simplified = _polygonal_only(simplified)
+
+    while (
+        simplified is not None
+        and not simplified.is_empty
+        and _coordinate_count(simplified) > _MAX_COORDINATES
+        and tolerance < _MAX_SIMPLIFY_TOLERANCE
+    ):
+        tolerance = min(tolerance * 2, _MAX_SIMPLIFY_TOLERANCE)
+        simplified = geom.simplify(tolerance, preserve_topology=True)
+        simplified = _polygonal_only(simplified)
+
+    return simplified
 
 
 # ---------------------------------------------------------------------------
@@ -73,10 +137,12 @@ def get_layer(layer_name: str) -> dict:
         if not row.geometry:
             continue
         geom = wkb.loads(bytes.fromhex(row.geometry))
-        # Fix invalid rings (self-intersections, etc.) then simplify to remove
-        # the excessive vertex density that crashes Cesium's geometry pipeline.
+        # Fix invalid rings, keep only polygonal output, and simplify until the
+        # geometry is small enough for Cesium's worker pipeline to handle.
         geom = make_valid(geom)
-        geom = geom.simplify(_SIMPLIFY_TOLERANCE, preserve_topology=True)
+        geom = _simplify_for_cesium(geom)
+        if geom is None or geom.is_empty:
+            continue
         # Collect all non-geometry columns as feature properties
         props = {
             col: getattr(row, col)
