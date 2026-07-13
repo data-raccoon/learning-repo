@@ -236,3 +236,68 @@ Ein PowerShell-Validator ohne zusätzliche Laufzeitabhängigkeiten prüft JSON-S
 - Menschenlesbare Berichte bleiben frei von YAML, internen IDs und Maschinenstatus; maschinenlesbare Zustände bleiben in Prüfakte und JSON-Manifest.
 - Die bestehende 25-Punkte-Checkliste bleibt gesetzliches Mindest-Gate; die Dokumentenmatrix ergänzt nur die zur Erfüllung dieser Pflichten erforderlichen Unterlagen.
 
+
+-----
+
+
+# Skill-Chain bereinigen und lokales Assessment-Dashboard erstellen
+
+## Zusammenfassung
+
+- Die vier Skills bleiben bestehen: `assess` für Einstufung, `prepare` für Dokumente und Evidenz, `audit` als alleinige Abschlussinstanz und `complete` als Orchestrator. Ihre fachlich unterschiedlichen Aufgaben rechtfertigen die Trennung.
+- Kein zusätzlicher Dashboard-Skill wird angelegt. Die Anzeige ist eine deterministische, schreibgeschützte HTML-Anwendung.
+- Die Chain wird auf einen eindeutigen Zustands- und Datenvertrag gebracht. Assessment- und Beispielinhalte werden nicht fachlich bewertet oder verändert.
+- Das Dashboard wird als einzelne `dashboard.html` mit eingebettetem CSS und JavaScript umgesetzt, über einen lokalen Python-Webserver geöffnet und per Ordnerauswahl mit Daten versorgt.
+
+## Skill- und Chain-Korrekturen
+
+- `complete-eu-ai-act-conformity` wird der einzige automatische Einstieg für vollständige oder fortzusetzende Verfahren. Die drei Fachmodule bleiben explizit einzeln nutzbar, geben im orchestrierten Betrieb aber immer an den Orchestrator zurück.
+- Der Einstufungs-Skill startet die Dossiererstellung nur im orchestrierten Modus. Eine allein angeforderte Ersteinstufung endet mit Einstufungsbericht und klarer Übergabeempfehlung.
+- Pro Use Case gilt genau ein Dossierordner mit genau einer `dossier-state.json`. Das bestehende `useCases`-Array bleibt kompatibel, muss in diesem Modell aber genau einen Eintrag enthalten. Mehrere Use Cases werden über `applicationId` gruppiert.
+- `dossier-state.json` wird zur maschinellen Quelle der Wahrheit. `pruefakte.md`, `dokumentenplan.md` und `evidenzregister.md` sind menschenlesbare Projektionen und dürfen keinen abweichenden Status führen.
+- Der Ablauf wird entkoppelt: Nach abgeschlossener Einstufung dürfen Dokumente entworfen werden; fehlende Belege führen zu `evidence_pending`. Sobald Dokumente und Evidenz prüfbereit sind, folgt `audit_pending`. Auditbefunde führen über `validation_failed` zurück zur passenden Arbeitsphase.
+- Nur der Audit-Skill darf `dossier_freigabereit` oder `nicht_freigabefaehig` setzen. Eine menschliche Freigabe bleibt davon getrennt und `release.status` bleibt bis dahin `pending`.
+- Die generischen Skill-Trigger werden mit der aktuell krankenhausspezifischen Stammcheckliste harmonisiert: Der 25-Punkte-Kern wird organisationsneutral formuliert; Gesundheitswesen/MDR bleibt ein optionaler Sektorpfad mit externen Nachweisen, keine eigene Rechtsprüfung.
+- Doppelte oder konkurrierende Anweisungen werden entfernt. Matrix, Zustandsmodell, zulässige Werte und Übergaberegeln erhalten jeweils genau eine maßgebliche Quelle.
+
+## Datenvertrag und Kompatibilität
+
+- `schemaVersion` wird auf `1.1.0` angehoben; vorhandene `1.0.0`-Assessments bleiben lesbar und werden nicht automatisch umgeschrieben.
+- Neu aufgenommen werden:
+  - `checklistItems`: die 25 Stamm-IDs mit `answer`, `status`, `rationale`, `evidenceLinks`, `owner`, `dueAt`, `legalReferences` und zugeordneten granularen `requirementIds`.
+  - `audit_pending` als kontrollierter Gesamtzustand.
+  - Eine Regel, dass IDs innerhalb eines Dossiers eindeutig und alle Dokument-/Evidenzreferenzen relativ zum Dossierordner sein müssen.
+- Granulare Anforderungen der Dossiermatrix bleiben unter `requirements`; über `checklistItems[].requirementIds` wird die bisher fehlende nachvollziehbare Verbindung zur Stammcheckliste hergestellt.
+- Ein JSON-Schema und ein read-only Validierungswerkzeug prüfen Enumwerte, Pflichtfelder, eindeutige IDs, Referenzen und Abschlussinvarianten. Der Audit-Skill muss diese Prüfung vor einem Endzustand ausführen.
+- Das Dashboard unterstützt beide Schemaversionen. Fehlende 1.1-Felder werden als „im Altschema nicht vorhanden“ dargestellt und nicht erfunden.
+
+## `dashboard.html`
+
+- Startansicht mit „Assessment-Ordner auswählen“. Primär wird `showDirectoryPicker()` verwendet; als Fallback dient ein Datei-Input mit Verzeichnisauswahl.
+- Die HTML sucht rekursiv nach `dossier-state.json`. Der jeweilige Elternordner bildet die Dossiergrenze; Anwendungen werden über `applicationId`, Dossiers über `assessmentId` plus Pfad identifiziert.
+- Dashboard-Funktionen:
+  - Kennzahlen für Assessments, Zustände, Risikopfade, offene/angeforderte/verifizierte Anforderungen, Evidenz- und Reviewstatus.
+  - Suche und Filter nach Anwendung, Zustand, Risikopfad, Aktualisierungsdatum und offenen Nachweisen.
+  - Gruppierung Anwendung → Use Case → Dossier.
+  - Detailansicht mit Übersicht, 25-Punkte-Checkliste, granularen Anforderungen, Dokumenten, Evidenzmetadaten und Review.
+  - Dokumentbaum für referenzierte und zusätzliche Markdown-Dateien in Dossier- und Reviewordnern.
+- Markdown wird durch eine kleine eigene, sichere Renderlogik dargestellt: Überschriften, Absätze, Listen, Tabellen, Blockquotes, Hervorhebungen, Links sowie Inline- und Block-Code. Rohes HTML wird immer escaped; Links erlauben nur sichere Protokolle und normalisierte dossierinterne Pfade.
+- Evidenzdateien werden aus Datenschutzgründen nicht automatisch geöffnet oder in den Speicher geladen. Angezeigt werden zunächst nur die Metadaten aus dem Zustandsmodell; eine Datei wird erst nach bewusstem Nutzerklick gelesen.
+- Ungültiges JSON, doppelte IDs, unbekannte Enumwerte, fehlende Dateien und nicht unterstützte Schemaversionen erscheinen als verständliche Warnungen, ohne die übrigen Assessments zu blockieren.
+- Die Oberfläche ist responsive, tastaturbedienbar, kontrastreich, druckbar und enthält keine Netzwerkaufrufe, Telemetrie oder CDN-Abhängigkeiten.
+- Betrieb: Repository-Verzeichnis mit `python -m http.server 8000` bereitstellen, `http://localhost:8000/dashboard.html` in Edge oder Chrome öffnen und dort den `assessments`-Ordner auswählen.
+
+## Test- und Abnahmekriterien
+
+- Skill-Szenarien: neue Einstufung, standalone Einstufung, vollständige Chain, Fortsetzung bei Evidenzlücke, mehrere Use Cases einer Anwendung, Versionsänderung, Auditfehler und beide kontrollierten Endzustände.
+- Vertragsprüfung: alle vier Skills bestehen die Skill-Validierung; Zustandsdateien bestehen das JSON-Schema; jede granulare Anforderung ist mindestens einer Stamm-ID zugeordnet.
+- Dashboard-Tests: leerer Ordner, vorhandene 1.0- und neue 1.1-Dossiers, gemischte Zustände, fehlerhaftes JSON, doppelte IDs, fehlende Markdown-Datei, unbekannter Status, große Dokumentmenge und Sonderzeichen/Umlaute.
+- Sicherheitstests: Markdown mit HTML/Script-Inhalten, unsicheren Links und `../`-Pfaden wird neutralisiert; ohne Nutzeraktion werden keine Evidenzinhalte gelesen.
+- Abnahme: Alle gültigen Dossiers erscheinen ohne manuelle Indexdatei, Filter und Kennzahlen stimmen mit den Zustandsdateien überein, sämtliche Markdown-Dokumente sind navigierbar und ein fehlerhaftes Dossier beeinträchtigt keine anderen.
+
+## Annahmen
+
+- Assessment- und Beispielinhalte dienen nur als strukturelle Testdaten und werden weder juristisch bewertet noch geändert.
+- Das Dashboard ist ausschließlich lesend; Bearbeitung, Freigaben und Statusänderungen bleiben Aufgabe der Skill-Chain.
+- Zielbrowser sind aktuelle Edge- oder Chrome-Versionen auf `localhost`.
+- Der lokale Python-Server stellt nur die HTML bereit; der Assessment-Zugriff erfolgt bewusst über die Browser-Ordnerfreigabe.

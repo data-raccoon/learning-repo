@@ -1,6 +1,6 @@
 ---
 name: prepare-eu-ai-act-dossier
-description: Erstellt und vervollständigt aus einer abgeschlossenen EU-AI-Act-Einstufung den risikobasierten Dokumentenplan, die erforderlichen Compliance-Dokumente und das Evidenzregister. Verwenden zum Unterlagen erstellen, Nachweise anfordern oder prüfen, Dossier fortsetzen und offene AI-Act-Pflichten schließen. Entwürfe werden nie als Evidenz behandelt; externe Zertifikate oder Produktentscheidungen werden nicht erfunden.
+description: Erstellt oder vervollständigt aus einer abgeschlossenen EU-AI-Act-Einstufung den risikobasierten Dokumentenplan, Compliance-Dokumente und das Evidenzregister eines vorhandenen Dossiers. Explizit für phasenbezogene Dokument- oder Evidenzarbeit verwenden; vollständige oder fortzusetzende Konformitätsvorgänge über complete-eu-ai-act-conformity steuern. Entwürfe werden nie als Evidenz behandelt; externe Entscheidungen werden nicht erfunden.
 ---
 
 # Anwendbares EU-AI-Act-Dossier erstellen
@@ -10,10 +10,11 @@ Erzeuge nur anwendbare Dokumente, aber schließe jedes geöffnete Pflichtenpaket
 ## Ressourcen laden
 
 1. Lies `references/dossier-matrix.md` vollständig.
-2. Lies `assets/document-templates.md` vor dem Erzeugen von Dokumenten.
-3. Lies `../complete-eu-ai-act-conformity/references/state-model.md` und den aktuellen `dossier-state.json`.
-4. Lies Prüfakte, Bewertung und alle eingereichten Evidenzdateien, auf die du dich stützt.
-5. Leite die Anforderungsliste vollständig aus Risikopfad, Rollen, Transparenzmerkmalen und der Dokumentenmatrix ab. Dokumentiere für jedes geöffnete und nicht geöffnete Paket die Begründung.
+2. Lies `references/checklist-mapping.md` vollständig.
+3. Lies `assets/document-templates.md` vor dem Erzeugen von Dokumenten.
+4. Lies `../complete-eu-ai-act-conformity/references/state-model.md`, validiere den aktuellen `dossier-state.json` und bearbeite nur ein Dossier mit genau einem Use Case.
+5. Lies Prüfakte, Bewertung und alle eingereichten Evidenzdateien, auf die du dich stützt.
+6. Leite die Anforderungsliste vollständig aus Risikopfad, Rollen, Transparenzmerkmalen und der Dokumentenmatrix ab. Ordne jede Anforderung nach `checklist-mapping.md` mindestens einer Stamm-ID zu.
 
 ## Pflichten instanziieren
 
@@ -21,7 +22,7 @@ Erzeuge nur anwendbare Dokumente, aber schließe jedes geöffnete Pflichtenpaket
 2. Öffne Transparenz, Art. 6 Abs. 3, Hochrisiko-Anbieter, Betreiber, Konformität, Lebenszyklus und Wirtschaftsakteure nur nach den Bedingungen der Matrix.
 3. Öffne beim Produktpfad die externen Produkt-Gates. Ersetze MDR- oder sonstige sektorale Entscheidungen nicht durch eigene Behauptungen.
 4. Markiere nicht geöffnete Anforderungen nur dann `not_applicable`, wenn die Begründung Tatsachen und Rechtsgrund nennt.
-5. Gleiche die erzeugte Liste ein zweites Mal gegen jede Routingregel der Matrix ab und erzeuge anschließend `dokumentenplan.md` und `evidenzregister.md` mit stabilen IDs.
+5. Gleiche die erzeugte Liste ein zweites Mal gegen jede Routingregel der Matrix ab. Aktualisiere zuerst `dossier-state.json` und leite anschließend `dokumentenplan.md` und `evidenzregister.md` mit stabilen IDs daraus ab.
 
 ## Dokumente entwerfen
 
@@ -34,7 +35,7 @@ Erzeuge nur anwendbare Dokumente, aber schließe jedes geöffnete Pflichtenpaket
 ## Evidenz anfordern und prüfen
 
 1. Formuliere für jede Lücke genaues Dokument, Aussteller, Systemversion, Mindestinhalt und akzeptierte Form.
-2. Setze die Anforderung auf `requested` und den Gesamtzustand auf `evidence_pending`.
+2. Setze die Anforderung auf `requested`. Setze den Gesamtzustand auf `evidence_pending`, sobald fehlende Evidenz die weitere Prüfung blockiert; Dokumententwürfe dürfen zuvor oder parallel entstehen.
 3. Prüfe eingereichte Evidenz auf Authentizitätsmerkmale, Geltungsbereich, Aktualität, Systemversionsbezug und Widersprüche.
 4. Setze Evidenz auf `accepted` oder `rejected`; begründe Ablehnungen.
 5. Setze eine Anforderung erst auf `evidenced`, wenn alle erforderlichen Belege akzeptiert wurden.
@@ -42,4 +43,4 @@ Erzeuge nur anwendbare Dokumente, aber schließe jedes geöffnete Pflichtenpaket
 
 ## Übergabe
 
-Wenn keine bekannte Lücke verbleibt, setze den Vorgang auf `drafting` und übergib an `$audit-eu-ai-act-dossier`. Setze niemals selbst `dossier_freigabereit`.
+Wenn Anforderungen belegt oder begründet nicht anwendbar und die zugehörigen Dokumente mindestens geprüft sind, setze `audit_pending`. Gib im orchestrierten Betrieb die Kontrolle an den Orchestrator zurück; nenne bei isolierter Nutzung `$audit-eu-ai-act-dossier` als nächsten Schritt. Setze niemals selbst einen Endzustand.

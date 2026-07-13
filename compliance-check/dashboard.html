@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>EU AI Act · Assessment Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f7f4; --surface: #ffffff; --surface-2: #edf3ee; --text: #15211a;
+      --muted: #607067; --line: #d7e1d9; --brand: #176b52; --brand-2: #0e4d3a;
+      --accent: #d9a441; --danger: #a63d40; --warn: #a36212; --ok: #19734b;
+      --shadow: 0 14px 36px rgba(25, 60, 44, .10); --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#101713; --surface:#18221c; --surface-2:#202d25; --text:#edf5ef; --muted:#a9b8ae; --line:#34453a; --brand:#61c49d; --brand-2:#8ddab9; --accent:#efc76f; --danger:#f08b8e; --warn:#efb15d; --ok:#77d4aa; --shadow:0 16px 42px rgba(0,0,0,.28); }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:15px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    button, input, select { font:inherit; }
+    button, .button { border:0; border-radius:12px; padding:.72rem 1rem; background:var(--brand); color:#fff; cursor:pointer; font-weight:700; }
+    button:hover { filter:brightness(.94); } button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline:3px solid color-mix(in srgb, var(--accent) 70%, transparent); outline-offset:2px; }
+    .secondary { background:var(--surface-2); color:var(--text); border:1px solid var(--line); }
+    .shell { width:min(1560px, 100%); margin:auto; padding:24px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:16px 0 24px; }
+    .eyebrow { color:var(--brand); font-weight:800; letter-spacing:.12em; text-transform:uppercase; font-size:.74rem; }
+    h1 { margin:.15rem 0; font-size:clamp(1.8rem,4vw,3.2rem); line-height:1.05; letter-spacing:-.04em; }
+    .subtitle { color:var(--muted); margin:0; max-width:720px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .notice { border:1px solid var(--line); background:var(--surface); border-radius:14px; padding:12px 16px; margin-bottom:16px; display:none; }
+    .notice.show { display:block; } .notice.error { border-color:var(--danger); color:var(--danger); }
+    .controls { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:grid; grid-template-columns:minmax(220px,2fr) repeat(3,minmax(150px,1fr)) auto; gap:12px; align-items:end; }
+    label { display:grid; gap:5px; color:var(--muted); font-size:.82rem; font-weight:700; }
+    input, select { min-width:0; border:1px solid var(--line); color:var(--text); background:var(--surface-2); border-radius:10px; padding:.68rem .78rem; }
+    .check { display:flex; align-items:center; gap:8px; min-height:43px; } .check input { min-width:auto; }
+    .stats { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin:16px 0; }
+    .stat { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px; }
+    .stat strong { display:block; font-size:1.7rem; line-height:1.1; } .stat span { color:var(--muted); font-size:.83rem; }
+    .workspace { display:grid; grid-template-columns:minmax(280px,360px) minmax(0,1fr); gap:16px; align-items:start; }
+    .panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+    .panel-head { padding:17px 18px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .panel-head h2, .panel-head h3 { margin:0; font-size:1rem; }
+    .assessment-list { max-height:calc(100vh - 330px); overflow:auto; padding:10px; }
+    .app-group { margin-bottom:12px; } .app-title { padding:8px; color:var(--muted); font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; }
+    .assessment { width:100%; text-align:left; padding:12px; margin:3px 0; border-radius:13px; background:transparent; color:var(--text); border:1px solid transparent; font-weight:400; }
+    .assessment:hover, .assessment.active { background:var(--surface-2); border-color:var(--line); filter:none; }
+    .assessment.active { border-left:4px solid var(--brand); }
+    .assessment strong { display:block; } .assessment small { color:var(--muted); display:block; margin-top:3px; }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .badge { display:inline-flex; align-items:center; max-width:100%; border-radius:999px; padding:.24rem .55rem; background:var(--surface-2); color:var(--muted); font-size:.74rem; font-weight:800; overflow-wrap:anywhere; }
+    .badge.ok { background:color-mix(in srgb,var(--ok) 16%,transparent); color:var(--ok); }
+    .badge.warn { background:color-mix(in srgb,var(--warn) 16%,transparent); color:var(--warn); }
+    .badge.danger { background:color-mix(in srgb,var(--danger) 14%,transparent); color:var(--danger); }
+    .empty { padding:50px 24px; text-align:center; color:var(--muted); }
+    .detail-head { padding:24px; border-bottom:1px solid var(--line); }
+    .detail-head h2 { margin:.25rem 0 .4rem; font-size:1.7rem; line-height:1.2; }
+    .detail-meta { color:var(--muted); }
+    .tabs { display:flex; gap:4px; overflow:auto; padding:10px 14px; border-bottom:1px solid var(--line); }
+    .tab { white-space:nowrap; background:transparent; color:var(--muted); padding:.55rem .8rem; }
+    .tab.active { background:var(--surface-2); color:var(--text); }
+    .tab-content { padding:22px; min-height:420px; }
+    .grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .card { border:1px solid var(--line); border-radius:15px; padding:16px; background:color-mix(in srgb,var(--surface-2) 45%,var(--surface)); min-width:0; }
+    .card h3 { margin:0 0 10px; font-size:1rem; } .card p { margin:.4rem 0; }
+    .metric { display:flex; align-items:end; justify-content:space-between; gap:12px; }
+    .metric strong { font-size:1.45rem; } .progress { height:8px; border-radius:99px; background:var(--line); overflow:hidden; margin-top:10px; }
+    .progress > span { display:block; height:100%; background:var(--brand); }
+    .warning-list { margin:0; padding-left:1.2rem; color:var(--warn); }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:14px; }
+    table { width:100%; border-collapse:collapse; min-width:720px; } th,td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; } th { color:var(--muted); font-size:.76rem; text-transform:uppercase; letter-spacing:.05em; background:var(--surface-2); } tr:last-child td { border-bottom:0; }
+    code, pre { font-family:var(--mono); } code { background:var(--surface-2); border-radius:5px; padding:.08rem .3rem; } pre { overflow:auto; padding:14px; border-radius:12px; background:#111a15; color:#e8f3eb; } pre code { background:transparent; padding:0; }
+    .documents { display:grid; grid-template-columns:minmax(210px,290px) minmax(0,1fr); gap:14px; }
+    .doc-list { border:1px solid var(--line); border-radius:14px; padding:8px; max-height:650px; overflow:auto; }
+    .doc-button { width:100%; text-align:left; background:transparent; color:var(--text); padding:9px; font-weight:600; overflow-wrap:anywhere; }
+    .doc-button:hover { background:var(--surface-2); filter:none; } .doc-button small { display:block; color:var(--muted); font-weight:400; }
+    .markdown { max-width:920px; overflow-wrap:anywhere; } .markdown h1,.markdown h2,.markdown h3 { line-height:1.25; margin-top:1.5em; } .markdown h1:first-child,.markdown h2:first-child { margin-top:0; } .markdown a { color:var(--brand); } .markdown blockquote { margin:1rem 0; padding:.2rem 1rem; border-left:4px solid var(--accent); color:var(--muted); }
+    .markdown table { min-width:540px; } .markdown img { max-width:100%; }
+    .file-action { padding:.42rem .65rem; font-size:.78rem; }
+    .sr-only { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
+    @media (max-width:1050px) { .controls { grid-template-columns:repeat(2,1fr); } .stats { grid-template-columns:repeat(3,1fr); } .workspace { grid-template-columns:1fr; } .assessment-list { max-height:420px; } }
+    @media (max-width:680px) { .shell { padding:14px; } header { align-items:flex-start; flex-direction:column; } .actions { justify-content:flex-start; } .controls,.grid-2,.documents { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } .tab-content { padding:14px; } }
+    @media print { .actions,.controls,.stats,.sidebar,.tabs { display:none!important; } .shell { width:100%; padding:0; } .workspace { display:block; } .panel { border:0; box-shadow:none; } .tab-content { padding:0; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">EU AI Act · lokal &amp; schreibgeschützt</div>
+        <h1>Assessment Dashboard</h1>
+        <p class="subtitle">Dossierstatus, Nachweislücken und Dokumente – vollständig im Browser, ohne Upload oder externe Dienste.</p>
+      </div>
+      <div class="actions">
+        <button id="pickFolder">Assessment-Ordner auswählen</button>
+        <button id="fallbackButton" class="secondary">Kompatibler Import</button>
+        <input id="folderInput" class="sr-only" type="file" webkitdirectory multiple>
+      </div>
+    </header>
+
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+    <section class="controls" aria-label="Assessment-Filter">
+      <label>Suche<input id="search" type="search" placeholder="Anwendung, ID, Zweck …"></label>
+      <label>Zustand<select id="stateFilter"><option value="">Alle Zustände</option></select></label>
+      <label>Risikopfad<select id="riskFilter"><option value="">Alle Risikopfade</option></select></label>
+      <label>Aktualisiert ab<input id="dateFilter" type="date"></label>
+      <label class="check"><input id="gapsFilter" type="checkbox"> Nur mit offenen Punkten</label>
+    </section>
+
+    <section id="stats" class="stats" aria-label="Kennzahlen"></section>
+
+    <section class="workspace">
+      <aside class="panel sidebar">
+        <div class="panel-head"><h2>Anwendungen &amp; Use Cases</h2><span id="resultCount" class="badge">0</span></div>
+        <nav id="assessmentList" class="assessment-list" aria-label="Assessments"><div class="empty">Noch kein Ordner geladen.</div></nav>
+      </aside>
+      <article id="detail" class="panel"><div class="empty"><h2>Assessment-Ordner auswählen</h2><p>Wähle den Ordner <code>assessments</code>. Die Dateien verlassen deinen Browser nicht.</p></div></article>
+    </section>
+  </main>
+
+  <script>
+  'use strict';
+  const store = { dossiers: [], selectedKey: '', activeTab: 'overview', currentDocumentPath: '', loadIssues: [] };
+  const states = ['intake','classification_pending','drafting','evidence_pending','audit_pending','validation_failed','dossier_freigabereit','nicht_freigabefaehig'];
+  const risks = ['open','no_ai_system','prohibited','not_high_risk','annex_iii_exception','annex_iii_high_risk','annex_i_high_risk'];
+  const requirementStates = ['open','requested','drafted','evidenced','verified','not_applicable'];
+  const documentStates = ['draft','reviewed','approved','external'];
+  const evidenceStates = ['submitted','accepted','rejected'];
+  const labels = {
+    intake:'Aufnahme', classification_pending:'Einstufung offen', drafting:'Dokumentation', evidence_pending:'Evidenz offen', audit_pending:'Audit bereit', validation_failed:'Audit fehlgeschlagen', dossier_freigabereit:'Dossier freigabereit', nicht_freigabefaehig:'Nicht freigabefähig',
+    open:'Offen', no_ai_system:'Kein KI-System', prohibited:'Verboten', not_high_risk:'Nicht hochriskant', annex_iii_exception:'Anhang-III-Ausnahme', annex_iii_high_risk:'Hochrisiko · Anhang III', annex_i_high_risk:'Hochrisiko · Anhang I',
+    requested:'Angefordert', drafted:'Entworfen', evidenced:'Belegt', verified:'Verifiziert', not_applicable:'Nicht anwendbar', draft:'Entwurf', reviewed:'Geprüft', approved:'Freigegeben', external:'Extern', submitted:'Eingereicht', accepted:'Akzeptiert', rejected:'Abgelehnt', pending:'Ausstehend', passed:'Bestanden', failed:'Fehlgeschlagen'
+  };
+
+  const $ = selector => document.querySelector(selector);
+  const arr = value => Array.isArray(value) ? value : [];
+  const text = value => value === null || value === undefined || value === '' ? '—' : String(value);
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const normalizePath = value => String(value || '').replaceAll('\\','/').replace(/^\.\//,'').replace(/\/{2,}/g,'/');
+  const dirname = value => { const parts=normalizePath(value).split('/'); parts.pop(); return parts.join('/'); };
+  const basename = value => normalizePath(value).split('/').pop() || '';
+  const joinPath = (...parts) => normalizePath(parts.filter(Boolean).join('/'));
+  const isSafeRelative = value => { const path=normalizePath(value); return !!path && !path.startsWith('/') && !path.split('/').includes('..') && !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(path); };
+  const display = value => labels[value] || text(value).replaceAll('_',' ');
+  const tone = value => ['dossier_freigabereit','verified','reviewed','approved','accepted','passed','erledigt'].includes(value) ? 'ok' : ['prohibited','nicht_freigabefaehig','validation_failed','rejected','failed','eskaliert'].includes(value) ? 'danger' : ['open','requested','evidence_pending','classification_pending','draft','drafted','submitted','pending','nachweis_fehlt'].includes(value) ? 'warn' : '';
+  const badge = value => `<span class="badge ${tone(value)}">${escapeHtml(display(value))}</span>`;
+  const uniqueIds = items => { const ids=arr(items).map(item=>item?.id).filter(Boolean); return ids.filter((id,index)=>ids.indexOf(id)!==index); };
+  const openGaps = dossier => arr(dossier.data.requirements).filter(item=>!['verified','not_applicable'].includes(item.status)).length;
+
+  function setNotice(message='', error=false) {
+    const node=$('#notice'); node.textContent=message; node.className='notice'+(message?' show':'')+(error?' error':'');
+  }
+
+  function validateDossier(data, dossierPath, fileMap) {
+    const warnings=[];
+    if (!['1.0.0','1.1.0'].includes(data.schemaVersion)) warnings.push(`Nicht unterstützte Schemaversion: ${text(data.schemaVersion)}`);
+    if (!states.includes(data.state)) warnings.push(`Unbekannter Gesamtzustand: ${text(data.state)}`);
+    if (arr(data.useCases).length!==1) warnings.push(`Erwartet wird genau ein Use Case, gefunden: ${arr(data.useCases).length}.`);
+    for (const uc of arr(data.useCases)) if (!risks.includes(uc.riskRoute)) warnings.push(`Unbekannter Risikopfad: ${text(uc.riskRoute)}`);
+    for (const [name,items,allowed] of [['requirements',data.requirements,requirementStates],['documents',data.documents,documentStates],['evidence',data.evidence,evidenceStates]]) {
+      for (const id of uniqueIds(items)) warnings.push(`Doppelte ID in ${name}: ${id}`);
+      for (const item of arr(items)) if (!allowed.includes(item.status)) warnings.push(`Unbekannter Status in ${name}[${text(item.id)}]: ${text(item.status)}`);
+    }
+    if (data.schemaVersion==='1.1.0') {
+      if (arr(data.checklistItems).length!==25) warnings.push(`Schema 1.1 erwartet 25 Stamm-IDs, gefunden: ${arr(data.checklistItems).length}.`);
+      for (const id of uniqueIds(data.checklistItems)) warnings.push(`Doppelte Stamm-ID: ${id}`);
+      for (const item of arr(data.checklistItems)) {
+        if (!['offen','ja','nein','nicht_anwendbar','eskalieren'].includes(item.answer)) warnings.push(`Unbekannte Antwort bei ${text(item.id)}: ${text(item.answer)}`);
+        if (!['nicht_begonnen','in_pruefung','nachweis_fehlt','erledigt','eskaliert'].includes(item.status)) warnings.push(`Unbekannter Stammstatus bei ${text(item.id)}: ${text(item.status)}`);
+      }
+      const mapped=new Set(arr(data.checklistItems).flatMap(item=>arr(item.requirementIds)));
+      for (const req of arr(data.requirements)) if (!mapped.has(req.id)) warnings.push(`Anforderung ${text(req.id)} ist keiner Stamm-ID zugeordnet.`);
+    } else if (data.schemaVersion==='1.0.0') warnings.push('Altschema 1.0: Die 25-Punkte-Ansicht ist nicht im JSON verfügbar.');
+    const documentIds=new Set(arr(data.documents).map(item=>item.id));
+    const evidenceIds=new Set(arr(data.evidence).map(item=>item.id));
+    for (const req of arr(data.requirements)) {
+      for (const id of arr(req.documentIds)) if (!documentIds.has(id)) warnings.push(`${text(req.id)} verweist auf unbekanntes Dokument ${id}.`);
+      for (const id of arr(req.evidenceIds)) if (!evidenceIds.has(id)) warnings.push(`${text(req.id)} verweist auf unbekannte Evidenz ${id}.`);
+    }
+    for (const item of [...arr(data.documents),...arr(data.evidence)]) {
+      if (!item.path) continue;
+      if (!isSafeRelative(item.path)) warnings.push(`Unsicherer relativer Pfad: ${item.path}`);
+      else if (!fileMap.has(joinPath(dossierPath,item.path))) warnings.push(`Datei fehlt: ${item.path}`);
+    }
+    return warnings;
+  }
+
+  async function walkDirectory(handle, prefix='', output=new Map()) {
+    for await (const [name,entry] of handle.entries()) {
+      const path=joinPath(prefix,name);
+      if (entry.kind==='directory') await walkDirectory(entry,path,output);
+      else output.set(path,{ name, path, getFile:()=>entry.getFile() });
+    }
+    return output;
+  }
+
+  function filesFromInput(fileList) {
+    const output=new Map();
+    for (const file of fileList) {
+      let path=normalizePath(file.webkitRelativePath || file.name);
+      const parts=path.split('/'); if (parts.length>1) path=parts.slice(1).join('/');
+      output.set(path,{ name:file.name, path, getFile:async()=>file });
+    }
+    return output;
+  }
+
+  async function importFiles(fileMap) {
+    store.dossiers=[]; store.loadIssues=[]; store.selectedKey=''; store.currentDocumentPath='';
+    const stateEntries=[...fileMap.entries()].filter(([path])=>basename(path)==='dossier-state.json');
+    for (const [statePath,entry] of stateEntries) {
+      try {
+        const file=await entry.getFile(); const data=JSON.parse(await file.text()); const dossierPath=dirname(statePath);
+        if (!data || typeof data!=='object' || Array.isArray(data)) throw new Error('JSON-Wurzel ist kein Objekt.');
+        const markdown=[...fileMap.keys()].filter(path=>{const relative=dossierPath?path.slice(dossierPath.length+1):path;return path.startsWith(dossierPath ? dossierPath+'/' : '') && path.toLowerCase().endsWith('.md') && !relative.startsWith('evidence/');}).map(path=>({path,relative:dossierPath?path.slice(dossierPath.length+1):path,title:basename(path).replace(/\.md$/i,'').replaceAll('-',' ')})).sort((a,b)=>a.relative.localeCompare(b.relative,'de'));
+        const warnings=validateDossier(data,dossierPath,fileMap);
+        const key=`${data.assessmentId || 'ohne-id'}|${dossierPath}`;
+        store.dossiers.push({key,path:dossierPath,statePath,data,fileMap,markdown,warnings});
+      } catch (error) { store.loadIssues.push(`${statePath}: ${error.message}`); }
+    }
+    const duplicateAssessmentIds=store.dossiers.map(d=>d.data.assessmentId).filter(Boolean).filter((id,index,all)=>all.indexOf(id)!==index);
+    for (const dossier of store.dossiers) if (duplicateAssessmentIds.includes(dossier.data.assessmentId)) dossier.warnings.push(`Assessment-ID mehrfach vorhanden: ${dossier.data.assessmentId}`);
+    store.dossiers.sort((a,b)=>String(b.data.updatedAt||'').localeCompare(String(a.data.updatedAt||'')) || String(a.data.systemName||'').localeCompare(String(b.data.systemName||''),'de'));
+    if (store.dossiers.length) store.selectedKey=store.dossiers[0].key;
+    updateFilterOptions(); render();
+    const message=`${store.dossiers.length} Dossier${store.dossiers.length===1?'':'s'} geladen${store.loadIssues.length?`, ${store.loadIssues.length} Datei(en) fehlerhaft`:''}.`;
+    setNotice(message, store.dossiers.length===0 && store.loadIssues.length>0);
+  }
+
+  function updateFilterOptions() {
+    const stateSelect=$('#stateFilter'), riskSelect=$('#riskFilter');
+    const selectedState=stateSelect.value, selectedRisk=riskSelect.value;
+    stateSelect.innerHTML='<option value="">Alle Zustände</option>'+[...new Set(store.dossiers.map(d=>d.data.state).filter(Boolean))].sort().map(value=>`<option value="${escapeHtml(value)}">${escapeHtml(display(value))}</option>`).join('');
+    riskSelect.innerHTML='<option value="">Alle Risikopfade</option>'+[...new Set(store.dossiers.flatMap(d=>arr(d.data.useCases).map(uc=>uc.riskRoute)).filter(Boolean))].sort().map(value=>`<option value="${escapeHtml(value)}">${escapeHtml(display(value))}</option>`).join('');
+    stateSelect.value=selectedState; riskSelect.value=selectedRisk;
+  }
+
+  function filteredDossiers() {
+    const query=$('#search').value.trim().toLocaleLowerCase('de'); const state=$('#stateFilter').value; const risk=$('#riskFilter').value; const date=$('#dateFilter').value; const gaps=$('#gapsFilter').checked;
+    return store.dossiers.filter(d=>{
+      const uc=arr(d.data.useCases)[0]||{}; const hay=[d.data.assessmentId,d.data.applicationId,d.data.systemName,d.data.systemVersion,uc.id,uc.name,uc.intendedPurpose,d.path].join(' ').toLocaleLowerCase('de');
+      return (!query||hay.includes(query)) && (!state||d.data.state===state) && (!risk||uc.riskRoute===risk) && (!date||String(d.data.updatedAt||'')>=date) && (!gaps||openGaps(d)>0||d.warnings.length>0);
+    });
+  }
+
+  function renderStats(items) {
+    const requirements=items.flatMap(d=>arr(d.data.requirements)); const evidence=items.flatMap(d=>arr(d.data.evidence));
+    const verified=requirements.filter(item=>item.status==='verified').length; const gaps=requirements.filter(item=>!['verified','not_applicable'].includes(item.status)).length; const reviews=items.filter(d=>d.data.review?.result==='passed').length;
+    $('#stats').innerHTML=[['Dossiers',items.length],['Offene Punkte',gaps],['Verifiziert',verified],['Evidenzen',evidence.length],['Audit bestanden',reviews]].map(([label,value])=>`<div class="stat"><strong>${value}</strong><span>${label}</span></div>`).join('');
+  }
+
+  function renderList(items) {
+    $('#resultCount').textContent=items.length;
+    if (!items.length) { $('#assessmentList').innerHTML=`<div class="empty">${store.dossiers.length?'Keine Treffer für diese Filter.':'Noch kein Ordner geladen.'}</div>`; return; }
+    const groups=new Map(); for (const d of items) { const key=d.data.applicationId||'Ohne Anwendungs-ID'; if(!groups.has(key)) groups.set(key,[]); groups.get(key).push(d); }
+    $('#assessmentList').innerHTML=[...groups.entries()].map(([app,dossiers])=>`<section class="app-group"><div class="app-title">${escapeHtml(app)}</div>${dossiers.map(d=>{const uc=arr(d.data.useCases)[0]||{};return `<button class="assessment ${d.key===store.selectedKey?'active':''}" data-select="${escapeHtml(d.key)}"><strong>${escapeHtml(uc.name||d.data.systemName||d.data.assessmentId)}</strong><small>${escapeHtml(d.data.systemName||'Ohne Systemname')} · ${escapeHtml(d.data.assessmentId||'Ohne ID')}</small><div class="row" style="margin-top:8px">${badge(d.data.state)}${badge(uc.riskRoute)}${d.warnings.length?`<span class="badge warn">${d.warnings.length} Hinweis(e)</span>`:''}</div></button>`}).join('')}</section>`).join('');
+  }
+
+  function selectedDossier() { return store.dossiers.find(d=>d.key===store.selectedKey); }
+  function renderDetail() {
+    const d=selectedDossier(); if(!d){$('#detail').innerHTML='<div class="empty"><h2>Kein Assessment ausgewählt</h2></div>';return;}
+    const uc=arr(d.data.useCases)[0]||{};
+    $('#detail').innerHTML=`<div class="detail-head"><div class="row">${badge(d.data.state)}${badge(uc.riskRoute)}<span class="badge">Schema ${escapeHtml(d.data.schemaVersion||'—')}</span></div><h2>${escapeHtml(uc.name||d.data.systemName||d.data.assessmentId)}</h2><div class="detail-meta">${escapeHtml(d.data.systemName||'Ohne Systemname')} · ${escapeHtml(d.data.assessmentId||'Ohne ID')} · Stand ${escapeHtml(d.data.updatedAt||'—')}</div></div><div class="tabs" role="tablist">${[['overview','Übersicht'],['checklist','25-Punkte-Checkliste'],['requirements','Anforderungen'],['documents','Dokumente'],['evidence','Evidenz'],['review','Review']].map(([id,label])=>`<button class="tab ${store.activeTab===id?'active':''}" role="tab" aria-selected="${store.activeTab===id}" data-tab="${id}">${label}</button>`).join('')}</div><div id="tabContent" class="tab-content"></div>`;
+    renderTab(d);
+  }
+
+  function renderTab(d) {
+    const target=$('#tabContent'); if(!target)return;
+    if(store.activeTab==='overview') target.innerHTML=overviewHtml(d);
+    if(store.activeTab==='checklist') target.innerHTML=checklistHtml(d);
+    if(store.activeTab==='requirements') target.innerHTML=requirementsHtml(d);
+    if(store.activeTab==='documents') target.innerHTML=documentsHtml(d);
+    if(store.activeTab==='evidence') target.innerHTML=evidenceHtml(d);
+    if(store.activeTab==='review') target.innerHTML=reviewHtml(d);
+  }
+
+  function overviewHtml(d) {
+    const uc=arr(d.data.useCases)[0]||{}, req=arr(d.data.requirements), docs=arr(d.data.documents), ev=arr(d.data.evidence); const closed=req.filter(i=>['verified','not_applicable'].includes(i.status)).length; const progress=req.length?Math.round(closed/req.length*100):0;
+    return `<div class="grid-2"><section class="card"><h3>Zweck und Einstufung</h3><p>${escapeHtml(uc.intendedPurpose||'Keine Zweckbestimmung hinterlegt.')}</p><div class="row">${badge(uc.riskRoute)}${arr(uc.roles).map(badge).join('')}<span class="badge ${uc.classificationFinal?'ok':'warn'}">${uc.classificationFinal?'Einstufung final':'Einstufung offen'}</span></div></section><section class="card"><h3>Fortschritt</h3><div class="metric"><span>Geschlossene Anforderungen</span><strong>${closed}/${req.length}</strong></div><div class="progress" aria-label="${progress} Prozent"><span style="width:${progress}%"></span></div><p class="detail-meta">${docs.length} Dokumente · ${ev.length} Evidenzen</p></section><section class="card"><h3>Rechtsstand</h3><p>Geprüft am: <strong>${escapeHtml(d.data.legalStatus?.checkedAt||'—')}</strong></p><p>${arr(d.data.legalStatus?.sources).length} amtliche Quelle(n)</p><p>${d.data.legalStatus?.consolidatedLawSeparatedFromProposals?'Konsolidiertes Recht und Vorschläge getrennt.':'Trennung noch nicht bestätigt.'}</p></section><section class="card"><h3>Datenqualität</h3>${d.warnings.length?`<ul class="warning-list">${d.warnings.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul>`:'<p class="badge ok">Keine strukturellen Hinweise</p>'}</section></div>`;
+  }
+
+  function checklistHtml(d) {
+    const items=arr(d.data.checklistItems); if(!items.length) return `<div class="empty"><h3>Im Altschema nicht vorhanden</h3><p>Dieses Dossier verwendet Schema ${escapeHtml(d.data.schemaVersion||'—')}. Stammwerte werden nicht aus Markdown geraten.</p></div>`;
+    return `<div class="table-wrap"><table><thead><tr><th>ID</th><th>Antwort</th><th>Status</th><th>Begründung</th><th>Owner / Fällig</th><th>Anforderungen</th></tr></thead><tbody>${items.map(item=>`<tr><td><code>${escapeHtml(item.id)}</code></td><td>${badge(item.answer)}</td><td>${badge(item.status)}</td><td>${escapeHtml(item.rationale||'—')}</td><td>${escapeHtml(item.owner||'—')}<br><small>${escapeHtml(item.dueAt||'—')}</small></td><td>${arr(item.requirementIds).map(id=>`<code>${escapeHtml(id)}</code>`).join(' ')||'—'}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+
+  function requirementsHtml(d) {
+    const items=arr(d.data.requirements); if(!items.length)return '<div class="empty">Keine Anforderungen vorhanden.</div>';
+    return `<div class="table-wrap"><table><thead><tr><th>ID / Paket</th><th>Status</th><th>Rechtsgrund</th><th>Begründung</th><th>Owner / Fällig</th><th>Dokumente · Evidenz</th></tr></thead><tbody>${items.map(item=>`<tr><td><code>${escapeHtml(item.id)}</code><br><small>${escapeHtml(item.package||'—')}</small></td><td>${badge(item.status)}</td><td>${arr(item.legalBasis).map(escapeHtml).join(', ')||'—'}</td><td>${escapeHtml(item.rationale||'—')}</td><td>${escapeHtml(item.owner||'—')}<br><small>${escapeHtml(item.dueAt||'—')}</small></td><td>${arr(item.documentIds).length} · ${arr(item.evidenceIds).length}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+
+  function documentsHtml(d) {
+    if(!d.markdown.length)return '<div class="empty">Keine Markdown-Dokumente gefunden.</div>';
+    return `<div class="documents"><nav class="doc-list" aria-label="Dossierdokumente">${d.markdown.map(doc=>`<button class="doc-button" data-document="${escapeHtml(doc.path)}">${escapeHtml(doc.title)}<small>${escapeHtml(doc.relative)}</small></button>`).join('')}</nav><section id="documentViewer" class="card markdown"><div class="empty">Dokument auswählen</div></section></div>`;
+  }
+
+  function evidenceHtml(d) {
+    const items=arr(d.data.evidence); if(!items.length)return '<div class="empty">Keine Evidenzmetadaten vorhanden.</div>';
+    return `<p class="detail-meta">Dateiinhalte werden erst nach bewusstem Klick gelesen.</p><div class="table-wrap"><table><thead><tr><th>ID / Titel</th><th>Status / Quelle</th><th>Aussteller / Version</th><th>Pfad</th><th>Aktion</th></tr></thead><tbody>${items.map(item=>{const full=joinPath(d.path,item.path);const available=isSafeRelative(item.path)&&d.fileMap.has(full);return `<tr><td><code>${escapeHtml(item.id)}</code><br>${escapeHtml(item.title||'—')}</td><td>${badge(item.status)} ${badge(item.sourceType)}</td><td>${escapeHtml(item.issuer||'—')}<br><small>${escapeHtml(item.appliesToSystemVersion||item.version||'—')}</small></td><td><code>${escapeHtml(item.path||'—')}</code></td><td>${available?`<button class="file-action" data-evidence="${escapeHtml(full)}">Datei bewusst öffnen</button>`:'<span class="badge warn">Nicht verfügbar</span>'}</td></tr>`}).join('')}</tbody></table></div><section id="evidenceViewer" class="card markdown" style="margin-top:14px;display:none"></section>`;
+  }
+
+  function reviewHtml(d) {
+    const review=d.data.review||{}, release=d.data.release||{}; const reportFull=isSafeRelative(review.reportPath)&&d.fileMap.has(joinPath(d.path,review.reportPath));
+    return `<div class="grid-2"><section class="card"><h3>Abschlussprüfung</h3><p>Ergebnis: ${badge(review.result)}</p><p>Konsistenz: ${badge(review.consistencyCheck)}</p><p>Prüfer: <strong>${escapeHtml(review.reviewer||'—')}</strong></p><p>Abgeschlossen: ${escapeHtml(review.completedAt||'—')}</p><p>Kritische Befunde: ${escapeHtml(review.criticalFindings??'—')}</p>${reportFull?`<button class="file-action" data-document="${escapeHtml(joinPath(d.path,review.reportPath))}">Auditbericht lesen</button>`:''}</section><section class="card"><h3>Menschliche Entscheidung</h3><p>Status: ${badge(release.status)}</p><p>Entscheider: <strong>${escapeHtml(release.decider||'—')}</strong></p><p>Datum: ${escapeHtml(release.date||'—')}</p><p><code>${escapeHtml(release.protocolPath||'—')}</code></p></section></div><section id="documentViewer" class="card markdown" style="margin-top:14px;display:none"></section>`;
+  }
+
+  function safeLink(url) {
+    const value=String(url||'').trim(); if (/^(https?:|mailto:)/i.test(value)) return {external:true,value}; if(isSafeRelative(value)) return {external:false,value}; return null;
+  }
+  function inlineMarkdown(raw) {
+    let escaped=escapeHtml(raw);
+    escaped=escaped.replace(/`([^`]+)`/g,'<code>$1</code>');
+    escaped=escaped.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+&quot;[^&]*&quot;)?\)/g,(all,label,url)=>{const safe=safeLink(url.replaceAll('&amp;','&'));if(!safe)return label;return safe.external?`<a href="${escapeHtml(safe.value)}" target="_blank" rel="noopener noreferrer">${label}</a>`:`<a href="#" data-relative-link="${escapeHtml(safe.value)}">${label}</a>`;});
+    escaped=escaped.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<strong>$1</strong>').replace(/(^|\s)\*([^*]+)\*/g,'$1<em>$2</em>').replace(/(^|\s)_([^_]+)_/g,'$1<em>$2</em>');
+    return escaped;
+  }
+  function markdownToHtml(markdown) {
+    const lines=String(markdown||'').replaceAll('\r','').split('\n'); let html='', paragraph=[], list='', code=false, codeLines=[];
+    const flushParagraph=()=>{if(paragraph.length){html+=`<p>${inlineMarkdown(paragraph.join(' '))}</p>`;paragraph=[];}};
+    const closeList=()=>{if(list){html+=`</${list}>`;list='';}};
+    for(let i=0;i<lines.length;i++){
+      const line=lines[i];
+      if(/^```/.test(line)){flushParagraph();closeList();if(code){html+=`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`;codeLines=[];code=false;}else code=true;continue;}
+      if(code){codeLines.push(line);continue;}
+      const heading=line.match(/^(#{1,6})\s+(.+)$/); if(heading){flushParagraph();closeList();const n=heading[1].length;html+=`<h${n}>${inlineMarkdown(heading[2])}</h${n}>`;continue;}
+      if(line.includes('|') && i+1<lines.length && /^\s*\|?\s*:?-+/.test(lines[i+1])){flushParagraph();closeList();const rows=[];const cells=value=>value.trim().replace(/^\||\|$/g,'').split('|').map(part=>part.trim());rows.push(cells(line));i+=2;while(i<lines.length&&lines[i].includes('|')&&lines[i].trim()){rows.push(cells(lines[i]));i++;}i--;html+='<div class="table-wrap"><table><thead><tr>'+rows[0].map(cell=>`<th>${inlineMarkdown(cell)}</th>`).join('')+'</tr></thead><tbody>'+rows.slice(1).map(row=>'<tr>'+row.map(cell=>`<td>${inlineMarkdown(cell)}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';continue;}
+      const unordered=line.match(/^\s*[-+*]\s+(.+)$/), ordered=line.match(/^\s*\d+[.)]\s+(.+)$/); if(unordered||ordered){flushParagraph();const wanted=unordered?'ul':'ol';if(list&&list!==wanted)closeList();if(!list){list=wanted;html+=`<${list}>`;}html+=`<li>${inlineMarkdown((unordered||ordered)[1])}</li>`;continue;}
+      const quote=line.match(/^>\s?(.*)$/); if(quote){flushParagraph();closeList();html+=`<blockquote>${inlineMarkdown(quote[1])}</blockquote>`;continue;}
+      if(/^\s*([-*_])(?:\s*\1){2,}\s*$/.test(line)){flushParagraph();closeList();html+='<hr>';continue;}
+      if(!line.trim()){flushParagraph();closeList();continue;} paragraph.push(line.trim());
+    }
+    if(code) html+=`<pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre>`; flushParagraph();closeList();return html;
+  }
+
+  async function showDocument(fullPath, viewerId='documentViewer') {
+    const d=selectedDossier(), viewer=document.getElementById(viewerId); if(!d||!viewer)return;
+    const entry=d.fileMap.get(normalizePath(fullPath)); if(!entry){viewer.style.display='block';viewer.innerHTML='<p class="badge warn">Datei nicht gefunden.</p>';return;}
+    try { const file=await entry.getFile(); const content=await file.text(); store.currentDocumentPath=normalizePath(fullPath); viewer.style.display='block'; viewer.innerHTML=markdownToHtml(content); }
+    catch(error){viewer.style.display='block';viewer.innerHTML=`<p class="badge danger">${escapeHtml(error.message)}</p>`;}
+  }
+  async function showEvidence(fullPath) {
+    const d=selectedDossier(), viewer=$('#evidenceViewer'); if(!d||!viewer)return; const entry=d.fileMap.get(normalizePath(fullPath)); if(!entry)return;
+    try { const file=await entry.getFile(); viewer.style.display='block'; if(file.type.startsWith('text/')||/\.(md|txt|json|csv)$/i.test(file.name)){const content=await file.text();viewer.innerHTML=/\.md$/i.test(file.name)?markdownToHtml(content):`<h3>${escapeHtml(file.name)}</h3><pre><code>${escapeHtml(content)}</code></pre>`;}else{const url=URL.createObjectURL(file);viewer.innerHTML=`<h3>${escapeHtml(file.name)}</h3><p>${escapeHtml(file.type||'Binärdatei')} · ${Math.ceil(file.size/1024)} KiB</p><a class="button" href="${url}" target="_blank" rel="noopener">Lokal öffnen</a>`;setTimeout(()=>URL.revokeObjectURL(url),60000);}}
+    catch(error){viewer.style.display='block';viewer.innerHTML=`<p class="badge danger">${escapeHtml(error.message)}</p>`;}
+  }
+
+  function render() { const items=filteredDossiers(); if(store.selectedKey&&!items.some(d=>d.key===store.selectedKey)) store.selectedKey=items[0]?.key||''; renderStats(items);renderList(items);renderDetail(); }
+
+  $('#pickFolder').addEventListener('click',async()=>{if(!window.showDirectoryPicker){$('#folderInput').click();return;}try{setNotice('Ordner wird gelesen …');const handle=await window.showDirectoryPicker({mode:'read'});await importFiles(await walkDirectory(handle));}catch(error){if(error.name!=='AbortError')setNotice(`Ordner konnte nicht gelesen werden: ${error.message}`,true);}});
+  $('#fallbackButton').addEventListener('click',()=>$('#folderInput').click());
+  $('#folderInput').addEventListener('change',event=>importFiles(filesFromInput(event.target.files)));
+  for(const id of ['search','stateFilter','riskFilter','dateFilter','gapsFilter']) document.getElementById(id).addEventListener(id==='search'?'input':'change',render);
+  $('#assessmentList').addEventListener('click',event=>{const button=event.target.closest('[data-select]');if(button){store.selectedKey=button.dataset.select;store.activeTab='overview';store.currentDocumentPath='';render();}});
+  $('#detail').addEventListener('click',async event=>{
+    const tab=event.target.closest('[data-tab]'); if(tab){store.activeTab=tab.dataset.tab;store.currentDocumentPath='';renderDetail();return;}
+    const doc=event.target.closest('[data-document]'); if(doc){await showDocument(doc.dataset.document);return;}
+    const evidence=event.target.closest('[data-evidence]'); if(evidence){await showEvidence(evidence.dataset.evidence);return;}
+    const relative=event.target.closest('[data-relative-link]'); if(relative){event.preventDefault();const d=selectedDossier();if(!d)return;const base=dirname(store.currentDocumentPath);const target=joinPath(base,relative.dataset.relativeLink);if(!isSafeRelative(relative.dataset.relativeLink)||!target.startsWith(d.path?d.path+'/':'')){setNotice('Unsicherer oder dossierfremder Dokumentpfad wurde blockiert.',true);return;}await showDocument(target);}
+  });
+  render();
+  </script>
+</body>
+</html>

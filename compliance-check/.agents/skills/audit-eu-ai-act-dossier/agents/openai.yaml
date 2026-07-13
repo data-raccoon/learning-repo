@@ -4,5 +4,4 @@ interface:
   default_prompt: "Nutze $audit-eu-ai-act-dossier, um das vorliegende AI-Act-Dossier auf Vollständigkeit und Freigabereife zu prüfen."
 
 policy:
-  allow_implicit_invocation: true
-
+  allow_implicit_invocation: false

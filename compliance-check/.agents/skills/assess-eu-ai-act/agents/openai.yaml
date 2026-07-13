@@ -4,5 +4,4 @@ interface:
   default_prompt: "Nutze $assess-eu-ai-act, um diese Anwendung nach dem EU AI Act einzustufen und den Pflichtenpfad festzulegen."
 
 policy:
-  allow_implicit_invocation: true
-
+  allow_implicit_invocation: false

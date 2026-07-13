@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Compliance: Dashboard starten",
+      "type": "process",
+      "command": "${env:USERPROFILE}\\.venvs\\all\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "http.server",
+        "8000",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Compliance: Aktuellen Dossierzustand validieren",
+      "type": "process",
+      "command": "${env:USERPROFILE}\\.venvs\\all\\Scripts\\python.exe",
+      "args": [
+        "${workspaceFolder}\\.agents\\skills\\complete-eu-ai-act-conformity\\scripts\\validate_dossier_state.py",
+        "${file}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

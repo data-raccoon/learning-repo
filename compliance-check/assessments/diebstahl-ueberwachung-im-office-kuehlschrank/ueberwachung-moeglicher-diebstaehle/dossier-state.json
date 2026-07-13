@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.1.0",
+  "assessmentId": "ASSESSMENT-2026-001",
+  "applicationId": "APP-01",
+  "systemName": "Diebstahl Überwachung im Office-Kühlschrank",
+  "systemVersion": "wechselnd / keine kontrollierte Basisversion",
+  "state": "classification_pending",
+  "updatedAt": "2026-07-13",
+  "legalStatus": {
+    "checkedAt": "2026-07-13",
+    "sources": [
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-2",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-3",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-5",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-6",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/annex-3",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-50",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/timeline/zeitplan-fuer-die-umsetzung-des-eu-ki-gesetzes",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-113"
+    ],
+    "consolidatedLawSeparatedFromProposals": true
+  },
+  "useCases": [
+    {
+      "id": "UC-01",
+      "name": "Überwachung möglicher Diebstähle aus einem Office-Kühlschrank",
+      "intendedPurpose": "Überwachung von Zugriffen auf einen Office-Kühlschrank zur Informationssammlung und Abschreckung möglicher Diebstähle: Das Öffnen aktiviert eine Kamera; ein KI-System identifiziert den einzelnen Mitarbeiter per Gesichtserkennung gegen von den Mitarbeitern bereitgestellte Referenzbilder, speichert die Zugriffszeit und ermittelt per Objekterkennung die Anzahl hinzugefügter oder entnommener Gegenstände. Die Zugriffsdaten sind für alle Mitarbeiter einsehbar. Derzeit folgen daraus keine Warnungen oder Sanktionen. Kameravideos werden nach der Erkennung sofort gelöscht. Der Arbeitgeber hat den Einsatz an einem EU-Arbeitsplatz genehmigt; die eingesetzten Modelle wechseln regelmäßig.",
+      "roles": ["deployer"],
+      "riskRoute": "annex_iii_high_risk",
+      "classificationFinal": false,
+      "routingFlags": {
+        "productGateOpen": true,
+        "interactionTransparency": false,
+        "syntheticContent": false,
+        "deepfakeDisclosure": false,
+        "publicInterestTextDisclosure": false,
+        "friaRequired": false,
+        "explanationRequired": false
+      }
+    }
+  ],
+  "checklistItems": [
+    {"id":"BAS-01","answer":"offen","status":"in_pruefung","rationale":"Zweck, Kamera-Trigger, Gesichtserkennung, Referenzbilder, Zeitprotokollierung, Objektzählung, mitarbeiterweite Einsicht, fehlende Sanktionen und sofortige Video-Löschung sind als Interviewangaben beschrieben. Modelle wechseln regelmäßig; kontrollierte Basisversion, Komponenten und Protokollspeicherfristen fehlen.","evidenceLinks":[],"owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)","dueAt":"","legalReferences":["Art. 3","Anhang IV"],"requirementIds":["REQ-SYSTEM"]},
+    {"id":"BAS-02","answer":"ja","status":"in_pruefung","rationale":"Gesichts- und Objekterkennung inferieren aus Kameradaten Identität und Objektbewegungen. Der Arbeitgeber genehmigte den Einsatz an einem EU-Arbeitsplatz; damit ist die KI-System-Eigenschaft und der EU-Bezug nach den Interviewangaben gegeben, aber noch nicht belegt.","evidenceLinks":[],"owner":"Zwei entwickelnde Mitarbeiter (zu benennen)","dueAt":"","legalReferences":["Art. 2","Art. 3 Nr. 1"],"requirementIds":["REQ-AI-SCOPE"]},
+    {"id":"BAS-03","answer":"offen","status":"nicht_begonnen","rationale":"Die Arbeitgeberorganisation ist vorläufig Betreiberin; Nachweis der KI-Kompetenz der verantwortlichen und ausführenden Personen fehlt.","evidenceLinks":[],"owner":"Arbeitgeberorganisation (zu benennen)","dueAt":"","legalReferences":["Art. 4"],"requirementIds":[]},
+    {"id":"BAS-04","answer":"nein","status":"in_pruefung","rationale":"Nach Interviewangabe verarbeitet das System nur Gesichtserkennung, Objektzahl und Zeitpunkt; Emotionserkennung, sensible biometrische Kategorisierung und weitere Funktionen werden verneint. Die biometrische Identifizierung im beschriebenen privaten Arbeitsplatz ist nicht allein eine verbotene Praxis nach Art. 5. Originalnachweis fehlt.","evidenceLinks":[],"owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)","dueAt":"","legalReferences":["Art. 5"],"requirementIds":["REQ-PROHIBITIONS"]},
+    {"id":"ROL-01","answer":"offen","status":"in_pruefung","rationale":"Der Arbeitgeber hat den EU-Arbeitsplatzeinsatz genehmigt und ist vorläufig Betreiber. Zwei Mitarbeiter entwickeln und betreiben technisch das Hobbyprojekt. Unter wessen Namen das System in Betrieb genommen wird und wer Modellwechsel kontrolliert, ist für die Anbieterrolle offen.","evidenceLinks":[],"owner":"Arbeitgeberorganisation und zwei entwickelnde Mitarbeiter (zu benennen)","dueAt":"","legalReferences":["Art. 3","Art. 25"],"requirementIds":["REQ-ROLES"]},
+    {"id":"CLS-01","answer":"offen","status":"nachweis_fehlt","rationale":"Produkt- bzw. Sicherheitsbauteilstatus und etwaige Drittstellenprüfung sind unbekannt.","evidenceLinks":[],"owner":"Produktverantwortlicher (zu benennen)","dueAt":"","legalReferences":["Art. 6 Abs. 1","Anhang I"],"requirementIds":["REQ-PRODUCT-ROUTE"]},
+    {"id":"CLS-02","answer":"ja","status":"in_pruefung","rationale":"Der Abgleich von Gesichtern gegen eine Klarnamensdatenbank spricht für biometrische Fernidentifizierung nach Anhang III Nr. 1 Buchst. a. Zusätzlich ordnet das System einzelnen Mitarbeitern Kühlschrankzugriffe und Objektbewegungen zu und überwacht damit Verhalten im Beschäftigungsverhältnis nach Anhang III Nr. 4 Buchst. b.","evidenceLinks":[],"owner":"Organisation und zwei entwickelnde Mitarbeiter (zu benennen)","dueAt":"","legalReferences":["Art. 6 Abs. 2","Anhang III Nr. 1 Buchst. a","Anhang III Nr. 4 Buchst. b"],"requirementIds":["REQ-ANNEX-III"]},
+    {"id":"CLS-03","answer":"nein","status":"in_pruefung","rationale":"Obwohl derzeit keine Sanktionen oder automatischen Entscheidungen folgen, sammelt und veröffentlicht das System biometrisch zugeordnete Verhaltensdaten mit Abschreckungszweck. Die damit verbundenen Grundrechtsrisiken sprechen gegen die Ausnahme nach Art. 6 Abs. 3; eine formale Anbieterbewertung und Originalnachweise fehlen.","evidenceLinks":[],"owner":"Compliance (zu benennen)","dueAt":"","legalReferences":["Art. 6 Abs. 3-4","Art. 49 Abs. 2"],"requirementIds":[]},
+    {"id":"CLS-04","answer":"offen","status":"in_pruefung","rationale":"Der Risikopfad ist Anhang-III-Hochrisiko nach Nr. 1 Buchst. a und Nr. 4 Buchst. b; fehlende Sanktionen beseitigen den Überwachungs- und biometrischen Zweck nicht. Anbieterrolle, kontrollierte Basisversion und Originalnachweise verhindern noch die endgültige Einstufung.","evidenceLinks":[],"owner":"Compliance (zu benennen)","dueAt":"","legalReferences":["Art. 6"],"requirementIds":["REQ-CLASSIFICATION"]},
+    {"id":"TRN-01","answer":"nein","status":"in_pruefung","rationale":"Die passive Gesichtserkennung ist keine direkte Interaktion und erzeugt nach Interviewangabe keine synthetischen oder manipulierten Inhalte. Art. 50 ist daher vorläufig nicht einschlägig; andere Informationspflichten bleiben extern zu prüfen.","evidenceLinks":[],"owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)","dueAt":"","legalReferences":["Art. 50"],"requirementIds":["REQ-TRANSPARENCY"]},
+    {"id":"PRO-01","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Anbieterroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 9"],"requirementIds":[]},
+    {"id":"PRO-02","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Anbieterroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 10"],"requirementIds":[]},
+    {"id":"PRO-03","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Anbieterroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 11","Art. 12","Art. 13","Anhang IV"],"requirementIds":[]},
+    {"id":"PRO-04","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Anbieterroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 14","Art. 15"],"requirementIds":[]},
+    {"id":"PRO-05","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Anbieterroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 17","Art. 18","Art. 19"],"requirementIds":[]},
+    {"id":"DEP-01","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Betreiberroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 26"],"requirementIds":[]},
+    {"id":"DEP-02","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Betreiberroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 27"],"requirementIds":[]},
+    {"id":"DEP-03","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei einschlägiger Hochrisiko- und Betreiberroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 26","Art. 86"],"requirementIds":[]},
+    {"id":"CNF-01","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei festgestellter Hochrisikoroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 43","Anhang VI","Anhang VII"],"requirementIds":[]},
+    {"id":"CNF-02","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei festgestellter Hochrisikoroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 47","Art. 48","Art. 49","Art. 71"],"requirementIds":[]},
+    {"id":"LIF-01","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei festgestellter Hochrisikoroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 20","Art. 21"],"requirementIds":[]},
+    {"id":"LIF-02","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei festgestellter Hochrisiko- und Anbieterroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 72"],"requirementIds":[]},
+    {"id":"LIF-03","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei festgestellter Hochrisikoroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 73"],"requirementIds":[]},
+    {"id":"LIF-04","answer":"offen","status":"nicht_begonnen","rationale":"Nur bei festgestellter Hochrisiko- und Anbieterroute zu instanziieren.","evidenceLinks":[],"owner":"","dueAt":"","legalReferences":["Art. 43 Abs. 4"],"requirementIds":[]},
+    {"id":"GAT-01","answer":"offen","status":"nicht_begonnen","rationale":"Erst nach abgeschlossener Einstufung, Dokumentation, Evidenz und Audit möglich.","evidenceLinks":[],"owner":"Menschlicher Entscheider (zu benennen)","dueAt":"","legalReferences":["Art. 16","Art. 26"],"requirementIds":[]}
+  ],
+  "requirements": [
+    {"id":"REQ-SYSTEM","package":"base","legalBasis":["Art. 3","Anhang IV"],"status":"drafted","rationale":"Interviewangaben zu Zweck, Kamera-Trigger, Gesichtserkennung, Referenzbildern, Zeitprotokoll, Objektzählung, Video-Löschung und fehlenden Folgen erfasst. Kontrollierte Basisversion und Protokollspeicherfristen fehlen.","owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"REQ-AI-SCOPE","package":"base","legalBasis":["Art. 2","Art. 3 Nr. 1"],"status":"drafted","rationale":"KI-System-Eigenschaft und EU-Einsatz aufgrund inferierender Gesicht-/Objekterkennung und Arbeitgeberbestätigung vorläufig bejaht; Originalunterlagen offen.","owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"REQ-PROHIBITIONS","package":"classification","legalBasis":["Art. 5"],"status":"drafted","rationale":"Nur Gesichtserkennung, Objektzahl und Zeitpunkt werden verarbeitet; verbotene Funktionen werden nach Interviewangabe verneint. Technische Funktionsliste als Nachweis anfordern.","owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"REQ-ROLES","package":"classification","legalBasis":["Art. 3","Art. 25"],"status":"requested","rationale":"Arbeitgeber als Betreiber vorläufig identifiziert; Anbieterrolle, Name der Inbetriebnahme und Kontrolle der Modellwechsel klären.","owner":"Arbeitgeberorganisation und zwei entwickelnde Mitarbeiter (zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"REQ-PRODUCT-ROUTE","package":"classification","legalBasis":["Art. 6 Abs. 1","Anhang I"],"status":"requested","rationale":"Produktstatus und Drittstellenprüfung klären.","owner":"Produktverantwortlicher (zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"REQ-ANNEX-III","package":"classification","legalBasis":["Art. 6 Abs. 2","Anhang III Nr. 1 Buchst. a","Anhang III Nr. 4 Buchst. b"],"status":"drafted","rationale":"Gesichtserkennung gegen Klarnamen spricht für biometrische Fernidentifizierung; die individuelle Zuordnung von Kühlschrankzugriffen/Objektbewegungen erfüllt zusätzlich vorläufig den Beschäftigten-Überwachungstatbestand. Originalnachweis und Folgen fehlen.","owner":"Organisation und zwei entwickelnde Mitarbeiter (zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"REQ-CLASSIFICATION","package":"classification","legalBasis":["Art. 6"],"status":"open","rationale":"Anhang-III-Hochrisiko nach biometrischem und Beschäftigten-Überwachungspfad; endgültiger Abschluss erst nach Anbieterrollen- und Versionsklärung sowie Originalnachweisen.","owner":"Compliance (zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"REQ-TRANSPARENCY","package":"transparency","legalBasis":["Art. 50"],"status":"drafted","rationale":"Keine direkte KI-Interaktion und keine synthetischen oder manipulierten Inhalte nach Interviewangabe; Art. 50 vorläufig nicht anwendbar, Originalnachweis offen.","owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)","dueAt":"","documentIds":["DOC-SYSTEM"],"evidenceIds":[]}
+  ],
+  "documents": [
+    {"id":"DOC-SYSTEM","title":"System- und Zweckbestimmung","path":"dossier/system-und-zweckbestimmung.md","status":"draft","version":"0.4","owner":"Zwei entwickelnde Mitarbeiter (namentlich zu benennen)"}
+  ],
+  "evidence": [],
+  "review": {"reviewer":"","completedAt":"","result":"pending","criticalFindings":0,"consistencyCheck":"pending","reportPath":"review/abschlusspruefung.md"},
+  "release": {"status":"pending","decider":"","date":"","protocolPath":"review/freigabeprotokoll.md"},
+  "remediationPlanPath": ""
+}

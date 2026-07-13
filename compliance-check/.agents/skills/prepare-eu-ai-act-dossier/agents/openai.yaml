@@ -4,5 +4,4 @@ interface:
   default_prompt: "Nutze $prepare-eu-ai-act-dossier, um die anwendbaren AI-Act-Unterlagen zu entwerfen und mit Nachweisen zu vervollständigen."
 
 policy:
-  allow_implicit_invocation: true
-
+  allow_implicit_invocation: false

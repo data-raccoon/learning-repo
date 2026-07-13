@@ -1,7 +1,7 @@
 ---
-schema_id: "eu-ai-act-hospital-checklist"
-schema_version: "2.0.0"
-template_version: "2.0.0"
+schema_id: "eu-ai-act-core-checklist"
+schema_version: "2.1.0"
+template_version: "2.1.0"
 language: "de"
 assessment:
   assessment_id: "ASSESSMENT-YYYY-NNN"
@@ -11,7 +11,7 @@ assessment:
   system_version: ""
   intended_purpose: ""
   lifecycle_phase: "planung"
-  hospital_role: "offen"
+  organisation_role: "offen"
   risk_result: "offen"
   owner: ""
   reviewer: ""
@@ -56,9 +56,9 @@ legal_source:
   explorer: "https://ai-act-service-desk.ec.europa.eu/de/ai-act-explorer"
 ---
 
-# EU-AI-Act-Checkliste für Krankenhausanwendungen
+# Organisationsneutrale EU-AI-Act-Checkliste
 
-> **Arbeitsinstrument, keine Rechtsberatung.** Diese Checkliste enthält das für die Erstbewertung und das gesetzliche Compliance-Tracking erforderliche Minimum. Sie ist für jeden eigenständigen Use Case separat auszufüllen.
+> **Arbeitsinstrument, keine Rechtsberatung.** Diese Checkliste enthält den organisationsneutralen Kern für Erstbewertung und Compliance-Tracking. Sie ist für jeden eigenständigen Use Case separat auszufüllen. Sektorale Produkt-, Datenschutz- oder Sicherheitsentscheidungen sind nur als externe Nachweise einzubeziehen, wenn sie den AI-Act-Pfad bestimmen.
 
 ## 1. Anwendung
 
@@ -95,7 +95,7 @@ legal_source:
 | `BAS-02` | Prüfen und begründen, ob ein KI-System im Sinne des AI Act vorliegt und der AI Act räumlich und sachlich anwendbar ist. | `offen` | `nicht_begonnen` |  |  |  |  | [Art. 2](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-2), [Art. 3 Nr. 1](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-3) |
 | `BAS-03` | Ausreichende KI-Kompetenz der Personen sicherstellen, die das System betreiben oder seine Nutzung verantworten. | `offen` | `nicht_begonnen` |  |  |  |  | [Art. 4](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-4) |
 | `BAS-04` | Sämtliche verbotenen Praktiken gegen Zweckbestimmung, Funktionen und tatsächliche Nutzung prüfen; bei Betroffenheit Stop und Nichtfreigabe. | `offen` | `nicht_begonnen` |  |  |  |  | [Art. 5](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-5) |
-| `ROL-01` | Rollen aller Beteiligten bestimmen; insbesondere prüfen, ob Eigenentwicklung, eigener Name, geänderte Zweckbestimmung oder wesentliche Änderung Anbieterpflichten des Krankenhauses auslösen. | `offen` | `nicht_begonnen` |  |  |  |  | [Art. 3](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-3), [Art. 25](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-25) |
+| `ROL-01` | Rollen aller Beteiligten bestimmen; insbesondere prüfen, ob Eigenentwicklung, eigener Name, geänderte Zweckbestimmung oder wesentliche Änderung Anbieterpflichten der bewertenden Organisation auslösen. | `offen` | `nicht_begonnen` |  |  |  |  | [Art. 3](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-3), [Art. 25](https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-25) |
 
 ### B. Risikoklassifizierung und Transparenz
 
@@ -109,7 +109,7 @@ legal_source:
 
 ### C. Mindestanforderungen bei Anbieterrolle für Hochrisiko-KI
 
-Dieser Abschnitt ist nur anwendbar, wenn das Krankenhaus Anbieter eines Hochrisiko-KI-Systems ist. Bei einem Fremdanbieter dienen die Punkte als Mindestliste der anzufordernden Anbieternachweise.
+Dieser Abschnitt ist nur anwendbar, wenn die bewertende Organisation Anbieter eines Hochrisiko-KI-Systems ist. Bei einem Fremdanbieter dienen die Punkte als Mindestliste der anzufordernden Anbieternachweise.
 
 | ID | Prüffrage / Tätigkeit | Antwort | Status | Begründung | Nachweis / Link | Verantwortlich | Fällig | AI-Act-Referenz |
 |---|---|---|---|---|---|---|---|---|
@@ -154,7 +154,7 @@ Dieser Abschnitt ist nur anwendbar, wenn das Krankenhaus Anbieter eines Hochrisi
 | Feld | Eintrag |
 |---|---|
 | Risikoklasse und Rechtsgrundlage |  |
-| Rolle des Krankenhauses |  |
+| Rolle der Organisation |  |
 | Anwendbare Pflichtenmodule |  |
 | Offene Nachweise |  |
 | Auflagen mit Verantwortlichen und Fristen |  |

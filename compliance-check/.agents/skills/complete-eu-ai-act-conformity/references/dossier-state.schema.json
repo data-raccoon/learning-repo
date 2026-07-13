@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.example/eu-ai-act/dossier-state.schema.json",
+  "title": "EU AI Act dossier state",
+  "type": "object",
+  "required": ["schemaVersion", "assessmentId", "applicationId", "systemName", "systemVersion", "state", "updatedAt", "legalStatus", "useCases", "requirements", "documents", "evidence", "review", "release", "remediationPlanPath"],
+  "properties": {
+    "schemaVersion": { "enum": ["1.0.0", "1.1.0"] },
+    "assessmentId": { "type": "string", "minLength": 1 },
+    "applicationId": { "type": "string", "minLength": 1 },
+    "systemName": { "type": "string" },
+    "systemVersion": { "type": "string" },
+    "state": { "enum": ["intake", "classification_pending", "drafting", "evidence_pending", "audit_pending", "validation_failed", "dossier_freigabereit", "nicht_freigabefaehig"] },
+    "updatedAt": { "type": "string" },
+    "legalStatus": {
+      "type": "object",
+      "required": ["checkedAt", "sources", "consolidatedLawSeparatedFromProposals"]
+    },
+    "useCases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": { "$ref": "#/$defs/useCase" }
+    },
+    "checklistItems": {
+      "type": "array",
+      "minItems": 25,
+      "maxItems": 25,
+      "items": { "$ref": "#/$defs/checklistItem" }
+    },
+    "requirements": { "type": "array", "items": { "$ref": "#/$defs/requirement" } },
+    "documents": { "type": "array", "items": { "$ref": "#/$defs/document" } },
+    "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+    "review": { "$ref": "#/$defs/review" },
+    "release": { "$ref": "#/$defs/release" },
+    "remediationPlanPath": { "type": "string" }
+  },
+  "allOf": [{
+    "if": { "properties": { "schemaVersion": { "const": "1.1.0" } } },
+    "then": { "required": ["checklistItems"] }
+  }],
+  "$defs": {
+    "relativePath": { "type": "string", "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|[/\\\\])\\.\\.(?:[/\\\\]|$)).*$" },
+    "useCase": {
+      "type": "object",
+      "required": ["id", "name", "intendedPurpose", "roles", "riskRoute", "classificationFinal", "routingFlags"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "intendedPurpose": { "type": "string" },
+        "roles": { "type": "array", "uniqueItems": true, "items": { "enum": ["provider", "deployer", "authorized_representative", "importer", "distributor"] } },
+        "riskRoute": { "enum": ["open", "no_ai_system", "prohibited", "not_high_risk", "annex_iii_exception", "annex_iii_high_risk", "annex_i_high_risk"] },
+        "classificationFinal": { "type": "boolean" },
+        "routingFlags": { "type": "object" }
+      }
+    },
+    "checklistItem": {
+      "type": "object",
+      "required": ["id", "answer", "status", "rationale", "evidenceLinks", "owner", "dueAt", "legalReferences", "requirementIds"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "answer": { "enum": ["offen", "ja", "nein", "nicht_anwendbar", "eskalieren"] },
+        "status": { "enum": ["nicht_begonnen", "in_pruefung", "nachweis_fehlt", "erledigt", "eskaliert"] },
+        "rationale": { "type": "string" },
+        "evidenceLinks": { "type": "array", "items": { "type": "string" } },
+        "owner": { "type": "string" },
+        "dueAt": { "type": "string" },
+        "legalReferences": { "type": "array", "items": { "type": "string" } },
+        "requirementIds": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "required": ["id", "package", "legalBasis", "status", "rationale", "owner", "dueAt", "documentIds", "evidenceIds"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["open", "requested", "drafted", "evidenced", "verified", "not_applicable"] },
+        "documentIds": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "evidenceIds": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "document": {
+      "type": "object",
+      "required": ["id", "title", "path", "status", "version", "owner"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "status": { "enum": ["draft", "reviewed", "approved", "external"] }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["id", "title", "path", "sourceType", "status", "issuer", "version", "date", "appliesToSystemVersion"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "$ref": "#/$defs/relativePath" },
+        "sourceType": { "enum": ["original_document", "system_record", "test_record", "signed_statement", "external_decision", "official_register", "ai_draft"] },
+        "status": { "enum": ["submitted", "accepted", "rejected"] }
+      }
+    },
+    "review": {
+      "type": "object",
+      "required": ["reviewer", "completedAt", "result", "criticalFindings", "consistencyCheck", "reportPath"],
+      "properties": {
+        "result": { "enum": ["pending", "passed", "failed"] },
+        "criticalFindings": { "type": "integer", "minimum": 0 },
+        "consistencyCheck": { "enum": ["pending", "passed", "failed"] },
+        "reportPath": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "release": {
+      "type": "object",
+      "required": ["status", "decider", "date", "protocolPath"],
+      "properties": {
+        "status": { "enum": ["pending", "approved", "rejected"] },
+        "protocolPath": { "$ref": "#/$defs/relativePath" }
+      }
+    }
+  }
+}
