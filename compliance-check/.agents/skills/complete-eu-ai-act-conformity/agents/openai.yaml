@@ -1,0 +1,7 @@
+interface:
+  display_name: "EU AI Act Dossier abschließen"
+  short_description: "Steuert das vollständige AI-Act-Dossier"
+  default_prompt: "Nutze $complete-eu-ai-act-conformity, um das EU-AI-Act-Dossier für diese Anwendung bis zur Freigabereife zu führen."
+
+policy:
+  allow_implicit_invocation: true

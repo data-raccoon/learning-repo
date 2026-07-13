@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "1.0.0",
+  "assessmentId": "ASSESSMENT-2026-001",
+  "applicationId": "APP-TOILETTEN-TAGEBUCH",
+  "systemName": "Automatisches Toiletten-Tagebuch",
+  "systemVersion": "nicht angegeben",
+  "state": "evidence_pending",
+  "updatedAt": "2026-07-13",
+  "legalStatus": {
+    "checkedAt": "2026-07-13",
+    "sources": [
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-2",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-3",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-4",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-5",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-6",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-22",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-23",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-24",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-25",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-43",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-50",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/annex-1",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/annex-3",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-113"
+    ],
+    "consolidatedLawSeparatedFromProposals": true
+  },
+  "useCases": [
+    {
+      "id": "APP-TOILETTEN-TAGEBUCH-UC-01",
+      "name": "Lokale Durchfall-Erkennung und Protokollierung",
+      "intendedPurpose": "Lokale Erkennung und Zeitreihen-Protokollierung normaler und Durchfall-Ereignisse zur persönlichen Nutzung und optionalen manuellen Vorlage beim Hausarzt",
+      "roles": ["provider"],
+      "riskRoute": "open",
+      "classificationFinal": false,
+      "routingFlags": {
+        "productGateOpen": true,
+        "interactionTransparency": true,
+        "syntheticContent": false,
+        "deepfakeDisclosure": false,
+        "publicInterestTextDisclosure": false,
+        "friaRequired": false,
+        "explanationRequired": false
+      }
+    }
+  ],
+  "requirements": [
+    {"id":"BAS-SYSTEM","package":"base","legalBasis":["Art. 3"],"status":"drafted","rationale":"Vollständigerer Entwurf vorhanden; freigegebene Zweckbestimmung, Architektur, Modell, Version und Leistungsnachweis fehlen.","owner":"Produkt / Entwicklung","dueAt":"vor Store-Einreichung","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"BAS-SCOPE","package":"base","legalBasis":["Art. 2–3"],"status":"drafted","rationale":"KI-System- und EU-Bezug sind entworfen; technische Inferenz- und Vertriebsnachweise fehlen.","owner":"Entwicklung / Recht","dueAt":"vor Einstufungsabschluss","documentIds":["DOC-SCOPE"],"evidenceIds":[]},
+    {"id":"BAS-ROLE","package":"base","legalBasis":["Art. 3", "Art. 22–25"],"status":"drafted","rationale":"Anbieter-/Privatnutzer-/Arztrollen sind entworfen; Rechtsträger, Sitz und Vertriebskette fehlen.","owner":"Recht / Vertrieb","dueAt":"vor Store-Einreichung","documentIds":["DOC-ROLE","DOC-ACTOR-ROUTING"],"evidenceIds":[]},
+    {"id":"BAS-PROHIBITED","package":"base","legalBasis":["Art. 5"],"status":"drafted","rationale":"Alle Art.-5-Tatbestände sind im Entwurf geprüft; technische Ausschluss- und Testnachweise fehlen.","owner":"Recht / Entwicklung","dueAt":"vor Einstufungsabschluss","documentIds":["DOC-PROHIBITED"],"evidenceIds":[]},
+    {"id":"BAS-RISK","package":"base","legalBasis":["Art. 6", "Anhang I", "Anhang III"],"status":"drafted","rationale":"Anhang-III- und Produktpfad sind getrennt dokumentiert; externe Produktentscheidung fehlt.","owner":"Recht / Produktrecht","dueAt":"vor Einstufungsabschluss","documentIds":["DOC-RISK","DOC-PRODUCT-GATE"],"evidenceIds":[]},
+    {"id":"BAS-LITERACY","package":"base","legalBasis":["Art. 4"],"status":"drafted","rationale":"Rollenbezogenes Kompetenzkonzept ist entworfen; Durchführung und Wirksamkeitsnachweise fehlen.","owner":"Geschäftsführung / Personal","dueAt":"vor Inverkehrbringen","documentIds":["DOC-LITERACY"],"evidenceIds":[]},
+
+    {"id":"TRN-INTERACTION","package":"transparency","legalBasis":["Art. 50 Abs. 1"],"status":"drafted","rationale":"UI-Transparenzkonzept vorhanden; fertige UI, Wortlaut, Barrierefreiheit und Ausspieltest fehlen.","owner":"Produkt / UX / Recht","dueAt":"vor Store-Einreichung","documentIds":["DOC-TRANSPARENCY"],"evidenceIds":[]},
+    {"id":"TRN-SYNTHETIC","package":"transparency","legalBasis":["Art. 50 Abs. 2"],"status":"not_applicable","rationale":"Der beschriebene Use Case klassifiziert Geräusche und erzeugt keine synthetischen Audio-, Bild-, Video- oder Textinhalte.","owner":"Recht","dueAt":"","documentIds":["DOC-TRANSPARENCY"],"evidenceIds":[]},
+    {"id":"TRN-DEEPFAKE","package":"transparency","legalBasis":["Art. 50 Abs. 4"],"status":"not_applicable","rationale":"Keine Erzeugung oder Manipulation von Bild-, Ton- oder Videoinhalten und keine Deepfakes.","owner":"Recht","dueAt":"","documentIds":["DOC-TRANSPARENCY"],"evidenceIds":[]},
+    {"id":"TRN-TEXT","package":"transparency","legalBasis":["Art. 50 Abs. 4"],"status":"not_applicable","rationale":"Keine Veröffentlichung von KI-generiertem Text zur Information der Öffentlichkeit über Angelegenheiten öffentlichen Interesses.","owner":"Recht","dueAt":"","documentIds":["DOC-TRANSPARENCY"],"evidenceIds":[]},
+
+    {"id":"EXC-6-3","package":"exception_6_3","legalBasis":["Art. 6 Abs. 3–4"],"status":"not_applicable","rationale":"Kein Anhang-III-Tatbestand festgestellt und keine Ausnahme beansprucht.","owner":"Recht","dueAt":"","documentIds":["DOC-RISK"],"evidenceIds":[]},
+    {"id":"EXC-REGISTER","package":"exception_6_3","legalBasis":["Art. 49 Abs. 2"],"status":"not_applicable","rationale":"Mangels Art.-6-Abs.-3-Ausnahme besteht keine Ausnahme-Registrierungspflicht.","owner":"Recht","dueAt":"","documentIds":[],"evidenceIds":[]},
+
+    {"id":"EXT-PRODUCT","package":"product_gate","legalBasis":["Art. 6 Abs. 1", "Anhang I"],"status":"requested","rationale":"Externe Produkt-/Medizinprodukteklassifizierung mit Aussage zur Drittstellenpflicht und Systemversion fehlt.","owner":"Produktrecht","dueAt":"vor Einstufungsabschluss","documentIds":["DOC-PRODUCT-GATE"],"evidenceIds":[]},
+    {"id":"EXT-SECTOR-CNF","package":"product_gate","legalBasis":["Art. 43"],"status":"requested","rationale":"Sektoraler Konformitätsweg ist abhängig von EXT-PRODUCT und muss bei positiver Produktentscheidung extern belegt werden.","owner":"Produktrecht / Qualität","dueAt":"nach EXT-PRODUCT","documentIds":["DOC-PRODUCT-GATE"],"evidenceIds":[]},
+
+    {"id":"ACT-AR","package":"economic_actor","legalBasis":["Art. 22"],"status":"requested","rationale":"Anbietersitz unbekannt; bei Drittlandsitz Bevollmächtigtenmandat erforderlich.","owner":"Recht / Geschäftsführung","dueAt":"vor Inverkehrbringen","documentIds":["DOC-ACTOR-ROUTING"],"evidenceIds":[]},
+    {"id":"ACT-IMPORTER","package":"economic_actor","legalBasis":["Art. 23"],"status":"requested","rationale":"Sitz und Lieferkette unbekannt; Einführerrolle ist zu belegen oder auszuschließen.","owner":"Recht / Vertrieb","dueAt":"vor Inverkehrbringen","documentIds":["DOC-ACTOR-ROUTING"],"evidenceIds":[]},
+    {"id":"ACT-DISTRIBUTOR","package":"economic_actor","legalBasis":["Art. 24"],"status":"requested","rationale":"App-Store- und Vertriebskette unbekannt; Händlerrolle ist anhand Verträgen zu bestimmen.","owner":"Recht / Vertrieb","dueAt":"vor Inverkehrbringen","documentIds":["DOC-ACTOR-ROUTING"],"evidenceIds":[]}
+  ],
+  "documents": [
+    {"id":"DOC-ASSESSMENT","title":"EU-AI-Act-Vorprüfung","path":"bewertung.md","status":"draft","version":"0.1","owner":"Recht"},
+    {"id":"DOC-CHECKLIST","title":"Prüfakte","path":"pruefakte.md","status":"draft","version":"0.1","owner":"Recht"},
+    {"id":"DOC-PLAN","title":"Dokumentenplan","path":"dokumentenplan.md","status":"draft","version":"0.2","owner":"Compliance"},
+    {"id":"DOC-EVIDENCE-REGISTER","title":"Evidenzregister","path":"evidenzregister.md","status":"draft","version":"0.2","owner":"Compliance"},
+    {"id":"DOC-SYSTEM","title":"System- und Zweckbestimmung","path":"dossier/system-und-zweckbestimmung.md","status":"draft","version":"0.2","owner":"Produkt / Entwicklung"},
+    {"id":"DOC-SCOPE","title":"Anwendungsbereich und KI-System","path":"dossier/anwendungsbereich-und-ki-system.md","status":"draft","version":"0.2","owner":"Entwicklung / Recht"},
+    {"id":"DOC-ROLE","title":"Rollen- und Akteursmatrix","path":"dossier/rollen-und-akteure.md","status":"draft","version":"0.2","owner":"Recht / Vertrieb"},
+    {"id":"DOC-PROHIBITED","title":"Prüfung verbotener Praktiken","path":"dossier/art-5-pruefung.md","status":"draft","version":"0.2","owner":"Recht / Entwicklung"},
+    {"id":"DOC-RISK","title":"Risikoeinstufung","path":"dossier/risikoeinstufung.md","status":"draft","version":"0.2","owner":"Recht / Produktrecht"},
+    {"id":"DOC-LITERACY","title":"KI-Kompetenzkonzept","path":"dossier/ki-kompetenz.md","status":"draft","version":"0.2","owner":"Geschäftsführung / Personal"},
+    {"id":"DOC-TRANSPARENCY","title":"Transparenzkonzept","path":"dossier/transparenzkonzept.md","status":"draft","version":"0.2","owner":"Produkt / UX / Recht"},
+    {"id":"DOC-PRODUCT-GATE","title":"Produktpfad und externe Entscheidung","path":"dossier/produktpfad.md","status":"draft","version":"0.2","owner":"Produktrecht"},
+    {"id":"DOC-ACTOR-ROUTING","title":"Wirtschaftsakteur-Routing","path":"dossier/wirtschaftsakteure.md","status":"draft","version":"0.1","owner":"Recht / Vertrieb"},
+    {"id":"DOC-REVIEW","title":"Abschlussprüfung – noch nicht durchgeführt","path":"review/abschlusspruefung.md","status":"draft","version":"0.1","owner":"Audit"},
+    {"id":"DOC-RELEASE","title":"Menschliches Freigabeprotokoll","path":"review/freigabeprotokoll.md","status":"draft","version":"0.1","owner":"Entscheider"}
+  ],
+  "evidence": [
+    {
+      "id": "EVD-INTERVIEW-001",
+      "title": "Unbestätigte Zusammenfassung der Benutzerangaben",
+      "path": "evidence/benutzerangaben-unbestaetigt.md",
+      "sourceType": "ai_draft",
+      "status": "submitted",
+      "issuer": "nicht bestätigt",
+      "version": "0.1",
+      "date": "2026-07-13",
+      "appliesToSystemVersion": "nicht angegeben"
+    }
+  ],
+  "review": {
+    "reviewer": "",
+    "completedAt": "",
+    "result": "pending",
+    "criticalFindings": 0,
+    "consistencyCheck": "pending",
+    "reportPath": "review/abschlusspruefung.md"
+  },
+  "release": {
+    "status": "pending",
+    "decider": "",
+    "date": "",
+    "protocolPath": "review/freigabeprotokoll.md"
+  },
+  "remediationPlanPath": ""
+}

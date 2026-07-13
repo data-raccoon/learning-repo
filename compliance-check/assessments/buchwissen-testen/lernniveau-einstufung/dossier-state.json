@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "1.0.0",
+  "assessmentId": "ASSESSMENT-2026-002",
+  "applicationId": "APP-BUCHWISSEN-TESTEN",
+  "systemName": "Buchwissen testen",
+  "systemVersion": "Planungsstand; kontrollierte Systemversion offen",
+  "state": "evidence_pending",
+  "updatedAt": "2026-07-13",
+  "legalStatus": {
+    "checkedAt": "2026-07-13",
+    "consolidatedLaw": "Verordnung (EU) 2024/1689; Art. 113 im AI Act Explorer nennt 2. August 2026 als allgemeinen Geltungsbeginn",
+    "adoptedChange": "Rat erteilte am 29. Juni 2026 die endgültige Zustimmung zum AI Omnibus; Stand-alone-Hochrisikoregeln sollen ab 2. Dezember 2027 gelten; Amtsblattveröffentlichung war am Prüftag nicht auffindbar",
+    "draftGuidance": "Entwurf der Kommissionsleitlinien für Hochrisiko-KI vom 6. Juli 2026; nicht rechtsverbindlich",
+    "sources": [
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act-explorer",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-2",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-3",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-4",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-5",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-6",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/annex-1",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/annex-3",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-25",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-50",
+      "https://ai-act-service-desk.ec.europa.eu/de/ai-act/article-113",
+      "https://www.consilium.europa.eu/en/policies/artificial-intelligence-act/timeline-artificial-intelligence/",
+      "https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems"
+    ],
+    "consolidatedLawSeparatedFromProposals": true
+  },
+  "useCases": [
+    {
+      "id": "APP-BUCHWISSEN-TESTEN-UC-01",
+      "name": "Bewertung von Buchwissen zur Lernniveau-Einstufung",
+      "intendedPurpose": "Erzeugung von Fragen aus Buchinhalten und automatisierte Bewertung von Schülerantworten durch Punktzahl und Feedback zur Unterstützung der Lernniveau-Einstufung durch Lehrkräfte",
+      "roles": ["provider", "deployer"],
+      "riskRoute": "annex_iii_high_risk",
+      "classificationFinal": true,
+      "routingFlags": {
+        "productGateOpen": false,
+        "interactionTransparency": true,
+        "syntheticContent": true,
+        "deepfakeDisclosure": false,
+        "publicInterestTextDisclosure": false,
+        "friaRequired": true,
+        "explanationRequired": true
+      }
+    }
+  ],
+  "requirements": [
+    {"id":"BAS-SYSTEM","package":"base","legalBasis":["Art. 3"],"status":"drafted","rationale":"System- und Zweckentwurf vorhanden; freigegebene Produktbeschreibung, Architektur und kontrollierte Version fehlen.","owner":"Produkt / Entwicklung","dueAt":"vor Konformitätsbewertung","documentIds":["DOC-SYSTEM"],"evidenceIds":[]},
+    {"id":"BAS-SCOPE","package":"base","legalBasis":["Art. 2–3"],"status":"drafted","rationale":"KI-System und EU-Bezug sind begründet; technische Modell- und Vertriebsnachweise fehlen.","owner":"Recht / Entwicklung","dueAt":"vor Inverkehrbringen","documentIds":["DOC-SCOPE"],"evidenceIds":[]},
+    {"id":"BAS-ROLE","package":"base","legalBasis":["Art. 3", "Art. 22–25"],"status":"drafted","rationale":"Anbieter- und Betreiberrolle sind entworfen; Rechtsträger, Sitz, Lieferanten und Vertriebskette fehlen.","owner":"Recht / Vertrieb","dueAt":"vor Inverkehrbringen","documentIds":["DOC-ROLE"],"evidenceIds":[]},
+    {"id":"BAS-PROHIBITED","package":"base","legalBasis":["Art. 5"],"status":"drafted","rationale":"Art.-5-Prüfung ist entworfen; Funktions- und technische Ausschlussnachweise fehlen.","owner":"Recht / Produkt","dueAt":"vor Pilotbetrieb","documentIds":["DOC-PROHIBITED"],"evidenceIds":[]},
+    {"id":"BAS-RISK","package":"base","legalBasis":["Art. 6", "Anhang I", "Anhang III"],"status":"drafted","rationale":"Anhang-III-Hochrisikopfad ist klassifiziert und als Dossierentwurf dokumentiert.","owner":"Recht","dueAt":"vor Konformitätsbewertung","documentIds":["DOC-CLASSIFICATION"],"evidenceIds":[]},
+    {"id":"BAS-LITERACY","package":"base","legalBasis":["Art. 4"],"status":"drafted","rationale":"Kompetenzkonzept entworfen; Rollenprofile, Schulung und Wirksamkeitsnachweise fehlen.","owner":"Personal / Produkt / Betreiber","dueAt":"vor Pilotbetrieb","documentIds":["DOC-LITERACY"],"evidenceIds":[]},
+
+    {"id":"TRN-INTERACTION","package":"transparency","legalBasis":["Art. 50 Abs. 1"],"status":"drafted","rationale":"Direkte Schülerinteraktion; UI- und Barrierefreiheitsnachweis fehlt.","owner":"Produkt / UX","dueAt":"vor Pilotbetrieb","documentIds":["DOC-TRANSPARENCY","DOC-DEP-NOTICES"],"evidenceIds":[]},
+    {"id":"TRN-SYNTHETIC","package":"transparency","legalBasis":["Art. 50 Abs. 2"],"status":"drafted","rationale":"KI erzeugt Fragen und Feedback als Text; technischer Kennzeichnungstest fehlt.","owner":"Entwicklung","dueAt":"vor Inverkehrbringen","documentIds":["DOC-TRANSPARENCY"],"evidenceIds":[]},
+    {"id":"TRN-DEEPFAKE","package":"transparency","legalBasis":["Art. 50 Abs. 4"],"status":"not_applicable","rationale":"Der Use Case erzeugt keine Bild-, Ton- oder Videoinhalte und keine Deepfakes.","owner":"Recht","dueAt":"","documentIds":[],"evidenceIds":[]},
+    {"id":"TRN-TEXT","package":"transparency","legalBasis":["Art. 50 Abs. 4"],"status":"not_applicable","rationale":"Die erzeugten Fragen und Feedbacktexte werden nicht zur Information der Öffentlichkeit über Angelegenheiten öffentlichen Interesses veröffentlicht.","owner":"Recht","dueAt":"","documentIds":[],"evidenceIds":[]},
+
+    {"id":"EXC-6-3","package":"exception_6_3","legalBasis":["Art. 6 Abs. 3–4"],"status":"not_applicable","rationale":"Keine Ausnahme wird beansprucht; die KI bleibt Hochrisiko-KI nach Anhang III.","owner":"Recht","dueAt":"","documentIds":["DOC-CLASSIFICATION"],"evidenceIds":[]},
+    {"id":"EXC-REGISTER","package":"exception_6_3","legalBasis":["Art. 49 Abs. 2"],"status":"not_applicable","rationale":"Keine Art.-6-Abs.-3-Ausnahme, daher keine Ausnahme-Registrierung.","owner":"Recht","dueAt":"","documentIds":[],"evidenceIds":[]},
+    {"id":"EXT-PRODUCT","package":"product_gate","legalBasis":["Art. 6 Abs. 1", "Anhang I"],"status":"not_applicable","rationale":"Abgeschlossene Einstufung als Stand-alone-Bildungssoftware ohne Anhang-I-Produkt- oder Sicherheitsfunktion.","owner":"Recht / Produkt","dueAt":"","documentIds":["DOC-CLASSIFICATION"],"evidenceIds":[]},
+    {"id":"EXT-SECTOR-CNF","package":"product_gate","legalBasis":["Art. 43"],"status":"not_applicable","rationale":"Mangels Anhang-I-Produktpfad kein integrierter sektoraler Konformitätsweg.","owner":"Recht","dueAt":"","documentIds":[],"evidenceIds":[]},
+
+    {"id":"HRP-RISK","package":"high_risk_provider","legalBasis":["Art. 9"],"status":"drafted","rationale":"Vorläufiges Risikoinventar erstellt; Bewertungen, Maßnahmen, Tests und Restrisiken fehlen.","owner":"Qualität","dueAt":"vor Konformitätsbewertung","documentIds":["DOC-RISK"],"evidenceIds":[]},
+    {"id":"HRP-DATA","package":"high_risk_provider","legalBasis":["Art. 10"],"status":"drafted","rationale":"Governance-Struktur erstellt; Datensatzherkunft, Eignung, Repräsentativität und Bias-Tests fehlen.","owner":"Data Owner","dueAt":"vor Konformitätsbewertung","documentIds":["DOC-DATA"],"evidenceIds":[]},
+    {"id":"HRP-TECH","package":"high_risk_provider","legalBasis":["Art. 11", "Anhang IV"],"status":"drafted","rationale":"Anhang-IV-Struktur instanziiert; technische Anlagen und kontrollierte Version fehlen.","owner":"Technische Leitung","dueAt":"vor Konformitätsbewertung","documentIds":["DOC-TECH"],"evidenceIds":[]},
+    {"id":"HRP-LOG","package":"high_risk_provider","legalBasis":["Art. 12", "Art. 18–19"],"status":"drafted","rationale":"Logging-Konzept entworfen; Implementierung, Logbeispiele und Kontrolltests fehlen.","owner":"Entwicklung / IT","dueAt":"vor Pilotbetrieb","documentIds":["DOC-LOG"],"evidenceIds":[]},
+    {"id":"HRP-IFU","package":"high_risk_provider","legalBasis":["Art. 13"],"status":"drafted","rationale":"Betriebsanleitung entworfen; Systemdetails, Leistungsgrenzen und Freigabe fehlen.","owner":"Produkt / Recht","dueAt":"vor Inverkehrbringen","documentIds":["DOC-IFU"],"evidenceIds":[]},
+    {"id":"HRP-OVERSIGHT","package":"high_risk_provider","legalBasis":["Art. 14"],"status":"drafted","rationale":"Aufsichtskontrollen entworfen; Mindesttiefe, UI-Funktionen, Benennung und Wirksamkeitstest fehlen.","owner":"Produkt / Pädagogik","dueAt":"vor Pilotbetrieb","documentIds":["DOC-OVERSIGHT"],"evidenceIds":[]},
+    {"id":"HRP-PERFORMANCE","package":"high_risk_provider","legalBasis":["Art. 15"],"status":"drafted","rationale":"Metrik- und Testdimensionen entworfen; Schwellen, Validierung, Robustheits- und Securityberichte fehlen.","owner":"QA / Security","dueAt":"vor Konformitätsbewertung","documentIds":["DOC-PERFORMANCE"],"evidenceIds":[]},
+    {"id":"HRP-QMS","package":"high_risk_provider","legalBasis":["Art. 17"],"status":"drafted","rationale":"QMS-Struktur entworfen; gelenkte und tatsächlich betriebene Verfahren fehlen.","owner":"Geschäftsführung / Qualität","dueAt":"vor Inverkehrbringen","documentIds":["DOC-QMS"],"evidenceIds":[]},
+    {"id":"HRP-RETENTION","package":"high_risk_provider","legalBasis":["Art. 18–19"],"status":"drafted","rationale":"Aufbewahrungsstruktur entworfen; Fristen, Ablage, Zugriff und Kontrolltest fehlen.","owner":"Recht / Qualität / IT","dueAt":"vor Inverkehrbringen","documentIds":["DOC-RETENTION"],"evidenceIds":[]},
+
+    {"id":"CNF-PATH","package":"conformity","legalBasis":["Art. 43"],"status":"drafted","rationale":"Konditionaler Art.-43-Pfad entworfen; Normen-/Spezifikationsanalyse und Pfadgenehmigung fehlen.","owner":"Recht / Qualität","dueAt":"vor Konformitätsbewertung","documentIds":["DOC-CNF-PATH"],"evidenceIds":[]},
+    {"id":"CNF-ASSESSMENT","package":"conformity","legalBasis":["Art. 43"],"status":"requested","rationale":"Abgeschlossener Bericht oder Zertifikat für die kontrollierte Systemversion muss extern beziehungsweise autorisiert erzeugt werden.","owner":"Qualität","dueAt":"vor Inverkehrbringen","documentIds":[],"evidenceIds":[]},
+    {"id":"CNF-DECLARATION","package":"conformity","legalBasis":["Art. 47", "Anhang V"],"status":"drafted","rationale":"Nicht unterschriebener Anhang-V-Entwurf vorhanden; darf erst nach abgeschlossenem Verfahren signiert werden.","owner":"Recht / Geschäftsführung","dueAt":"nach CNF-ASSESSMENT","documentIds":["DOC-DECLARATION"],"evidenceIds":[]},
+    {"id":"CNF-CE","package":"conformity","legalBasis":["Art. 48"],"status":"requested","rationale":"CE-Kennzeichnungsnachweis darf erst nach erfolgreicher Konformitätsbewertung erzeugt werden.","owner":"Produkt / Qualität","dueAt":"vor Inverkehrbringen","documentIds":[],"evidenceIds":[]},
+    {"id":"CNF-REGISTER","package":"conformity","legalBasis":["Art. 49", "Art. 71"],"status":"requested","rationale":"Offizieller Anbieter-/Systemregisterauszug für die kontrollierte Systemversion fehlt.","owner":"Recht / Qualität","dueAt":"vor Inverkehrbringen","documentIds":[],"evidenceIds":[]},
+
+    {"id":"LIF-CAPA","package":"lifecycle","legalBasis":["Art. 20–21"],"status":"drafted","rationale":"CAPA- und Behördenprozess entworfen; Freigabe, Kontakte, Fristen und Übung fehlen.","owner":"Qualität / Recht","dueAt":"vor Inverkehrbringen","documentIds":["DOC-CAPA"],"evidenceIds":[]},
+    {"id":"LIF-PMS","package":"lifecycle","legalBasis":["Art. 72"],"status":"drafted","rationale":"PMS-Plan entworfen; Kennzahlenschwellen, Frequenzen und Freigabe fehlen.","owner":"Qualität / Produkt","dueAt":"vor Inverkehrbringen","documentIds":["DOC-PMS"],"evidenceIds":[]},
+    {"id":"LIF-INCIDENT","package":"lifecycle","legalBasis":["Art. 73"],"status":"drafted","rationale":"Vorfallprozess entworfen; Fristenmatrix, Kontakte und Drill fehlen.","owner":"Qualität / Recht / Security","dueAt":"vor Inverkehrbringen","documentIds":["DOC-INCIDENT"],"evidenceIds":[]},
+    {"id":"LIF-CHANGE","package":"lifecycle","legalBasis":["Art. 25", "Art. 43 Abs. 4"],"status":"drafted","rationale":"Change-Control für kostengetriebene Modellwechsel entworfen; realer Prozess- und Revalidierungsnachweis fehlt.","owner":"Produkt / Entwicklung / Qualität","dueAt":"vor erstem Modellwechsel","documentIds":["DOC-CHANGE"],"evidenceIds":[]},
+
+    {"id":"DEP-OPERATIONS","package":"high_risk_deployer","legalBasis":["Art. 26"],"status":"drafted","rationale":"Generisches Betreiber-Betriebskonzept vorhanden; je Betreiber zu genehmigen und zu belegen.","owner":"Schule / Träger","dueAt":"vor erster Nutzung","documentIds":["DOC-DEP-OPS"],"evidenceIds":[]},
+    {"id":"DEP-OVERSIGHT","package":"high_risk_deployer","legalBasis":["Art. 26"],"status":"drafted","rationale":"Benennungs- und Befähigungsanforderungen entworfen; konkrete Personen und Tests fehlen.","owner":"Schule / Träger","dueAt":"vor erster Nutzung","documentIds":["DOC-DEP-OVERSIGHT"],"evidenceIds":[]},
+    {"id":"DEP-NOTICES","package":"high_risk_deployer","legalBasis":["Art. 26"],"status":"drafted","rationale":"Schüler-/Elterninformation entworfen; Freigabe und Ausspielnachweis je Betreiber fehlen.","owner":"Schule / Träger","dueAt":"vor erster Nutzung","documentIds":["DOC-DEP-NOTICES"],"evidenceIds":[]},
+    {"id":"DEP-REPORTING","package":"high_risk_deployer","legalBasis":["Art. 26"],"status":"drafted","rationale":"Betreiber-Meldeprozess entworfen; Kontakte, Fristen und Drill fehlen.","owner":"Schule / Träger","dueAt":"vor erster Nutzung","documentIds":["DOC-DEP-REPORTING"],"evidenceIds":[]},
+    {"id":"DEP-FRIA","package":"high_risk_deployer","legalBasis":["Art. 27"],"status":"drafted","rationale":"Betreiberspezifische FRIA-Vorlage vorhanden; Anwendbarkeit und Abschluss je Betreiber fehlen.","owner":"Schule / Träger","dueAt":"vor erster Nutzung","documentIds":["DOC-FRIA"],"evidenceIds":[]},
+    {"id":"DEP-EXPLANATION","package":"high_risk_deployer","legalBasis":["Art. 86"],"status":"drafted","rationale":"Erläuterungs- und Beschwerdeprozess entworfen; Wirkung, Fristen, Kontakte und Testfall fehlen.","owner":"Schule / Träger","dueAt":"vor erster Nutzung","documentIds":["DOC-EXPLANATION"],"evidenceIds":[]},
+
+    {"id":"ACT-AR","package":"economic_actor","legalBasis":["Art. 22"],"status":"requested","rationale":"Anbietersitz unbekannt; bei Drittlandsitz ist ein Bevollmächtigter samt Mandat erforderlich.","owner":"Recht / Geschäftsführung","dueAt":"vor Inverkehrbringen","documentIds":["DOC-ACTOR-ROUTING"],"evidenceIds":[]},
+    {"id":"ACT-IMPORTER","package":"economic_actor","legalBasis":["Art. 23"],"status":"requested","rationale":"Sitz, Marken- und Lieferkette sind nicht vollständig bekannt; Einführerrolle ist zu belegen oder zu verneinen.","owner":"Recht / Vertrieb","dueAt":"vor Inverkehrbringen","documentIds":["DOC-ACTOR-ROUTING"],"evidenceIds":[]},
+    {"id":"ACT-DISTRIBUTOR","package":"economic_actor","legalBasis":["Art. 24"],"status":"requested","rationale":"Vertriebskanäle sind unbekannt; Händlerrolle ist zu belegen oder zu verneinen.","owner":"Recht / Vertrieb","dueAt":"vor Inverkehrbringen","documentIds":["DOC-ACTOR-ROUTING"],"evidenceIds":[]}
+  ],
+  "documents": [
+    {"id":"DOC-ASSESSMENT","title":"EU-AI-Act-Einstufung","path":"bewertung.md","status":"draft","version":"0.1","owner":"Recht"},
+    {"id":"DOC-CHECKLIST","title":"Prüfakte mit 25 Stamm-IDs","path":"pruefakte.md","status":"draft","version":"0.1","owner":"Recht"},
+    {"id":"DOC-PLAN","title":"Dokumentenplan","path":"dokumentenplan.md","status":"draft","version":"0.1","owner":"Compliance"},
+    {"id":"DOC-EVIDENCE-REGISTER","title":"Evidenzregister","path":"evidenzregister.md","status":"draft","version":"0.1","owner":"Compliance"},
+    {"id":"DOC-SYSTEM","title":"System- und Zweckbestimmung","path":"dossier/system-und-zweckbestimmung.md","status":"draft","version":"0.1","owner":"Produkt / Entwicklung"},
+    {"id":"DOC-SCOPE","title":"KI-System und Anwendungsbereich","path":"dossier/ki-system-und-anwendungsbereich.md","status":"draft","version":"0.1","owner":"Recht / Entwicklung"},
+    {"id":"DOC-ROLE","title":"Rollen- und Akteursmatrix","path":"dossier/rollen-und-akteure.md","status":"draft","version":"0.1","owner":"Recht"},
+    {"id":"DOC-PROHIBITED","title":"Prüfung verbotener Praktiken","path":"dossier/art-5-pruefung.md","status":"draft","version":"0.1","owner":"Recht / Produkt"},
+    {"id":"DOC-CLASSIFICATION","title":"Risikoeinstufungsvermerk","path":"dossier/risikoeinstufung.md","status":"draft","version":"0.1","owner":"Recht"},
+    {"id":"DOC-LITERACY","title":"KI-Kompetenzkonzept","path":"dossier/ki-kompetenz.md","status":"draft","version":"0.1","owner":"Personal / Produkt"},
+    {"id":"DOC-TRANSPARENCY","title":"Transparenzkonzept","path":"dossier/transparenzkonzept.md","status":"draft","version":"0.1","owner":"Produkt / UX / Entwicklung"},
+    {"id":"DOC-RISK","title":"Risikomanagementakte","path":"dossier/risikomanagement.md","status":"draft","version":"0.1","owner":"Qualität"},
+    {"id":"DOC-DATA","title":"Daten-Governance-Akte","path":"dossier/daten-governance.md","status":"draft","version":"0.1","owner":"Data Owner"},
+    {"id":"DOC-TECH","title":"Technische Dokumentation nach Anhang IV","path":"dossier/technische-dokumentation.md","status":"draft","version":"0.1","owner":"Technische Leitung"},
+    {"id":"DOC-LOG","title":"Logging- und Protokollkonzept","path":"dossier/logging-und-protokolle.md","status":"draft","version":"0.1","owner":"Entwicklung / IT"},
+    {"id":"DOC-IFU","title":"Betriebsanleitung","path":"dossier/betriebsanleitung.md","status":"draft","version":"0.1","owner":"Produkt / Recht"},
+    {"id":"DOC-OVERSIGHT","title":"Konzept menschlicher Aufsicht","path":"dossier/menschliche-aufsicht.md","status":"draft","version":"0.1","owner":"Produkt / Pädagogik"},
+    {"id":"DOC-PERFORMANCE","title":"Genauigkeit, Robustheit und Cybersicherheit","path":"dossier/leistung-robustheit-cybersicherheit.md","status":"draft","version":"0.1","owner":"QA / Security"},
+    {"id":"DOC-QMS","title":"Qualitätsmanagementsystem","path":"dossier/qualitaetsmanagement.md","status":"draft","version":"0.1","owner":"Geschäftsführung / Qualität"},
+    {"id":"DOC-RETENTION","title":"Dokumenten- und Protokollaufbewahrung","path":"dossier/aufbewahrung.md","status":"draft","version":"0.1","owner":"Recht / Qualität / IT"},
+    {"id":"DOC-CNF-PATH","title":"Konformitätsstrategie","path":"dossier/konformitaetsstrategie.md","status":"draft","version":"0.1","owner":"Recht / Qualität"},
+    {"id":"DOC-DECLARATION","title":"EU-Konformitätserklärung – Entwurf","path":"dossier/eu-konformitaetserklaerung-entwurf.md","status":"draft","version":"0.1","owner":"Recht / Geschäftsführung"},
+    {"id":"DOC-CAPA","title":"CAPA- und Behördenprozess","path":"dossier/capa-und-behoerden.md","status":"draft","version":"0.1","owner":"Qualität / Recht"},
+    {"id":"DOC-PMS","title":"Post-Market-Monitoring-Plan","path":"dossier/post-market-monitoring.md","status":"draft","version":"0.1","owner":"Qualität / Produkt"},
+    {"id":"DOC-INCIDENT","title":"Prozess für schwerwiegende Vorfälle","path":"dossier/schwerwiegende-vorfaelle.md","status":"draft","version":"0.1","owner":"Qualität / Recht / Security"},
+    {"id":"DOC-CHANGE","title":"Änderungs- und Neubewertungsprozess","path":"dossier/aenderungsmanagement.md","status":"draft","version":"0.1","owner":"Produkt / Entwicklung / Qualität"},
+    {"id":"DOC-DEP-OPS","title":"Betreiber-Betriebskonzept","path":"dossier/betreiber-betriebskonzept.md","status":"draft","version":"0.1","owner":"Schule / Träger"},
+    {"id":"DOC-DEP-OVERSIGHT","title":"Betreiber-Aufsicht","path":"dossier/betreiber-aufsicht.md","status":"draft","version":"0.1","owner":"Schule / Träger"},
+    {"id":"DOC-DEP-NOTICES","title":"Schüler- und Elterninformation","path":"dossier/betroffeneninformation.md","status":"draft","version":"0.1","owner":"Betreiber / Produkt / UX"},
+    {"id":"DOC-DEP-REPORTING","title":"Betreiber-Meldeprozess","path":"dossier/betreiber-meldeprozess.md","status":"draft","version":"0.1","owner":"Schule / Träger"},
+    {"id":"DOC-FRIA","title":"Grundrechte-Folgenabschätzung – Arbeitsvorlage","path":"dossier/grundrechte-folgenabschaetzung.md","status":"draft","version":"0.1","owner":"Schule / Träger"},
+    {"id":"DOC-EXPLANATION","title":"Erläuterungs- und Beschwerdeverfahren","path":"dossier/erlaeuterungsrecht.md","status":"draft","version":"0.1","owner":"Betreiber / Recht"},
+    {"id":"DOC-ACTOR-ROUTING","title":"Wirtschaftsakteur-Routing","path":"dossier/wirtschaftsakteure.md","status":"draft","version":"0.1","owner":"Recht / Vertrieb"}
+  ],
+  "evidence": [
+    {
+      "id": "EVD-001",
+      "title": "Unbestätigte Zusammenfassung der Benutzerangaben",
+      "path": "evidence/benutzerangaben-unbestaetigt.md",
+      "sourceType": "ai_draft",
+      "status": "submitted",
+      "issuer": "KI-gestützter Entwurf; Benutzeridentität nicht dokumentiert",
+      "version": "0.1",
+      "date": "2026-07-13",
+      "appliesToSystemVersion": "Planungsstand"
+    }
+  ],
+  "review": {
+    "reviewer": "",
+    "completedAt": "",
+    "result": "pending",
+    "criticalFindings": 0,
+    "consistencyCheck": "pending",
+    "reportPath": "review/abschlusspruefung.md"
+  },
+  "release": {
+    "status": "pending",
+    "decider": "",
+    "date": "",
+    "protocolPath": "review/freigabeprotokoll.md"
+  },
+  "remediationPlanPath": ""
+}

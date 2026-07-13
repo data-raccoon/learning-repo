@@ -1,0 +1,8 @@
+interface:
+  display_name: "EU AI Act Dossier erstellen"
+  short_description: "Erstellt und belegt die Pflichtunterlagen"
+  default_prompt: "Nutze $prepare-eu-ai-act-dossier, um die anwendbaren AI-Act-Unterlagen zu entwerfen und mit Nachweisen zu vervollständigen."
+
+policy:
+  allow_implicit_invocation: true
+
