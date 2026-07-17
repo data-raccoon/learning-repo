@@ -25,6 +25,13 @@ All repository artifacts, agent instructions, code, and technical documentation 
 - Record material decisions in `company/decisions/` or the relevant venture's `decisions/` directory.
 - Close work only when acceptance criteria have evidence and unresolved risks are explicit.
 
+## Mistral Vibe Execution
+
+- For an approved Mistral Vibe run, set `--workdir` to the repository root and allow the selected agent to use `read_file` and `grep` across ordinary repository content within that workdir.
+- Do not substitute an isolated partial copy unless the Founder or governing Work Order explicitly requests data minimization.
+- This standing read scope does not authorize reading credentials or restricted data, accessing paths outside the workdir, writing files, running shell commands, incurring unapproved spend, or bypassing any Founder approval gate.
+- Follow `company/automations/mistral-execution.md` for invocation, tool, disclosure, and verification requirements.
+
 ## Human Approval Gates
 
 Stop and request explicit Founder approval before:
@@ -47,4 +54,3 @@ Run these commands after changing Company-OS configuration, agents, skills, temp
 & "${env:USERPROFILE}\.venvs\all\Scripts\python.exe" scripts\validate_company_os.py
 & "${env:USERPROFILE}\.venvs\all\Scripts\python.exe" -m unittest discover -s tests -v
 ```
-

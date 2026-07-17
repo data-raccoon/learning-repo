@@ -1,0 +1,21 @@
+agent_type = "agent"
+display_name = "Company-OS Operations Knowledge"
+description = "Supervised maintenance of SOPs, operating documentation, indexes, and review records."
+safety = "safe"
+system_prompt_id = "company_os_operations_knowledge"
+enabled_tools = ["read_file", "grep", "write_file", "search_replace", "ask_user_question"]
+
+[tools.read_file]
+permission = "always"
+
+[tools.grep]
+permission = "always"
+
+[tools.write_file]
+permission = "ask"
+
+[tools.search_replace]
+permission = "ask"
+
+[tools.ask_user_question]
+permission = "always"

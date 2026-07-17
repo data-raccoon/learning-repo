@@ -1,0 +1,18 @@
+agent_type = "agent"
+display_name = "Company-OS QA Reliability"
+description = "Read-only execution of predefined checks and evidence-based reporting of observed failures."
+safety = "safe"
+system_prompt_id = "company_os_qa_reliability"
+enabled_tools = ["read_file", "grep", "bash", "ask_user_question"]
+
+[tools.read_file]
+permission = "always"
+
+[tools.grep]
+permission = "always"
+
+[tools.bash]
+permission = "ask"
+
+[tools.ask_user_question]
+permission = "always"
