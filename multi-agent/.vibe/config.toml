@@ -1,0 +1,5 @@
+# Project-local Vibe configuration.
+# Load agents and skills from the current workdir.
+
+agent_paths = ["./.vibe/agents"]
+skill_paths = ["./.agents/skills"]
