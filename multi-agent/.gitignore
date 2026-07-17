@@ -1,0 +1,43 @@
+# Python caches, test output, and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+venv/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# LaTeX output and build intermediates
+*.pdf
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.xdv
+
+# Temporary browser profiles and tool scratch space
+.chrome-profile/
+.edge-profile/
+.codex/tmp/
+.codex/sessions/
+
+# Editor and operating-system noise
+*.tmp
+*.swp
+*~
+.DS_Store
+Desktop.ini
+Thumbs.db

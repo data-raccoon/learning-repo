@@ -1,0 +1,334 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{fontspec}
+\usepackage[ngerman]{babel}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\setmainfont{Arial}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black}
+\setlist{nosep,leftmargin=*}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\setlength{\emergencystretch}{3em}
+\renewcommand{\arraystretch}{1.25}
+
+\newcommand{\status}[1]{\textbf{[#1]}}
+\newcommand{\fall}[3]{%
+  \clearpage
+  \section{#1}
+  \textbf{Status:} #2
+
+  #3
+}
+
+\title{\textbf{Öffentliche Mittel in Köln}\\[0.4em]
+\large Fälle, Chancen und nächste Entscheidungen}
+\author{Company-OS · Cologne Public Spending Explorer}
+\date{Stand: 17. Juli 2026}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{3cm}
+  {\Huge\bfseries Öffentliche Mittel in Köln\par}
+  \vspace{0.8cm}
+  {\LARGE Fälle, Chancen und nächste Entscheidungen\par}
+  \vspace{1.5cm}
+  {\large Interne Entscheidungsvorlage zur Verbesserung von Effizienz und Wirksamkeit\par}
+  \vfill
+  \begin{tabular}{rl}
+    Vertiefte Falldossiers: & 5 \\
+    Opportunity-Hypothesen: & 29 \\
+    Evidenzgetestete Kandidaten: & 8 \\
+  \end{tabular}
+  \vfill
+  {\large Stand: 17. Juli 2026\par}
+  \vspace{0.5cm}
+  {\bfseries Intern · Nicht zur Veröffentlichung\par}
+\end{titlepage}
+
+\tableofcontents
+\clearpage
+
+\section{Entscheidung in Kürze}
+
+Die bisherige Recherche liefert keine belastbare ``Verschwendungsliste''. Sie liefert fünf unterschiedlich reife Fälle sowie ein skalierbares Portfolio von 29 prüfbaren Verbesserungsmöglichkeiten. Der nächste sinnvolle Schritt ist ein gestuftes Lernprogramm: zuerst mit öffentlichen Daten, anschließend nur dort mit kontrollierten Aggregaten, wo der zusätzliche Erkenntniswert klar ist.
+
+\subsection{Vorgeschlagene Entscheidung}
+
+\begin{enumerate}
+  \item \textbf{Vier öffentliche Prototypen freigeben:} Investitionsplan-Realismus, Stichprobe zu Wirtschaftlichkeitsuntersuchungen, kleinräumige Kinderbetreuung und Vergabe-Lebenszyklusregister.
+  \item \textbf{Drei kontrollierte Datentests vorbereiten:} Jugendhilfe-Erstattungen, Gesundheitscontrolling sowie Prozesszeiten bei Baugenehmigungen. Vor Ausführung sind Datenowner, Rechtsgrundlage, Aggregationsniveau und Datenschutz festzulegen.
+  \item \textbf{E-Akte auf Hold belassen:} Erst fortsetzen, wenn eine aktuelle Nutzenmessung öffentlich vorliegt oder ein verhältnismäßiges Messkonzept genehmigt ist.
+  \item \textbf{Die zwei reifsten Falldossiers weiterführen:} Ordnungsbehördliche Bestattungen als zeitlich begrenztes Recovery-Experiment und kommunale Gebäude als integrierte Portfolioplanung.
+\end{enumerate}
+
+\begin{longtable}{p{4.1cm}p{5.3cm}p{4.5cm}}
+\toprule
+\textbf{Entscheidung} & \textbf{Nutzen} & \textbf{Empfehlung} \\
+\midrule
+Vier Public-Data-Prototypen & Hoher Lernwert ohne sensible Daten & \status{Freigeben} \\
+Drei kontrollierte Aggregate & Schließt operative Evidenzlücken & \status{Konzept vorbereiten} \\
+E-Akte messen & Potenziell hoher organisationsweiter Nutzen & \status{Hold} \\
+Extern kommunizieren & Spätere Transparenz & \status{Nicht freigegeben} \\
+\bottomrule
+\end{longtable}
+
+\section{Methodik und Grenzen}
+
+Untersucht wird die Kette
+
+\begin{center}
+\textbf{Ressourcen $\rightarrow$ Aktivitäten $\rightarrow$ Leistungen $\rightarrow$ Wirkungen.}
+\end{center}
+
+Hohe Ausgaben, Defizite, geringe Nutzung, Abweichungen oder fehlende Kennzahlen sind zunächst Signale. Erst die Verbindung mehrerer Evidenzrollen kann eine Handlungsempfehlung tragen.
+
+\begin{itemize}
+  \item \textbf{Effizienz:} Welche vergleichbare Leistung wurde mit welchen Ressourcen erbracht?
+  \item \textbf{Wirksamkeit:} Hat die Leistung zum dokumentierten öffentlichen Ziel beigetragen?
+  \item \textbf{Wirtschaftlichkeit:} Wurden Alternativen, Lebenszykluskosten und Risiken angemessen verglichen?
+  \item \textbf{Beobachtbarkeit:} Kann die Entscheidung mit stabilen Daten und Definitionen überprüft werden?
+\end{itemize}
+
+\subsection{Nicht verhandelbare Grenzen}
+
+\begin{itemize}
+  \item Ein gpaNRW- oder BdSt-Fall ist kein Beweis für Verschwendung.
+  \item Fehlende Daten sind zunächst ein Transparenzproblem, kein Leistungsurteil.
+  \item Plan, Ist-Ausgabe, Aufwand, Kosten und Zahlung bleiben getrennt.
+  \item Wirkung wird nicht aus Korrelation oder Reichweite allein abgeleitet.
+  \item Externe Kommunikation, Verträge, Ausgaben, Credentials, Produktionsänderungen, sensible Daten und irreversible Maßnahmen benötigen menschliche Freigabe.
+\end{itemize}
+
+\part{Fünf vertiefte Fälle}
+
+\fall{Heinrich-Böll-Platz: Bewachung und dauerhafte Lösung}{Evidence building; Forschungsempfehlung}{
+Wiederkehrende Bewachungs- und Sperrkosten sind belegt. Nicht belegt ist, dass die Bewachung derzeit vermeidbar oder eine bauliche Lösung wirtschaftlich überlegen ist.
+
+\textbf{Kennzahlen}
+\begin{itemize}
+  \item Planansatz Bewachung 2025: EUR 304.000.
+  \item Historischer Planansatz 2015: EUR 169.500.
+  \item Nominale Veränderung: rund 79 Prozent, ohne Preis- oder Leistungsbereinigung.
+  \item 2024: EUR 286.667 für eine kombinierte Position Heinrich-Böll-Platz und Flora; nicht direkt vergleichbar.
+\end{itemize}
+
+\textbf{Einordnung}
+
+Die akustische Wechselwirkung mit der Philharmonie, Sicherheitsanforderungen sowie Kunst- und Baurechte sind plausible Restriktionen. Die aktuelle technische und rechtliche Evidenz ist noch nicht vollständig rekonstruiert.
+
+\textbf{Nächster Schritt}
+
+Vor einer neuen Studie alle vorhandenen Akustik-, Sicherheits-, Kunst-, Betriebs-, Vergabe- und Sanierungsunterlagen in einem Lebenszyklus-Dossier bündeln. Status quo, optimierter Betrieb, Zwischenlösung und Integration in die Philharmonie-Sanierung auf gemeinsamer Basis vergleichen.
+
+\textbf{Heute entscheidbar:} Zeitlich begrenzte Bestandsaufnahme. Keine bauliche Maßnahme und keine Einsparsumme.
+}
+
+\fall{Stadtweites Software-Lizenzmanagement}{Evidence building; Statusprüfung}{
+Zwei unabhängige Prüfpfade stützen eine historische Transparenz- und Kontrolllücke. Ob sie im Juli 2026 noch besteht und welchen finanziellen Umfang sie hat, ist offen.
+
+\textbf{Belegt}
+\begin{itemize}
+  \item Die örtliche Rechnungsprüfung berichtete im Prüfpfad zum Jahresabschluss 2023 weiterhin fehlende vollständige zentrale Übersichten.
+  \item gpaNRW bewertete die IT-Steuerung insgesamt positiv, sah aber punktuellen Verbesserungsbedarf bei dezentralen Ressourcen und Lizenzmanagement.
+  \item Die Stadt meldete ein Beschaffungsverfahren für Lizenzmanagementsoftware; der aktuelle Produktivstatus ist nicht öffentlich verifiziert.
+\end{itemize}
+
+\textbf{Nächster Schritt}
+
+Zuerst den aktuellen Stand feststellen. Falls die Lücke fortbesteht, zwölf Wochen lang ein minimales Register für die wertmäßig wichtigsten Hersteller und alle wesentlichen Verlängerungen führen. Ein Tool erst auf Basis geklärter Datenowner, Prozesse und Anforderungen bewerten.
+
+\textbf{Nicht ableiten:} Überlizenzierung, konkrete Einsparung oder Compliance-Verletzung sind nicht nachgewiesen.
+}
+
+\fall{Lentpark: Linienbus und TaxiBus}{Evidence building; Wirkungsevaluation}{
+Der Wechsel von einer schwach genutzten Linienverlängerung zum TaxiBus war plausibel effizienzsteigernd. Tatsächliche Einsparung und erhaltene Zugänglichkeit sind jedoch nicht belegt.
+
+\textbf{Historische Angaben}
+\begin{itemize}
+  \item EUR 180.000 jährliche Kosten der Linienverlängerung laut BdSt.
+  \item Rund EUR 30.000 damalige TaxiBus-Schätzung; kein Ist-Wert.
+  \item TaxiBus 184 bedient Lentpark weiterhin.
+\end{itemize}
+
+Es fehlen tatsächliche Vollkosten, Buchungsversuche, durchgeführte und abgelehnte Fahrten, Zuverlässigkeit, Barrierefreiheit und Substitution durch andere Angebote.
+
+\textbf{Nächster Schritt}
+
+Retrospektive Vorher-Nachher-Evaluation mit einem aktuellen Zwölfmonatsdatensatz. Daraus einen wiederverwendbaren Review-Trigger für schwach genutzte Linien- und On-Demand-Angebote entwickeln.
+}
+
+\fall{Ordnungsbehördliche Bestattungen und Kostenerstattung}{Recommendation draft; begrenztes Experiment}{
+Eine historische Rückstands- und Steuerungslücke ist hoch belastbar. Würdevolle und fristgerechte Bestattung hat Vorrang; optimiert wird ausschließlich die nachgelagerte, rechtmäßige Kostenerstattung.
+
+\textbf{Kennzahlen 2023}
+\begin{itemize}
+  \item Defizit je abgeschlossenem Fall: EUR 1.306.
+  \item Aufwand je Fall: EUR 2.817.
+  \item Ertrag je Fall: EUR 1.511.
+  \item Nur vier von 19 Vergleichsstädten hatten ein höheres Defizit je Fall.
+\end{itemize}
+
+gpaNRW fand im Prüfzeitraum nicht immer fristgerechte Fälle und nicht durchgängig zeitnahe Erstattungsverfolgung. Die Stadt bestätigte steigende Fallzahlen, Personalengpässe und Rückstände. gpaNRW stellte ausdrücklich kein unwirtschaftliches Verhalten fest.
+
+\textbf{Nächster Schritt}
+
+Datenschutzsicheres Backlog-Inventar und zwölfwöchige Recovery-Lane nach Verjährungsnähe, erwartbar erstattungsfähigem Wert und Bearbeitungsaufwand. Primärdienst strikt schützen. Keine laufende Vergabe ohne Vergabe- und Rechtsfreigabe verändern.
+}
+
+\fall{Kommunale Gebäude: Dekarbonisierung als Portfolio}{Recommendation draft; Governance-Empfehlung}{
+Köln verfügt über substanzielle Energie- und Gebäudedaten sowie nachweisliche Verbesserungen. Öffentlich fehlt jedoch ein vollständig finanziertes, kapazitätsbeschränktes und zielkonsistentes Gesamtportfolio.
+
+\textbf{Berichtete Ergebnisse seit 2005}
+\begin{itemize}
+  \item Rund 500 Gebäude in der Langzeitbetrachtung.
+  \item 38 Prozent weniger CO$_2$.
+  \item 22 Prozent weniger Stromverbrauch.
+  \item 34,5 Prozent Heizkosteneinsparung.
+  \item 23,1 Millionen kWh erzeugter Solarstrom.
+\end{itemize}
+
+\textbf{Nächster Schritt}
+
+Versioniertes Portfolio aus Energie, Zustand, Pflichtinstandhaltung, Maßnahmenoptionen, Investitions- und Lebenszykluskosten, Förderung, CO$_2$, Servicekritikalität, Störung, Reifegrad und Umsetzungskapazität.
+
+Erforderlich sind drei Szenarien: aktuell finanziert, realistisch finanz- und kapazitätsbeschränkt sowie zielkonsistent 2035. Noch kein Einzelgebäude und kein pauschales Klimabudget festlegen.
+}
+
+\part{Acht evidenzgetestete Opportunities}
+
+\section{Ergebnis des Evidence Sprint 001}
+
+Sieben der acht getesteten Ideen gehen mit einem klar begrenzten nächsten Evidenzschritt weiter. Die E-Akte bleibt auf Hold.
+
+\begin{longtable}{p{1.7cm}p{4.8cm}p{2.2cm}p{6cm}}
+\toprule
+\textbf{ID} & \textbf{Opportunity} & \textbf{Entscheid} & \textbf{Nächster Test} \\
+\midrule
+OPP-001 & Investitionsprüfungen & Continue & 30 öffentliche Investitionsentscheidungen schichten und vergleichen. \\
+OPP-002 & Investitionsplan-Realismus & Continue & Dreijährige Kohorte großer Maßnahmen und Ursachentaxonomie. \\
+OPP-008 & Wirkung der E-Akte & Hold & Erst bei aktuellem Bericht oder genehmigten aggregierten Workflow-Maßen. \\
+OPP-014 & Jugendhilfe-Erstattungen & Continue & Implementierungsstatus und datenschutzsichere abgeschlossene Fallkohorte. \\
+OPP-018 & Gesundheitsamt-Controlling & Continue & Drei aggregierte Leistungen mit Fach- und Finanzdaten verbinden. \\
+OPP-021 & Frühere Bauantragsbeteiligung & Continue & Anonymisierte Vorher-Nachher-Prozesskohorten. \\
+OPP-023 & Kleinräumige Kinderbetreuung & Continue & Drei öffentliche räumliche Angebotsprototypen. \\
+OPP-029 & Vergabe-zu-Leistung & Continue & Fünf abgeschlossene Vergabe-Lebenszyklen verbinden. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Wesentliche Einordnung}
+
+\begin{itemize}
+  \item \textbf{OPP-001:} Einzelne Wirtschaftlichkeitsberechnungen existieren. Untersucht wird Konsistenz, nicht pauschales Fehlen.
+  \item \textbf{OPP-002:} Öffentliche Abschlüsse enthalten Plan, Ist, Übertragung und teilweise Ursachen. Übertragungen sind nicht automatisch negativ.
+  \item \textbf{OPP-008:} Rollout und erwartete Vorteile sind dokumentiert; aktuelle realisierte Wirkung ist es nicht.
+  \item \textbf{OPP-014:} Konstante geplante Erträge beweisen keine entgangenen Erstattungen.
+  \item \textbf{OPP-018:} Finanzintegration war offen; fehlende öffentliche Abschlussmeldung beweist keine Nichtumsetzung.
+  \item \textbf{OPP-021:} Wohnungsfertigstellungen und Genehmigungszahlen messen nicht isoliert den Verwaltungsprozess.
+  \item \textbf{OPP-023:} Gute gesamtstädtische Kapazität kann lokale Unterschiede verdecken; nominale Plätze sind nicht gleich tatsächlich verfügbare Plätze.
+  \item \textbf{OPP-029:} Öffentliche Vergabedaten ermöglichen einen Contract Spine; fehlende Leistungsdaten sind kein Beweis für schlechtes Vertragsmanagement.
+\end{itemize}
+
+\part{Weitere 21 Opportunities}
+
+\section{Noch nicht evidenzgetestetes Portfolio}
+
+\begin{longtable}{p{1.8cm}p{5.1cm}p{8cm}}
+\toprule
+\textbf{ID} & \textbf{Titel} & \textbf{Prüfidee} \\
+\midrule
+OPP-003 & Kreditportfolio-Risiko & Vorhandene Treasury-, Beteiligungs- und Haushaltsrisiken entscheidungsorientiert verbinden; zuerst Doppelberichterstattung ausschließen. \\
+OPP-004 & Mitarbeitenden-Mobilität & Standortzugang und freiwillige Aggregate verbinden; Schicht, Behinderung und Care-Arbeit berücksichtigen. \\
+OPP-005 & Mitarbeitenden-Parkportfolio & Kosten, Belegung, Zugang, Ausnahmen und alternative Flächennutzung standortspezifisch prüfen. \\
+OPP-006 & Vermiedene Servicewege & Bei fünf Leistungen Abschluss, Wiederholungskontakte, Unterstützungsbedarf und Reisebelastung je Kanal vergleichen. \\
+OPP-007 & Schul-IT-Harmonisierung & Unterstützten Standardkatalog mit begründeten Ausnahmen prüfen; pädagogische Autonomie wahren. \\
+OPP-009 & Prozessportfolio & Volumen, vermeidbaren Aufwand, Wirkung, Wiederverwendung und Ownership in einen gemeinsamen Intake bringen. \\
+OPP-010 & IT-Prüfkompetenz & Digitales Risikoportfolio gegen Fähigkeiten und Prüfungsabdeckung spiegeln. \\
+OPP-011 & Bauprojekt-Governance & Bei 15 Projekten prüfen, welche Gates tatsächlich Zeit, Scope und Prognose verbessern. \\
+OPP-012 & Risiko-zu-Kontinuität & Zehn kritische Leistungen mit Gefahren, Mindestservice, Abhängigkeiten und Übungen verbinden. \\
+OPP-013 & Krisen-Rufbereitschaft & Alarmbedarf, Rollen, Belastung und Redundanz auswerten; Extremrisiken nicht aus Durchschnittsdaten wegoptimieren. \\
+OPP-015 & Jugendhilfe-Schnittstelle & Einen volumenstarken Übergang mit Datenfeldern, Rechtszweck, Zugriff, Wartezeit und Fehlern modellieren. \\
+OPP-016 & Bezirks-Jugendhilfecontrolling & Bedarf und Fallmix vor Leistungsvergleichen berücksichtigen; Peer Learning statt Rangliste. \\
+OPP-017 & Jugendhilfe-Prozesskontrollen & Korrekturen und Near Misses analysieren; nur risikorelevante Kontrollen ergänzen. \\
+OPP-019 & Gesundheits-Trägercontrolling & Förderzweck, Belastung, Reichweite, Outcome-Logik und Verlängerungsentscheidung vergleichen. \\
+OPP-020 & Gesundheits-Personalplanung & Nachfrage, Pflichtaufgaben, Skills, Vakanzen und Prozessveränderungen in Szenarien verbinden. \\
+OPP-022 & Bauantrags-Backlog & Bestand nach Alter, Stufe, Komplexität, fehlendem Input und Skills routen; Rechtmäßigkeit vor Tempo. \\
+OPP-024 & Hitzeaktionsplan & Exposition, Verwundbarkeit, Maßnahmen und Reichweite sicher aggregiert kartieren. \\
+OPP-025 & Radverkehrsmaßnahmen & Fünf Maßnahmen mit Vergleichskorridoren, Wetter, Sicherheit, Kosten und Instandhaltung evaluieren. \\
+OPP-026 & ÖPNV-Ausgleich und Qualität & Finanzierung, Leistung, Qualität, Nachfrage und Infrastruktur über Jahresberichte konsistent machen. \\
+OPP-027 & Städtische Beteiligungen & Für sechs große Expositionen Schuldenart, Unterstützung, Auftrag und Investitionsbedarf scope-sicher verbinden. \\
+OPP-028 & Integration: Angebotsmix & Programme nach Zweck, Zielgruppe, Reichweitendefinition, Referral, Kosten und Outcome-Evidenz strukturieren. \\
+\bottomrule
+\end{longtable}
+
+\part{Entscheidungsfahrplan}
+
+\section{Welle A: ausschließlich öffentliche Daten}
+
+\begin{enumerate}
+  \item OPP-002: Dreijährige Investitionskohorte.
+  \item OPP-001: 30 öffentliche Investitionsentscheidungen.
+  \item OPP-023: Drei kleinräumige Kinderbetreuungsgebiete.
+  \item OPP-029: Fünf abgeschlossene Vergabe-Lebenszyklen.
+\end{enumerate}
+
+\section{Welle B: nur nach gesonderter Datenfreigabe}
+
+\begin{itemize}
+  \item \textbf{OPP-014 Jugendhilfe:} Nur abgeschlossene, ausreichend aggregierte Anspruchsdaten; keine Familien- oder Adressdaten; Primärhilfe unberührt.
+  \item \textbf{OPP-018 Gesundheitsamt:} Nur aggregierte Leistungs-, Zeit-, Qualitäts-, Personal- und Finanzdaten; keine individuellen Gesundheitsdaten.
+  \item \textbf{OPP-021 Baugenehmigungen:} Nur anonymisierte Prozessmeilensteine und Komplexitätsbänder; keine Antragsteller- oder Grundstücksbewertung.
+\end{itemize}
+
+\section{Explizit nicht freigegeben}
+
+\begin{itemize}
+  \item Externe Kommunikation oder Veröffentlichung.
+  \item Vertrags- oder Vergabeänderungen.
+  \item Ausgaben, Abonnements oder Credential-Änderungen.
+  \item Produktive Deployments oder Änderungen produktiver Daten.
+  \item Zugriff auf nicht genehmigte oder personenbezogene Daten.
+  \item Irreversible Maßnahmen, Governance- oder Serviceänderungen.
+\end{itemize}
+
+\appendix
+\section{Kernquellen}
+
+\begin{itemize}
+  \item \href{https://gpanrw.de/sites/default/files/2026-01/Gesamtbericht_Stadt_Koeln_2024_2025.pdf}{gpaNRW: Überörtliche Prüfung der Stadt Köln 2024/2025}.
+  \item \href{https://gpanrw.de/sites/default/files/2026-02/Stellungnahme_Stadt_K%C3%B6ln_2025.pdf}{Stadt Köln: Stellungnahme zu den gpaNRW-Feststellungen}.
+  \item \href{https://www.stadt-koeln.de/artikel/60791/index.html}{Stadt Köln: Haushaltsplan 2025/2026}.
+  \item \href{https://www.stadt-koeln.de/politik-und-verwaltung/finanzen/jahresabschluesse}{Stadt Köln: Jahresabschlüsse}.
+  \item \href{https://vergabeplattform.stadt-koeln.de/NetServer/}{Vergabeplattform der Stadt Köln}.
+  \item \href{https://www.stadt-koeln.de/politik-und-verwaltung/gebaeudewirtschaft-der-stadt-koeln/berichte}{Gebäudewirtschaft: Energieberichte}.
+  \item \href{https://www.stadt-koeln.de/politik-und-verwaltung/presse/mitteilungen/28216/index.html}{Status Kindertagesbetreuung 2025/2026}.
+  \item \href{https://www.inkar.de/}{BBSR INKAR}.
+\end{itemize}
+
+\section{Statusbegriffe}
+
+\textbf{Evidence building.} Wesentliche Evidenz vorhanden, operative Empfehlung noch nicht vollständig abgesichert.
+
+\textbf{Recommendation draft.} Begrenzter nächster Schritt formuliert; Ausführung bleibt freigabepflichtig.
+
+\textbf{Continue.} Der nächste Evidenztest ist gerechtfertigt, nicht die Hypothese bestätigt.
+
+\textbf{Hold.} Idee bleibt erhalten, bis eine klar benannte Abhängigkeit erfüllt ist.
+
+\textbf{Untriaged.} Registrierte Opportunity ohne abgeschlossenen Stop-or-Continue-Test.
+
+\vfill
+\hrule
+\smallskip
+\small
+Diese Unterlage ist nicht zur externen Veröffentlichung freigegeben. Vor öffentlicher Kommunikation sind Quellenaktualisierung, Rechts-/Risiko-Review, Gegenpositionen und Founder Approval erforderlich. Geldbeträge sind, sofern nicht anders angegeben, nominal und nicht automatisch vergleichbar.
+
+\end{document}

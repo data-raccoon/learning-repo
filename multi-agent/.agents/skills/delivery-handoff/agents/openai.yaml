@@ -1,0 +1,4 @@
+interface:
+  display_name: "Delivery Handoff"
+  short_description: "Transfer work with explicit evidence and ownership"
+  default_prompt: "Use $delivery-handoff to prepare this work for the next delivery owner."

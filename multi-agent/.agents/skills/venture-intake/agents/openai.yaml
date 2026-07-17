@@ -1,0 +1,4 @@
+interface:
+  display_name: "Venture Intake"
+  short_description: "Turn an idea into a testable venture thesis"
+  default_prompt: "Use $venture-intake to turn this idea into a testable venture thesis."

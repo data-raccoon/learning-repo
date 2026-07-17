@@ -1,0 +1,4 @@
+interface:
+  display_name: "Council Decision"
+  short_description: "Run a structured strategic council decision"
+  default_prompt: "Use $council-decision to evaluate this strategic choice with the Agent Council."

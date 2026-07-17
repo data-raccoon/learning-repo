@@ -1,0 +1,4 @@
+interface:
+  display_name: "Initiative Planning"
+  short_description: "Define an owned and testable initiative plan"
+  default_prompt: "Use $initiative-planning to create a decision-ready work order for this initiative."

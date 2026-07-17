@@ -1,0 +1,4 @@
+interface:
+  display_name: "Weekly Operating Review"
+  short_description: "Review portfolio progress, metrics, and risks"
+  default_prompt: "Use $weekly-operating-review to run this week's portfolio operating review."

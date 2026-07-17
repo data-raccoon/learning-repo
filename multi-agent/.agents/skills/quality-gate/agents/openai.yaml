@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quality Gate"
+  short_description: "Assess release readiness across assurance lanes"
+  default_prompt: "Use $quality-gate to assess whether this change is ready to advance."
