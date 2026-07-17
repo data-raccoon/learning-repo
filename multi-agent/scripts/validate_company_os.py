@@ -11,6 +11,7 @@ from pathlib import Path
 
 EXPECTED_AGENTS = {
     "chief_of_staff": "workspace-write",
+    "assistenz": "workspace-write",
     "portfolio_strategist": "read-only",
     "finance_capital_allocator": "read-only",
     "legal_risk_governance": "read-only",
@@ -114,7 +115,7 @@ def _validate_agents(root: Path, errors: list[str]) -> None:
     directory = root / ".codex" / "agents"
     paths = sorted(directory.glob("*.toml"))
     if len(paths) != len(EXPECTED_AGENTS):
-        errors.append(f"Expected 18 agent TOMLs, found {len(paths)}")
+        errors.append(f"Expected {len(EXPECTED_AGENTS)} agent TOMLs, found {len(paths)}")
 
     seen: set[str] = set()
     for path in paths:
@@ -264,10 +265,12 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
-    print("Company-OS validation passed: 18 agents, 6 skills, governance, templates, and references are valid.")
+    print(
+        f"Company-OS validation passed: {len(EXPECTED_AGENTS)} agents, "
+        "6 skills, governance, templates, and references are valid."
+    )
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

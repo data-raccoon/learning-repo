@@ -11,6 +11,7 @@ review_date: 2026-10-17
 | Agent | Cell | Default access | Primary output |
 | --- | --- | --- | --- |
 | `chief_of_staff` | Founder Office | workspace-write | Work Order or consolidated decision |
+| `assistenz` | Founder Office Support | workspace-write | Administrative brief or coordination draft |
 | `portfolio_strategist` | Council | read-only | Portfolio recommendation |
 | `finance_capital_allocator` | Council | read-only | Financial case and constraints |
 | `legal_risk_governance` | Council | read-only | Risk and approval analysis |
@@ -28,4 +29,3 @@ review_date: 2026-10-17
 | `qa_reliability` | Assurance | read-only | Verification evidence |
 | `security_privacy` | Assurance | read-only | Security and privacy findings |
 | `operations_knowledge` | Operations | workspace-write | SOP or knowledge update |
-
