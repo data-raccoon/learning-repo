@@ -4,6 +4,29 @@
     window.setTimeout(function () {
       var failures = [], phase = 'BOOT';
       function check(value, code) { if (!value) failures.push(code); }
+      function physicalClick(element, code) {
+        if (!element) {
+          failures.push(code + '_MISSING');
+          return;
+        }
+        element.scrollIntoView({ block: 'center', inline: 'center' });
+        var rect = element.getBoundingClientRect();
+        var x = rect.left + rect.width / 2;
+        var y = rect.top + rect.height / 2;
+        var pressTarget = document.elementFromPoint(x, y);
+        var pressReachesButton = pressTarget === element || element.contains(pressTarget);
+        check(pressReachesButton, code + '_POINTER_REACHABLE');
+        if (!pressReachesButton) return;
+        element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: x, clientY: y, button: 0 }));
+        window.setTimeout(function() {
+          var releaseTarget = document.elementFromPoint(x, y);
+          var sameButton = element.isConnected && (releaseTarget === element || element.contains(releaseTarget));
+          check(sameButton, code + '_STABLE_DURING_PRESS');
+          if (!sameButton) return;
+          element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: x, clientY: y, button: 0 }));
+          element.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x, clientY: y, button: 0 }));
+        }, 125);
+      }
       try {
         check(window.__glimweaveBootErrors.length === 0, window.__glimweaveBootErrors[0] || 'BOOT_ERROR');
         check(!!(window.GW && GW.Utils && GW.State && GW.Simulation && GW.Renderer && GW.UI), 'MODULES');
@@ -14,6 +37,10 @@
         var state = test.createState(12345);
         check(!!state && test.validateState(state), 'VALID_INITIAL_STATE');
         check(test.assertStateInvariants(state) !== false, 'INITIAL_INVARIANTS');
+        GW.State.deleteSave();
+        localStorage.setItem('glimweave_save_v1', JSON.stringify(GW.State.toPersistent(test.createState(54321))));
+        check(GW.State.load() === null, 'LEGACY_SAVE_IGNORED');
+        check(localStorage.getItem('glimweave_save_v1') === null, 'LEGACY_SAVE_DELETED');
         phase = 'DATA';
         check(Object.keys(GW_DATA.weftlingTypes).length === 5, 'FIVE_CLASSES');
         check(Object.keys(GW_DATA.globalUpgrades).length >= 18, 'UPGRADE_COUNT');
@@ -110,6 +137,14 @@
           check(!!glimspinnerBtn && !!driftcatcherBtn, 'PURCHASE_BUTTONS_EXIST');
           check(glimspinnerBtn && !glimspinnerBtn.disabled && driftcatcherBtn && !driftcatcherBtn.disabled, 'PURCHASE_BUTTONS_ENABLED');
 
+          var tutorialNext = document.querySelector('#tutorial-step-0 .btn-primary');
+          check(!!tutorialNext, 'TUTORIAL_NEXT_EXISTS');
+          if (tutorialNext) tutorialNext.click();
+          var tutorialStepOne = document.querySelector('#tutorial-step-1');
+          check(!!tutorialStepOne && tutorialStepOne.style.display === 'block', 'TUTORIAL_NEXT_ADVANCES');
+          GW.UI.hideTutorial();
+          check(document.querySelector('#tutorial').style.display === 'none', 'TUTORIAL_CLOSES');
+
           var fnvHash = function(imageData) {
             var hash = 2166136261;
             for (var i = 0; i < imageData.data.length; i += 16) {
@@ -128,30 +163,31 @@
             hashBefore = fnvHash(sampleImageData);
           }
 
-          glimspinnerBtn.click();
+          physicalClick(glimspinnerBtn, 'GLIMSPINNER');
           window.setTimeout(function () {
             try {
               var reservoirAfterGlimspinner = parseInt(String((document.querySelector('[data-testid="reservoir-display"]') || document.querySelector('#reservoirValue') || reservoirEl).textContent || '').replace(/\D/g, ''), 10);
               check(reservoirAfterGlimspinner === 55, 'RESERVOIR_AFTER_GLIMSPINNER_55');
 
               var driftcatcherBtnAfter = document.querySelector('#purchaseList button[aria-label^="Buy Driftcatcher"]');
+              var reservoirBeforeDriftcatcher = reservoirAfterGlimspinner;
               if (!driftcatcherBtnAfter) failures.push('DRIFTCATCHER_BTN_MISSING');
               else if (driftcatcherBtnAfter.disabled) failures.push('DRIFTCATCHER_BTN_DISABLED');
-              else driftcatcherBtnAfter.click();
+              else physicalClick(driftcatcherBtnAfter, 'DRIFTCATCHER');
               window.setTimeout(function () {
                 try {
                   var reservoirAfterDriftcatcher = parseInt(String((document.querySelector('[data-testid="reservoir-display"]') || document.querySelector('#reservoirValue') || reservoirEl).textContent || '').replace(/\D/g, ''), 10);
-                  if (reservoirAfterDriftcatcher !== 0) {
+                  var ownedDriftcatcher = document.querySelector('[data-testid="owned-driftcatcher"]') || Array.from(document.querySelectorAll('*')).find(function(el) { return String(el.textContent || '').toLowerCase().match(/driftcatcher.*1/); });
+                  if (!ownedDriftcatcher || reservoirAfterDriftcatcher >= reservoirBeforeDriftcatcher) {
                     var announcer = document.querySelector('#announcer');
                     var announcerText = String(announcer && announcer.textContent || '').replace(/\W+/g, '_').toUpperCase().slice(0, 140);
                     failures.push('RESERVOIR_AFTER_DRIFTCATCHER_' + reservoirAfterDriftcatcher + '_ACTION_MESSAGE_' + announcerText);
                     check(!!announcer && String(announcer.textContent || '').toLowerCase().includes('rejected'), 'ANNOUNCER_REJECTED_ACTION');
                   } else {
-                    check(true, 'RESERVOIR_AFTER_DRIFTCATCHER_0');
+                    check(true, 'DRIFTCATCHER_PURCHASED_AND_RESERVOIR_DECREASED');
                   }
 
                   var ownedGlimspinner = document.querySelector('[data-testid="owned-glimspinner"]') || Array.from(document.querySelectorAll('*')).find(function(el) { return String(el.textContent || '').toLowerCase().match(/glimspinner.*1/); });
-                  var ownedDriftcatcher = document.querySelector('[data-testid="owned-driftcatcher"]') || Array.from(document.querySelectorAll('*')).find(function(el) { return String(el.textContent || '').toLowerCase().match(/driftcatcher.*1/); });
                   check(!!ownedGlimspinner || String(document.body.textContent || '').toLowerCase().includes('glimspinner') && String(document.body.textContent || '').toLowerCase().includes('1'), 'OWNED_GLIMSPINNER_VISIBLE');
                   check(!!ownedDriftcatcher || String(document.body.textContent || '').toLowerCase().includes('driftcatcher') && String(document.body.textContent || '').toLowerCase().includes('1'), 'OWNED_DRIFTCATCHER_VISIBLE');
 

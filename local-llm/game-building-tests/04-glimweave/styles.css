@@ -404,6 +404,85 @@ body {
   line-height: 1.5;
 }
 
+/* Interactive controls */
+.btn,
+.icon-btn {
+  min-height: var(--touch-min);
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid rgba(0, 242, 254, 0.55);
+  border-radius: var(--r-sm);
+  background: rgba(0, 242, 254, 0.14);
+  color: var(--c-lum-100);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast), opacity var(--t-fast);
+}
+
+.btn:hover:not(:disabled),
+.icon-btn:hover:not(:disabled) {
+  background: rgba(0, 242, 254, 0.28);
+  border-color: var(--phase-primary);
+  box-shadow: var(--phase-glow);
+}
+
+.btn:focus-visible,
+.icon-btn:focus-visible {
+  outline: 3px solid var(--c-lum-100);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.icon-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: var(--phase-primary);
+  color: var(--c-space-900);
+}
+
+.btn-secondary {
+  background: transparent;
+}
+
+/* Tutorial is an explicit modal; its controls remain visually and physically reachable. */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-4);
+  background: rgba(5, 7, 18, 0.82);
+  backdrop-filter: blur(5px);
+}
+
+.tutorial-container {
+  width: min(520px, 100%);
+  padding: var(--s-6);
+  border: 1px solid var(--phase-primary);
+  border-radius: var(--r-lg);
+  background: var(--c-space-800);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.tutorial-step h2,
+.tutorial-step p {
+  margin-bottom: var(--s-4);
+}
+
+.tutorial-step .btn {
+  margin-right: var(--s-2);
+}
+
+.tutorial-close {
+  width: 100%;
+  margin-top: var(--s-4);
+}
+
 /* ------------------------------------------------------------------------
    PURCHASE PANEL - Weftlings
    ------------------------------------------------------------------------ */
@@ -701,8 +780,6 @@ body {
   box-shadow: 0 0 40px rgba(0, 242, 254, 0.3), 0 0 80px rgba(79, 0, 245, 0.2);
   animation: victoryPulse 2s ease-in-out infinite;
 }
-
-@vibe-scratchpad-39751680-x
 
 /* PLAYFIELD LAYOUT OVERRIDES */
 #gameCanvas {

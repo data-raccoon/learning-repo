@@ -30,6 +30,7 @@
   var visibilityState = true;
   var offlineReportShown = false;
   var tutorialElement = null;
+  var lastStructureSignature = '';
 
   var speedMap = { 0.5: 0.5, 1: 1, 2: 2, 4: 4 };
   var speedKeys = [0.5, 1, 2, 4];
@@ -218,6 +219,7 @@
 
   function showTutorialStep(stepId) {
     if (!tutorialElement) createTutorialOverlay();
+    stepId = Math.max(0, Math.min(DATA.constants.tutorial.steps, Number(stepId) || 0));
     tutorialElement.style.display = 'flex';
     var stepEl = document.getElementById('tutorial-step-' + stepId);
     if (stepEl) {
@@ -233,10 +235,19 @@
     if (tutorialElement) {
       tutorialElement.style.display = 'none';
       if (state) {
+        var wasComplete = state.settings.tutorialComplete;
         state.tutorialStep = DATA.constants.tutorial.steps;
         state.settings.tutorialComplete = true;
+        if (!wasComplete) saveState();
       }
     }
+  }
+
+  function tutorialStepHandler(stepId) {
+    return function() {
+      if (state) state.tutorialStep = stepId;
+      showTutorialStep(stepId);
+    };
   }
 
   function createTutorialOverlay() {
@@ -299,18 +310,12 @@
       step.appendChild(p);
 
       if (i > 0) {
-        var backBtn = createButton('Back', 'btn btn-secondary', function() {
-          if (state) state.tutorialStep = i - 1;
-          showTutorialStep(i - 1);
-        });
+        var backBtn = createButton('Back', 'btn btn-secondary', tutorialStepHandler(i - 1));
         step.appendChild(backBtn);
       }
 
       if (i < DATA.constants.tutorial.steps) {
-        var nextBtn = createButton('Next', 'btn btn-primary', function() {
-          if (state) state.tutorialStep = i + 1;
-          showTutorialStep(i + 1);
-        });
+        var nextBtn = createButton('Next', 'btn btn-primary', tutorialStepHandler(i + 1));
         step.appendChild(nextBtn);
       } else {
         var doneBtn = createButton('Begin', 'btn btn-primary', function() {
@@ -618,7 +623,7 @@
       showModal('Reset Game', 'Are you sure you want to reset all progress? This cannot be undone.', [
         { text: 'Cancel' },
         { text: 'Reset', callback: function() {
-          localStorage.removeItem('glimweave_save_v1');
+          State.deleteSave();
           location.reload();
         }}
       ]);
@@ -656,7 +661,7 @@
     panel.appendChild(scoreRow);
 
     var newGameBtn = createButton('New Game', 'btn btn-primary btn-large', function() {
-      localStorage.removeItem('glimweave_save_v1');
+      State.deleteSave();
       location.reload();
     });
     panel.appendChild(newGameBtn);
@@ -756,6 +761,8 @@
         dispatchAction({ type: 'BUY_WEFTLING', weftlingType: typeId, x: x, y: y });
       });
       btn.disabled = reservoir < cost || atMax;
+      btn.dataset.currency = 'reservoir';
+      btn.dataset.cost = String(cost);
       btn.setAttribute('aria-label', 'Buy ' + weftling.id + ' for ' + cost + ' Glim');
 
       if (atMax) {
@@ -797,6 +804,8 @@
         dispatchAction({ type: 'BUY_UPGRADE', upgradeId: upgradeId });
       });
       btn.disabled = state.reservoir < cost || atCap;
+      btn.dataset.currency = 'reservoir';
+      btn.dataset.cost = String(cost);
       btn.setAttribute('aria-label', 'Buy ' + upgrade.name + ' for ' + cost + ' Glim');
 
       if (owned && atCap) {
@@ -902,6 +911,8 @@
         dispatchAction({ type: 'BUY_UPGRADE', upgradeId: upgrade.id });
       });
       btn.disabled = state.reservoir < cost || atCap;
+      btn.dataset.currency = 'reservoir';
+      btn.dataset.cost = String(cost);
       btn.setAttribute('aria-label', 'Buy ' + upgrade.name + ' for ' + cost + ' Glim');
 
       if (atCap) {
@@ -941,6 +952,10 @@
         dispatchAction({ type: 'BUY_UPGRADE', upgradeId: upgradeId });
       });
       btn.disabled = owned || iridescence < upgrade.cost;
+      if (!owned) {
+        btn.dataset.currency = 'iridescence';
+        btn.dataset.cost = String(upgrade.cost);
+      }
       btn.setAttribute('aria-label', (owned ? 'Already owned: ' : 'Buy ') + upgrade.name + ' for ' + upgrade.cost + ' Iridescence');
 
       item.appendChild(name);
@@ -1084,7 +1099,7 @@
   }
 
   function updateTutorial() {
-    if (!state || state.settings.tutorialComplete || state.tutorialStep >= DATA.constants.tutorial.steps) {
+    if (!state || state.settings.tutorialComplete || state.tutorialStep > DATA.constants.tutorial.steps) {
       hideTutorial();
       return;
     }
@@ -1092,6 +1107,37 @@
     if (state.tutorialStep >= 0 && tutorialElement && tutorialElement.style.display !== 'flex') {
       showTutorialStep(state.tutorialStep);
     }
+  }
+
+  function getStructureSignature() {
+    if (!state) return '';
+    var unlockedWeftlings = Object.keys(DATA.weftlings).filter(function(typeId) {
+      var unlock = DATA.weftlings[typeId].unlock;
+      if (unlock.phase && state.phase < unlock.phase) return false;
+      if (unlock.totalGlimCaptured && state.totalGlimCaptured < unlock.totalGlimCaptured) return false;
+      if (unlock.totalGlimSpentOnCapacity && state.baseCapacity < unlock.totalGlimSpentOnCapacity + 100) return false;
+      return true;
+    });
+    return JSON.stringify({
+      phase: state.phase,
+      victory: state.victory,
+      doctrine: state.upgrades.doctrine,
+      unlockedWeftlings: unlockedWeftlings
+    });
+  }
+
+  function refreshAffordability() {
+    if (!rootElement) return;
+    Array.prototype.forEach.call(rootElement.querySelectorAll('button[data-currency][data-cost]'), function(btn) {
+      var funds = btn.dataset.currency === 'iridescence' ? state.iridescence : state.reservoir;
+      btn.disabled = funds < Number(btn.dataset.cost);
+    });
+  }
+
+  function updateLiveUI() {
+    updateStats();
+    updateRetunePanel();
+    refreshAffordability();
   }
 
   function updateUI() {
@@ -1122,6 +1168,7 @@
         if (doctrineUpgradesPanel) doctrineUpgradesPanel.style.display = 'none';
       }
     }
+    lastStructureSignature = getStructureSignature();
   }
 
   function checkOfflineProgress() {
@@ -1176,7 +1223,11 @@
         lastAutoSave = now;
       }
       Simulation.step(state, GW.TICK_MS);
-      updateUI();
+      if (getStructureSignature() !== lastStructureSignature) {
+        updateUI();
+      } else {
+        updateLiveUI();
+      }
     }, GW.TICK_MS);
   }
 
@@ -1279,6 +1330,7 @@
 
     if (!actionHandler) {
       actionHandler = function(action) {
+        var stateBeforeAction = JSON.stringify(state);
         try {
           Simulation.handleAction(state, action);
           saveState();
@@ -1287,6 +1339,12 @@
           // depends on the next animation-frame callback becoming available.
           Renderer.render(state, 0);
         } catch (e) {
+          // Simulation actions mutate in place. Restore the complete runtime
+          // snapshot when validation rejects an action so autosave cannot
+          // persist a partially applied purchase or duplicate entity.
+          state = JSON.parse(stateBeforeAction);
+          updateUI();
+          Renderer.render(state, 0);
           var reason = e.message || String(e);
           announce('Action rejected: ' + reason);
           UI.showNotification('Cannot perform action: ' + reason, 'error');

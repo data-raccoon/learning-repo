@@ -8,8 +8,9 @@
     return;
   }
 
-  var SAVE_KEY = "glimweave_save_v1";
-  var STATE_VERSION = "1.0";
+  var SAVE_KEY = "glimweave_save_v2";
+  var LEGACY_SAVE_KEYS = ["glimweave_save_v1"];
+  var STATE_VERSION = "2.0";
   var MAX_OFFLINE_SECONDS = 3600;
   var OFFLINE_PRODUCTION_MULTIPLIER = 0.5;
 
@@ -350,11 +351,9 @@
     var s = deepCopy(state);
     if (typeof s.version === 'undefined' || s.version === null || s.version === '') {
       s.version = STATE_VERSION;
-      s.ownedClassCount = computeOwnedClassCount(s.weftlings || []);
     }
-    if (s.version === STATE_VERSION) {
-      return s;
-    }
+    s.version = STATE_VERSION;
+    s.ownedClassCount = computeOwnedClassCount(s.weftlings || []);
     return s;
   }
 
@@ -395,6 +394,11 @@
 
   function load() {
     try {
+      // Development save compatibility is intentionally disabled. Remove
+      // earlier namespaces so stale experimental state cannot affect boot.
+      for (var i = 0; i < LEGACY_SAVE_KEYS.length; i++) {
+        localStorage.removeItem(LEGACY_SAVE_KEYS[i]);
+      }
       var raw = localStorage.getItem(SAVE_KEY);
       if (raw === null || raw === undefined) {
         return null;
@@ -402,6 +406,7 @@
       var persistentState = JSON.parse(raw);
       var migrated = migrate(persistentState);
       var runtime = fromPersistent(migrated);
+      validateState(runtime);
       return runtime;
     } catch (e) {
       return null;
@@ -411,6 +416,9 @@
   function deleteSave() {
     try {
       localStorage.removeItem(SAVE_KEY);
+      for (var i = 0; i < LEGACY_SAVE_KEYS.length; i++) {
+        localStorage.removeItem(LEGACY_SAVE_KEYS[i]);
+      }
     } catch (e) {
     }
   }
