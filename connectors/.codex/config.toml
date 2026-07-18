@@ -1,0 +1,20 @@
+[mcp_servers.tana]
+url = "https://home.tana.inc/mcp"
+auth = "oauth"
+enabled_tools = [
+  "searchItems",
+  "semanticSearchItems",
+  "readItems",
+  "getItemInfo",
+  "listEdges",
+  "readTable",
+  "getTypes",
+  "readSkill",
+  "contextRetrieval",
+  "readEvent",
+  "readFullTranscript",
+  "readScreenShareScreenshots",
+  "listEvents",
+  "listCalendars",
+  "createItems",
+]
