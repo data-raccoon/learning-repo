@@ -6,6 +6,10 @@ Experiment 04 demonstrated that Mistral Cloud `mistral-medium-3.5` can build a c
 
 ## Actionable Lessons
 
+> **Later correction:** full-image clean-profile QA disproved the original claim that the
+> generated game was complete and working. See `REPAIR_SESSION_LEARNINGS.md` for the
+> cloud-specific repair evidence and the orchestration failures discovered afterward.
+
 ### Contract Packets Enable Modular Production
 
 Each major subsystem (`state.js`, `simulation.js`, `render.js`, `ui.js`, `styles.css`, and `data/game-data.json`) was produced by a separate, targeted Mistral Cloud run against a precise contract packet. These packets specified the exact interface, data shapes, and integration points required. This separation allowed independent model invocations to generate a coherent multi-file project without cross-contamination or prompt drift. The artifact ownership table in the brief was not decorative—it was the orchestration backbone.

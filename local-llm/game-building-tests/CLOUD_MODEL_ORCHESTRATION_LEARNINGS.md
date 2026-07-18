@@ -139,7 +139,86 @@ exit class, compact failure detail, and provider usage when available—even whe
 is accepted. Accepted artifacts should be immutable or versioned rather than silently
 overwriting earlier evidence.
 
-## 11. Recommended cloud workflow
+## 11. Take over based on trajectory, not a declaration of model incapability
+
+A takeover decision is economic and operational. It does not prove that the worker model
+could never solve the problem. In the final Glimweave repair, Mistral received two bounded
+episodes. The first exposed a retrieval-policy defect. The second ran with a qualified tool
+path, correct shell syntax, early compaction, grep-first retrieval, and bounded reads. It
+still consumed 608,981 cumulative tokens without recording a causal hypothesis, editing a
+file, or producing a before/after verifier comparison.
+
+That sequence established a reasoning-trajectory plateau for the measured model and harness.
+It was enough to route upward even though no code hypothesis had failed. Requiring two failed
+patches would be too narrow a rule: repeated investigation that never transitions to an
+experiment is also lack of progress.
+
+Use this takeover sequence:
+
+1. Qualify the harness independently: paths, permissions, edit calls, verifier execution,
+   streaming evidence, and compaction must work.
+2. Give the worker an outcome, external evidence, coherent ownership, and a bounded number
+   of autonomous diagnosis-edit-verify cycles.
+3. Continue while the trajectory becomes more specific, reduces external failures, or lands
+   independently surviving changes.
+4. Repair the harness rather than escalating when the failure is a denial, invalid path,
+   missing output, browser crash, or broken continuation.
+5. Escalate when a qualified episode repeatedly produces no hypothesis or experiment, repeats
+   disproven reasoning, weakens acceptance, damages structure, or exceeds the cost cap without
+   external progress.
+
+There is an additional practical threshold: if the outer orchestrator must supply the causal
+hypothesis or exact patch to make the worker move, the intellectual takeover has already
+happened. At that point either route diagnosis upward explicitly or label the cheaper model's
+role accurately as implementation rather than autonomous repair.
+
+The takeover prompt should contain the current diff, exact verifier command and output,
+artifact paths, constraints, and disproven hypotheses. It should not contain the stronger
+model's proposed fix. The new owner must be able to diagnose independently.
+
+## 12. The successful repair changes how evidence should be designed
+
+The compact verifier reported three symptoms: a rejected second purchase, missing rejection
+announcement, and unchanged canvas pixels. The decisive error was not in that string. It was
+preserved in the final DOM as a notification: both Weftlings received the same UUID and state
+validation rejected the second one.
+
+The stronger model followed an evidence ladder:
+
+1. external gate names established the affected public journey;
+2. retained DOM and screenshot distinguished blank rendering from hidden UI;
+3. the DOM's production exception identified duplicate IDs;
+4. the architecture contract said the RNG should be Mulberry32;
+5. focused source inspection found an unsafe 64-bit multiplication in JavaScript `Number`;
+6. one production patch reduced three failures to one;
+7. a renderer-lifecycle patch reduced the final failure to `PASS`;
+8. a new full-resolution screenshot confirmed that the green result represented a meaningful
+   playfield rather than another false positive.
+
+This yields several reusable rules:
+
+- Preserve rich artifacts even when the model receives compact output. JSON gate codes are
+  routing signals; DOM, console/error text, screenshots, and state snapshots are diagnostic
+  evidence.
+- Elevate the first relevant production exception into structured verifier output. In this
+  case doing so would have saved extensive source searching.
+- Do not allocate one worker per visible failure before checking whether the gates share a
+  causal dependency. One UUID defect explained both the failed purchase and unchanged canvas.
+- Compare implementation with architecture contracts. Documentation is not proof, but a
+  disagreement between the declared algorithm and code is a high-value diagnostic lead.
+- Test foundational invariants directly. Deterministic RNG tests should cover sequence
+  variation and UUID uniqueness, not only repeatability for a seed.
+- Make first render and state-changing renders explicit. `requestAnimationFrame` is not a
+  reliable initialization event in background tabs or automated browsers.
+- Assign initialization ownership once. Idempotent initialization can hide duplicate calls,
+  observers, and lifecycle resets rather than making them harmless.
+- Treat failure-count reduction as trajectory evidence. The intermediate one-gate result
+  justified a second scoped repair instead of a broader rewrite.
+- Keep the evaluator immutable during repair and visually inspect the final evidence. The
+  verifier passed without being weakened, and the screenshot independently confirmed the
+  intended game area.
+
+## 13. Recommended cloud workflow
 
 For the next ambitious cloud-model build:
 
@@ -164,7 +243,7 @@ For the next ambitious cloud-model build:
 
 The local-model experiments taught how to architect ambitious products around a model's
 limited integration capacity. Glimweave taught a different lesson: a capable cloud model
-can own far more of the product, but agentic token economics and large-file repair become
-first-class architectural constraints. Better orchestration is not simply granting a
-larger budget. It is designing software, packets, edit protocols, tests, and evidence so
-that the cloud model spends tokens only where its judgment adds value.
+can own far more of the product, but agentic token economics, evidence quality, and temporal
+routing become first-class architectural constraints. Better orchestration is not simply
+granting a larger budget. It is designing software, packets, edit protocols, tests, evidence,
+and takeover rules so each model spends tokens only where its judgment adds value.
