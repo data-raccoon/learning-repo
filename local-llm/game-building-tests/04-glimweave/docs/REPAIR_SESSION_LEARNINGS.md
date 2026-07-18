@@ -323,6 +323,111 @@ real field, Reservoir, motes, and both units. This matters because the session b
 false-green suite and a visually empty game. For visual applications, completion needs both
 executable behavioral evidence and a meaningful rendered artifact.
 
+## Post-Pass Failure: Synthetic Clicks Hid an Unusable UI
+
+After the clean-profile verifier and screenshot both passed, human testing found that the
+Buy buttons still did nothing. This was not a stale-save problem. The simulation loop called
+the full `updateUI()` every 100 ms, and the update functions cleared the control containers
+with `innerHTML = ''` before recreating every button. A human press has a lifecycle: pointer
+down, a nonzero delay, pointer up, and then click. If the target node is replaced during that
+delay, the browser cancels the click. The verifier used `button.click()`, which dispatches a
+synthetic click immediately and bypasses both hit-testing and the press interval, so it
+reliably exercised a path that a person could not.
+
+A separate tutorial defect had the same verification blind spot. Next and Back callbacks
+closed over the function-scoped loop variable, so every button used the loop's final value.
+The first Next action jumped to a nonexistent step. Once the tutorial became a real modal,
+this could also leave an overlay between the pointer and the game. Screenshots proved that
+the controls were visible; synthetic clicks proved that their handlers existed. Neither
+proved that a pointer could reach a stable control and complete its native event sequence.
+
+### Interaction acceptance needs three independent layers
+
+Browser QA should distinguish:
+
+1. **Action semantics:** invoking the action changes valid game state.
+2. **DOM wiring:** the intended element owns the expected handler and accessible state.
+3. **Physical interaction:** hit-testing reaches that element, its identity survives from
+   press through release, and a native-style pointer or keyboard sequence causes the visible
+   result.
+
+Passing one layer is not evidence for the others. In particular, `HTMLElement.click()` is a
+useful wiring probe but is not an end-to-end pointer test.
+
+### DOM identity is an architectural invariant
+
+Interactive elements should not be destroyed by high-frequency simulation or render loops.
+The repaired architecture updates stats and affordability in place on each tick. It rebuilds
+control structure only when a structural signature changes, such as an unlock, phase change,
+or completed purchase. This is not merely a performance optimization: stable DOM identity is
+required for pointer presses, focus, keyboard use, assistive technology, and selection.
+
+Future UI contracts should state explicitly:
+
+- simulation ticks may update text, progress, and disabled state in place;
+- simulation ticks must not replace focused or pressed controls;
+- structural rendering is event-driven, not frame- or tick-driven;
+- tutorial and modal layers must have explicit stacking, focus, and dismissal behavior;
+- loop-generated callbacks must be tested with at least two distinct indices.
+
+### The browser gate must preserve time and geometry
+
+The strengthened regression holds the pointer down for longer than one simulation tick,
+uses `document.elementFromPoint()` at the control's center, verifies that the same connected
+node remains the release target, and only then releases and clicks. It also verifies that
+the tutorial advances to the next actual step and can be dismissed before buying. A capable
+automation environment should prefer trusted browser mouse/keyboard input, but an in-page
+timed hit-test is still materially stronger than `.click()` when that is unavailable.
+
+For the next project, the clean-profile public journey must include:
+
+- pointer hit-testing at the declared viewport;
+- pointer-down, a delay spanning at least one application tick, then pointer-up;
+- stable target identity across that interval;
+- overlay and stacking checks at the same coordinates;
+- keyboard activation using the browser's native button behavior;
+- visible and state-level confirmation after the action;
+- focus continuity during live updates;
+- a second interaction after the first action causes a legitimate structural rerender.
+
+### How to assign this class of repair to Mistral
+
+The worker should own a coherent outcome rather than receive a proposed line edit. A useful
+task is: "Own real first-use interaction from tutorial dismissal through two purchases. Use
+the clean-profile verifier. Diagnose why a timed pointer sequence fails, repair the UI
+lifecycle within the UI subsystem, and rerun until the physical-interaction gates pass. Do
+not weaken or replace the external verifier."
+
+The task packet should include the compact failure codes, tick interval, screenshot/DOM
+paths, and verifier command. It should not say "stop calling `innerHTML` every tick" unless
+that cause has already been established and the job is intentionally implementation-only.
+This lets Mistral demonstrate diagnosis, avoids anchoring it to the orchestrator's guess, and
+still gives it a bounded subsystem and objective terminal condition.
+
+This failure alone is not a reason to route away from Mistral. Continue with Mistral if it
+turns the timed interaction failure into a tested lifecycle hypothesis or improves the
+external gate. Escalate under the existing policy when, in the proven harness, it repeats
+synthetic tests as proof, changes handlers without testing target stability, weakens the
+timed gate, or completes two evidence-based repairs without changing the physical failure.
+
+### Persistence policy during rapid development
+
+The investigation first treated legacy saves as a likely cause because invalid historical
+state had produced earlier deadlocks. During pre-release development, save compatibility was
+not valuable enough to justify that ambiguity. The project now uses a new save namespace and
+deletes the previous namespace on load/reset. For future experiments, choose the persistence
+policy in the brief: either migration is a tested product requirement, or development builds
+invalidate old saves by version. Do not improvise migration while diagnosing interaction.
+
+### General lesson versus model-specific lesson
+
+The DOM churn, closure bug, and false-green `.click()` test are general architecture and
+evaluation failures; they are not evidence of a Mistral context limitation. The Mistral-
+specific orchestration lesson is narrower: give the worker an interaction-lifecycle gate,
+subsystem ownership, and browser evidence, then judge its trajectory by experiments and
+verifier deltas. A stronger model's later diagnosis cannot compensate for an evaluator that
+defines success in a way no human user experiences.
+
 Sources consulted on 2026-07-18:
 
 - Anthropic, *Effective context engineering for AI agents*:

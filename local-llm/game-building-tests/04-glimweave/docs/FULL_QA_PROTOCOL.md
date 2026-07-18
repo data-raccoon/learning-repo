@@ -37,10 +37,20 @@ interfaces:
 - the canvas backing size matches its CSS display size within device-pixel-ratio rules;
 - UI panels do not fully occlude the play field;
 - action dispatch reaches the production simulation handler;
+- pointer hit-testing reaches each first-use control with no overlay intercepting it;
+- a pressed control keeps the same DOM identity across at least one simulation tick and
+  completes pointer-down/pointer-up activation;
+- keyboard activation uses native control behavior and focus survives live simulation
+  updates;
 - the first producer, first mote, first capture, first upgrade, first phase transition,
   doctrine choice, Retuning, save/reload, and reset are reachable without direct test
   state mutation;
 - keyboard and narrow-viewport operation preserve those paths.
+
+`HTMLElement.click()` may be used as a narrow handler-wiring probe, but it cannot satisfy a
+public interaction gate. The physical gate must preserve viewport geometry and nonzero event
+timing, then confirm both visible output and state change. The journey must perform another
+interaction after the first action legitimately changes the control structure.
 
 ## Required report structure
 

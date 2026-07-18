@@ -74,6 +74,12 @@ For the next ambitious local or cloud model project, adopt the following pattern
 
 8. **Plan for failure modes.** Assume generated tests may be wrong. Assume large regenerations may introduce regressions. Assume static review will miss runtime defects. Design the orchestration to catch these failures quickly with minimal instrumentation and clear feedback loops.
 
+9. **Test interaction lifecycles, not only handlers.** A synthetic `.click()` can pass while
+   a human click is cancelled because a simulation tick replaces the button between pointer
+   down and pointer up. Require hit-testing, a timed press spanning an application tick,
+   stable DOM identity, native keyboard activation, and visible/state confirmation. Treat
+   high-frequency replacement of interactive DOM as an architectural contract violation.
+
 ## Conclusion
 
 Glimweave succeeded in its core objective: Mistral Cloud built a complete, original browser game with a rich simulation, multiple factions, upgrade trees, and a finite campaign. The key to success was not the model’s raw capability but the orchestration strategy: contract-driven modularity, small replaceable artifacts, stable external contracts, runtime verification, and disciplined provenance tracking. The failures—full-module regeneration, monolithic integration, static-only review—were as instructive as the successes. The blueprint above distills these lessons into a repeatable pattern for the next ambitious project.
