@@ -1,0 +1,43 @@
+{
+  "python": {
+    "version": "3.14.3",
+    "executable": "C:\\Users\\stevr\\.venvs\\all\\Scripts\\python.exe"
+  },
+  "system": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "cpu": "Intel(R) Core(TM) i5-9600K CPU @ 3.70GHz",
+    "logical_cpus": 6,
+    "memory": {
+      "total_gb": 31.9,
+      "available_gb": 15.3,
+      "load_percent": 52
+    }
+  },
+  "gpu": [
+    {
+      "name": "NVIDIA GeForce RTX 2080 SUPER",
+      "vram_total_mb": 8192,
+      "vram_used_mb": 2555,
+      "vram_free_mb": 5433,
+      "driver_version": "610.62",
+      "compute_capability": "7.5"
+    }
+  ],
+  "storage": {
+    "path": "C:\\LLMs",
+    "total_gb": 1862.0,
+    "free_gb": 493.1
+  },
+  "model_root": {
+    "path": "C:\\LLMs",
+    "exists": true
+  },
+  "tools": {
+    "llama-server": null,
+    "llama-cli": null,
+    "ollama": null,
+    "docker": null,
+    "wsl": "C:\\Windows\\system32\\wsl.EXE"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "interpreter": "%USERPROFILE%\\.venvs\\all\\Scripts\\python.exe",
+  "pythonVersion": "3.14.3",
+  "modelRoot": "C:\\LLMs\\models",
+  "inferenceBackend": "llama.cpp",
+  "dependencies": []
+}

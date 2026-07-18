@@ -1,0 +1,27 @@
+agent_type = "agent"
+display_name = "Local Files"
+description = "Token-minimal local Ministral agent with file tools only."
+safety = "safe"
+active_model = "local-ministral-3b-q4"
+system_prompt_id = "local-files"
+enabled_tools = [
+    "read_file",
+    "grep",
+    "edit",
+    "write_file",
+]
+disabled_skills = ["*"]
+enable_connectors = false
+include_project_context = false
+
+[tools.read_file]
+permission = "always"
+
+[tools.grep]
+permission = "always"
+
+[tools.edit]
+permission = "ask"
+
+[tools.write_file]
+permission = "ask"
