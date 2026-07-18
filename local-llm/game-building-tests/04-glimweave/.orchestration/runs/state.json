@@ -1,0 +1,36 @@
+{
+  "job": "state",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T17:35:21.729911+00:00",
+  "finished_utc": "2026-07-18T17:36:07.037147+00:00",
+  "duration_seconds": 45.307,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\state.md",
+      "sha256": "e7b034d7c0735d7eea9541ca4f34ece7a96ff4ec131ad818bc9f3708947ac3bb"
+    },
+    {
+      "path": "docs\\contracts\\state.md",
+      "sha256": "a768c2a421fb631d62e2826bbc7af099c9714fb34d992a25d15890fcd80c0ce6"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    },
+    {
+      "path": "src\\utils.js",
+      "sha256": "4efa507112e9511883f7380a6f56dc512e65769cc6cd4e7903f54b1c6a457472"
+    }
+  ],
+  "output": {
+    "path": "src/state.js",
+    "bytes": 19731,
+    "sha256": "f899805cdb5ff7fb871dba236a7080f12779ab900ae46dd9ea0fd8ac4dd4e46e"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 2.0
+  }
+}

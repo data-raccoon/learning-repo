@@ -1,0 +1,28 @@
+{
+  "job": "repair_smoke_fade_direct",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:34:36.270366+00:00",
+  "finished_utc": "2026-07-18T18:35:00.229963+00:00",
+  "duration_seconds": 23.96,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\repair_smoke_fade_direct.md",
+      "sha256": "ada937b4f3c06d07658c1ecf98df6f5ba7b239e01793b9b66dba584222937e81"
+    },
+    {
+      "path": "src\\smoke-scenarios.js",
+      "sha256": "27d271ddbbfad4ac9b9631c668b9cc82738917f935249c8f02477dfb6b38a921"
+    }
+  ],
+  "output": {
+    "path": "src/smoke-scenarios.js",
+    "bytes": 6570,
+    "sha256": "8e9479e8b5c82a40f63e715db043444a2bd85327d02eeb661fbf62d3acaf0fcc"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.4
+  }
+}

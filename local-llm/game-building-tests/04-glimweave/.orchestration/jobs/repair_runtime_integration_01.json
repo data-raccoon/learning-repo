@@ -1,0 +1,11 @@
+{
+  "id": "repair_runtime_integration_01",
+  "prompt_file": ".orchestration/prompts/repair_runtime_integration_01.md",
+  "output": "src/integration.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["src/integration.js"],
+  "max_tokens": 35000,
+  "max_turns": 10,
+  "max_price": 0.5
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101424">
+  <title>Glimweave</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#uiRoot">Skip to controls</a>
+  <main id="gameShell">
+    <canvas id="gameCanvas" aria-label="The living Sky Loom and drifting Glim field"></canvas>
+    <section id="uiRoot" tabindex="-1" aria-label="Glimweave controls and status"></section>
+  </main>
+  <div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <output id="smoke-result" hidden>PENDING</output>
+  <script src="bootstrap.js"></script>
+  <script src="data/game-data.js"></script>
+  <script src="src/utils.js"></script>
+  <script src="src/state.js"></script>
+  <script src="src/simulation.js"></script>
+  <script src="src/integration.js"></script>
+  <script src="src/test-bridge.js"></script>
+  <script src="src/render.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/test-bridge.js"></script>
+  <script src="src/smoke-scenarios.js"></script>
+  <script src="smoke.js"></script>
+  <script>window.GW.init();</script>
+</body>
+</html>

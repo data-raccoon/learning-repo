@@ -1,0 +1,10 @@
+{
+  "id": "product_design",
+  "prompt_file": ".orchestration/prompts/product_design.md",
+  "output": "docs/GAME_DESIGN.md",
+  "kind": "text",
+  "language": "markdown",
+  "inputs": ["EXPERIMENT_BRIEF.md"],
+  "max_tokens": 50000,
+  "max_price": 2.0
+}

@@ -1,0 +1,36 @@
+{
+  "job": "orchestration_learnings",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T19:01:56.443966+00:00",
+  "finished_utc": "2026-07-18T19:02:23.549365+00:00",
+  "duration_seconds": 27.105,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\orchestration_learnings.md",
+      "sha256": "cc0d3ad6480510945c7ac9afdfedf9591c69d86eabd35feb521d707f0aaa31c0"
+    },
+    {
+      "path": "EXPERIMENT_BRIEF.md",
+      "sha256": "f1133d97f99bc9eeaa13f14c065fec5840d11b236efbca2e1b677e8520f74568"
+    },
+    {
+      "path": "docs\\QA_REVIEW.md",
+      "sha256": "9a150c0598356737e73ff3f96758eaf47772182ba1447812dbd7da1701b5cf45"
+    },
+    {
+      "path": "docs\\VERIFICATION.md",
+      "sha256": "6c45191f94f6653c575616f9058d0f5d6b7eb235b35d8a4cd22e0f94afb03a0f"
+    }
+  ],
+  "output": {
+    "path": "docs/ORCHESTRATION_LEARNINGS.md",
+    "bytes": 9580,
+    "sha256": "f445b73b80ce3367fe9882029b3d76ac1011b3266756880c86146058e0c934ee"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.5
+  }
+}

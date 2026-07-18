@@ -1,0 +1,10 @@
+{
+  "id": "repair_final_readme_02",
+  "prompt_file": ".orchestration/prompts/repair_final_readme_02.md",
+  "output": "README.md",
+  "kind": "text",
+  "inputs": ["README.md"],
+  "max_tokens": 30000,
+  "max_turns": 8,
+  "max_price": 0.4
+}

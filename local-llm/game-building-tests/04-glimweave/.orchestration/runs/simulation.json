@@ -1,0 +1,40 @@
+{
+  "job": "simulation",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T17:36:56.106996+00:00",
+  "finished_utc": "2026-07-18T17:38:53.034309+00:00",
+  "duration_seconds": 116.927,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\simulation.md",
+      "sha256": "29d85b607ab97b99394090f19efa76740bc28296c4aea399b4505a43c5296fef"
+    },
+    {
+      "path": "docs\\contracts\\simulation.md",
+      "sha256": "7f276d8b47dc0b3bcf198748c7e71e66c27a11220f5f59f76d7d833738f8a038"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    },
+    {
+      "path": "src\\utils.js",
+      "sha256": "4efa507112e9511883f7380a6f56dc512e65769cc6cd4e7903f54b1c6a457472"
+    },
+    {
+      "path": "src\\state.js",
+      "sha256": "b221080ffe5f6a91d8996904d9d4133086e044f52a70c54e0e7ccf8b03dda695"
+    }
+  ],
+  "output": {
+    "path": "src/simulation.js",
+    "bytes": 42666,
+    "sha256": "eb0736195bb272046b3fb83d0dd4d285e2ef353dcbe3ae924cd2c41ff3768a24"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 2.0
+  }
+}

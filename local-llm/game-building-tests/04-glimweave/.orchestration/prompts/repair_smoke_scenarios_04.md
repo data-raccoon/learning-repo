@@ -1,0 +1,6 @@
+Return ONLY the complete corrected `src/smoke-scenarios.js` as plain ES5 JavaScript. Preserve working scenarios. Fix exactly these two remaining smoke-integration defects:
+
+1. Deterministic fade: legally buy a Glimspinner, step until at least one real mote exists, then remove all Weftlings and set `ownedClassCount = 0`. Take one existing finite-fade mote produced by the simulation and set its `age` to `Math.max(0, mote.fadeTime - 1)`. Keep only that mote if necessary to isolate the assertion. Validate the state, call `test.step(state, 1)` (one 100 ms test tick), and require the mote count to become zero. Do not inject a fake mote or weaken validation.
+2. Persistence: the inherited `test.saveState` is not a serializer because production `GW.State.save` returns void. In `testOfflineProgress` and `testSaveLoad`, serialize with `JSON.stringify(GW.State.toPersistent(state))`, reconstruct with `GW.State.fromPersistent(JSON.parse(serialized))`, and, if required by the runtime, pass the reconstructed state through `GW.Simulation.init`. Validate reconstructed state. Then test real offline progress and value preservation. Do not depend on or modify localStorage.
+
+Keep smoke-only guards, strict boolean results, and all other valid setup. No Markdown or commentary.

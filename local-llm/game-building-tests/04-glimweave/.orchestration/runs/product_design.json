@@ -1,0 +1,28 @@
+{
+  "job": "product_design",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T17:11:59.112180+00:00",
+  "finished_utc": "2026-07-18T17:15:33.945485+00:00",
+  "duration_seconds": 214.833,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\product_design.md",
+      "sha256": "97eaa750aa1e002dcd594bcf791b35262dbe7cad58f8e8e68f2b0130a161a63d"
+    },
+    {
+      "path": "EXPERIMENT_BRIEF.md",
+      "sha256": "f1133d97f99bc9eeaa13f14c065fec5840d11b236efbca2e1b677e8520f74568"
+    }
+  ],
+  "output": {
+    "path": "docs/GAME_DESIGN.md",
+    "bytes": 19586,
+    "sha256": "1bad97a194f6ed4867062b9a5cbd6efbdbd0be562d2caf92f6b207cdc523fd1e"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 2.0
+  }
+}

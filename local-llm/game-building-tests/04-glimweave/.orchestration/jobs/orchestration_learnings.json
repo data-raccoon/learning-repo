@@ -1,0 +1,10 @@
+{
+  "id": "orchestration_learnings",
+  "prompt_file": ".orchestration/prompts/orchestration_learnings.md",
+  "output": "docs/ORCHESTRATION_LEARNINGS.md",
+  "kind": "text",
+  "inputs": ["EXPERIMENT_BRIEF.md", "docs/QA_REVIEW.md", "docs/VERIFICATION.md"],
+  "max_tokens": 40000,
+  "max_turns": 10,
+  "max_price": 0.5
+}

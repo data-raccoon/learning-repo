@@ -1,0 +1,10 @@
+{
+  "id": "state",
+  "prompt_file": ".orchestration/prompts/state.md",
+  "output": "src/state.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["docs/contracts/state.md", "data/game-data.json", "src/utils.js"],
+  "max_tokens": 110000,
+  "max_price": 2.0
+}

@@ -1,0 +1,11 @@
+{
+  "id": "repair_simulation_02",
+  "prompt_file": ".orchestration/prompts/repair_simulation_02.md",
+  "output": "src/simulation.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["src/simulation.js"],
+  "max_tokens": 270000,
+  "max_turns": 36,
+  "max_price": 2.0
+}

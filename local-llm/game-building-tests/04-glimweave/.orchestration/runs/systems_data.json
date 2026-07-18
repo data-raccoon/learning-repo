@@ -1,0 +1,32 @@
+{
+  "job": "systems_data",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T17:24:47.264322+00:00",
+  "finished_utc": "2026-07-18T17:30:46.007164+00:00",
+  "duration_seconds": 358.743,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\systems_data.md",
+      "sha256": "831a22696882bf1c643595ea08e05f826e76924ef5b6bc08e13c13a9ce20f5f5"
+    },
+    {
+      "path": "EXPERIMENT_BRIEF.md",
+      "sha256": "f1133d97f99bc9eeaa13f14c065fec5840d11b236efbca2e1b677e8520f74568"
+    },
+    {
+      "path": "docs\\ARCHITECTURE.md",
+      "sha256": "559a5fc581a3a35931c22219e58fa7bfe31a0ec91935e59c86d3768a5704a18d"
+    }
+  ],
+  "output": {
+    "path": "data/game-data.json",
+    "bytes": 14731,
+    "sha256": "eff01d65f1ed61d1ac4f789de7b3b4cdd3f36abf1ab4777479bc0832ac830620"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 2.0
+  }
+}

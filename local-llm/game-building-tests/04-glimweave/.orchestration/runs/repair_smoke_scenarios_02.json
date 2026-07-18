@@ -1,0 +1,36 @@
+{
+  "job": "repair_smoke_scenarios_02",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:27:58.718928+00:00",
+  "finished_utc": "2026-07-18T18:29:09.615783+00:00",
+  "duration_seconds": 70.897,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\repair_smoke_scenarios_02.md",
+      "sha256": "9ed5df03d8dc315fbb192df507581bb4b27ace7b2076a1b60201f8255fbfaf81"
+    },
+    {
+      "path": "src\\smoke-scenarios.js",
+      "sha256": "fbecf0c9a6603fc0b887f444cabc38ad5f45316c95a7a545188852f28b267dfd"
+    },
+    {
+      "path": "smoke.js",
+      "sha256": "6b9359f8868d42d29808065b0a83ef15b9e9dc07a955b76370c9f8ee882bfa6c"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    }
+  ],
+  "output": {
+    "path": "src/smoke-scenarios.js",
+    "bytes": 5672,
+    "sha256": "f751b579450e527c2166a6b0285e4af45b65c52677e51a9edd5736970ad0028e"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 1.25
+  }
+}

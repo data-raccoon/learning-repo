@@ -1,0 +1,28 @@
+{
+  "job": "extend_smoke_integration",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:48:29.098018+00:00",
+  "finished_utc": "2026-07-18T18:49:23.630366+00:00",
+  "duration_seconds": 54.532,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\extend_smoke_integration.md",
+      "sha256": "e97052b2c23341e9d48dace1d1192b8626f216a80fae664687e8fe41f79256fb"
+    },
+    {
+      "path": "smoke.js",
+      "sha256": "6b9359f8868d42d29808065b0a83ef15b9e9dc07a955b76370c9f8ee882bfa6c"
+    }
+  ],
+  "output": {
+    "path": "smoke.js",
+    "bytes": 5131,
+    "sha256": "a248e96b628e13604456492d325e7f4830ec08959ab2c1c09abc3b1fe081f651"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.5
+  }
+}

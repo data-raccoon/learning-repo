@@ -1,0 +1,11 @@
+{
+  "id": "runtime_integration",
+  "prompt_file": ".orchestration/prompts/runtime_integration.md",
+  "output": "src/integration.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["data/game-data.json"],
+  "max_tokens": 50000,
+  "max_turns": 14,
+  "max_price": 0.75
+}

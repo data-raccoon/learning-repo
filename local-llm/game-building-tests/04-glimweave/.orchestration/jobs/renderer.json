@@ -1,0 +1,11 @@
+{
+  "id": "renderer",
+  "prompt_file": ".orchestration/prompts/renderer.md",
+  "output": "src/render.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["docs/contracts/renderer.md", "data/game-data.json", "src/utils.js", "src/state.js", "src/simulation.js"],
+  "max_tokens": 190000,
+  "max_turns": 40,
+  "max_price": 2.0
+}

@@ -1,0 +1,10 @@
+{
+  "id": "final_readme",
+  "prompt_file": ".orchestration/prompts/final_readme.md",
+  "output": "README.md",
+  "kind": "text",
+  "inputs": ["EXPERIMENT_BRIEF.md", "docs/QA_REVIEW.md", "docs/VERIFICATION.md"],
+  "max_tokens": 40000,
+  "max_turns": 10,
+  "max_price": 0.5
+}

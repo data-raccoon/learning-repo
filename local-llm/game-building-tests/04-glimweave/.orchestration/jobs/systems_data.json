@@ -1,0 +1,10 @@
+{
+  "id": "systems_data",
+  "prompt_file": ".orchestration/prompts/systems_data.md",
+  "output": "data/game-data.json",
+  "kind": "json",
+  "language": "json",
+  "inputs": ["EXPERIMENT_BRIEF.md", "docs/ARCHITECTURE.md"],
+  "max_tokens": 180000,
+  "max_price": 2.0
+}

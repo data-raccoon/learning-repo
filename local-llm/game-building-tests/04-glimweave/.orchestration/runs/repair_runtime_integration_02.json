@@ -1,0 +1,28 @@
+{
+  "job": "repair_runtime_integration_02",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:56:35.361400+00:00",
+  "finished_utc": "2026-07-18T18:57:07.505639+00:00",
+  "duration_seconds": 32.144,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\repair_runtime_integration_02.md",
+      "sha256": "aa5c03bb1060b573ab3164f81a8f9f590612bb70aa929f61469d774897f5f9d1"
+    },
+    {
+      "path": "src\\integration.js",
+      "sha256": "277e5fe8dec6ce21cf84b94649f8315ac3bef8578d9785313595f5edd92f2a1a"
+    }
+  ],
+  "output": {
+    "path": "src/integration.js",
+    "bytes": 2156,
+    "sha256": "57e3d9766695a5c4711cdd0fbeb534e89854382cad029f4c0cc52d30ef4a625d"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.35
+  }
+}

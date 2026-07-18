@@ -1,0 +1,11 @@
+{
+  "id": "smoke_scenarios",
+  "prompt_file": ".orchestration/prompts/smoke_scenarios.md",
+  "output": "src/smoke-scenarios.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["smoke.js", "src/state.js", "src/simulation.js", "data/game-data.json"],
+  "max_tokens": 120000,
+  "max_turns": 24,
+  "max_price": 1.25
+}

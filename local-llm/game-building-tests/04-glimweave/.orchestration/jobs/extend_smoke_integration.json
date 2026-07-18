@@ -1,0 +1,11 @@
+{
+  "id": "extend_smoke_integration",
+  "prompt_file": ".orchestration/prompts/extend_smoke_integration.md",
+  "output": "smoke.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["smoke.js"],
+  "max_tokens": 35000,
+  "max_turns": 10,
+  "max_price": 0.5
+}

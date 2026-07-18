@@ -1,0 +1,44 @@
+{
+  "job": "qa_review",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:59:22.545317+00:00",
+  "finished_utc": "2026-07-18T19:00:25.364372+00:00",
+  "duration_seconds": 62.819,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\qa_review.md",
+      "sha256": "f80870d3b29cdb4c21791cb2d37e5b9746e16272bcb25e02357021ef8061da58"
+    },
+    {
+      "path": "EXPERIMENT_BRIEF.md",
+      "sha256": "f1133d97f99bc9eeaa13f14c065fec5840d11b236efbca2e1b677e8520f74568"
+    },
+    {
+      "path": "docs\\VERIFICATION.md",
+      "sha256": "6c45191f94f6653c575616f9058d0f5d6b7eb235b35d8a4cd22e0f94afb03a0f"
+    },
+    {
+      "path": "smoke.js",
+      "sha256": "df1e1f7cde64dc29c123c712c2ca9bcfe5ccebd7e23d2260bc135825453cdcdb"
+    },
+    {
+      "path": "src\\integration.js",
+      "sha256": "820b168991dafd377a44aa27ed736f1af618d281b6cadb3a926336b04004d78f"
+    },
+    {
+      "path": ".orchestration\\NORMALIZATIONS.md",
+      "sha256": "f43820970a9d2b824f7b14504516bd012e8c81c82771bf5cb994035a6b745ae4"
+    }
+  ],
+  "output": {
+    "path": "docs/QA_REVIEW.md",
+    "bytes": 6915,
+    "sha256": "c59ea7df4f121721b6fcacd1114de6a5060e8bf7f9016b712fa3c8d7c056b76c"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.6
+  }
+}

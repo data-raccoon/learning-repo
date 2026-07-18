@@ -1,0 +1,11 @@
+{
+  "id": "repair_smoke_scenarios_03",
+  "prompt_file": ".orchestration/prompts/repair_smoke_scenarios_03.md",
+  "output": "src/smoke-scenarios.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["src/smoke-scenarios.js"],
+  "max_tokens": 40000,
+  "max_turns": 10,
+  "max_price": 0.5
+}

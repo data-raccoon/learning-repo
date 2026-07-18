@@ -1,0 +1,28 @@
+{
+  "job": "test_bridge",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:11:32.478527+00:00",
+  "finished_utc": "2026-07-18T18:16:19.459012+00:00",
+  "duration_seconds": 286.98,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\test_bridge.md",
+      "sha256": "7896dc34aa575d66f1a0a73e67142d5dc9459a91d672de68280e040ac689417e"
+    },
+    {
+      "path": "smoke.js",
+      "sha256": "6b9359f8868d42d29808065b0a83ef15b9e9dc07a955b76370c9f8ee882bfa6c"
+    }
+  ],
+  "output": {
+    "path": "src/test-bridge.js",
+    "bytes": 384,
+    "sha256": "d4ddf24c1da0d86b1fc7330b2a086392063d10f5e8eb7141b72e44fe48e0b7ef"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.5
+  }
+}

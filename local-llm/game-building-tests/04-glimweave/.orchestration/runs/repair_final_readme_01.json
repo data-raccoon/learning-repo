@@ -1,0 +1,28 @@
+{
+  "job": "repair_final_readme_01",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T19:03:43.179928+00:00",
+  "finished_utc": "2026-07-18T19:04:10.037769+00:00",
+  "duration_seconds": 26.858,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\repair_final_readme_01.md",
+      "sha256": "76ab144269660dd1f2465a82a7492ce15cecb60a6d7b909b2cbd63fab8092c5d"
+    },
+    {
+      "path": "README.md",
+      "sha256": "ba7302ae3feb52ae4dd65d28072277fe2898fa0877482335d6071c7649263a2a"
+    }
+  ],
+  "output": {
+    "path": "README.md",
+    "bytes": 6993,
+    "sha256": "21751f51824644785525e1136af6e89dd7ef72b989eb7d5f74ad73297b2c9e05"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.45
+  }
+}

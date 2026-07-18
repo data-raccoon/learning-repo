@@ -1,0 +1,28 @@
+{
+  "job": "runtime_integration",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:43:02.199790+00:00",
+  "finished_utc": "2026-07-18T18:44:22.134532+00:00",
+  "duration_seconds": 79.935,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\runtime_integration.md",
+      "sha256": "f153db0e348df81c190ac71756069610cabdda28eccb3eb555934a26d5e089b6"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    }
+  ],
+  "output": {
+    "path": "src/integration.js",
+    "bytes": 3064,
+    "sha256": "acf51b3fd0ed468f43ba91b13083537c1cfba07a10583c4528d473b3a34f818d"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 0.75
+  }
+}

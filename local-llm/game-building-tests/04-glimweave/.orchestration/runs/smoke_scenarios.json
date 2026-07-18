@@ -1,0 +1,40 @@
+{
+  "job": "smoke_scenarios",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T18:18:05.110719+00:00",
+  "finished_utc": "2026-07-18T18:20:17.475629+00:00",
+  "duration_seconds": 132.365,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\smoke_scenarios.md",
+      "sha256": "4a1937feee187e755a179ffc8abebf456fbdea70cc173af2c80a0fd1bdce0b96"
+    },
+    {
+      "path": "smoke.js",
+      "sha256": "6b9359f8868d42d29808065b0a83ef15b9e9dc07a955b76370c9f8ee882bfa6c"
+    },
+    {
+      "path": "src\\state.js",
+      "sha256": "b221080ffe5f6a91d8996904d9d4133086e044f52a70c54e0e7ccf8b03dda695"
+    },
+    {
+      "path": "src\\simulation.js",
+      "sha256": "90ef0540c0edd33ca1a2748491e650e18803fedd3865c79674718081d2f7be0d"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    }
+  ],
+  "output": {
+    "path": "src/smoke-scenarios.js",
+    "bytes": 5339,
+    "sha256": "5d676778ce8a5d1d5f7ab95846c4167b807543d8df0ae158801ea940a93172ae"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 1.25
+  }
+}

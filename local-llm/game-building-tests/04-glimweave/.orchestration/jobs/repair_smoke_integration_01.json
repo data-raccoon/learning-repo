@@ -1,0 +1,11 @@
+{
+  "id": "repair_smoke_integration_01",
+  "prompt_file": ".orchestration/prompts/repair_smoke_integration_01.md",
+  "output": "smoke.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["smoke.js"],
+  "max_tokens": 30000,
+  "max_turns": 8,
+  "max_price": 0.4
+}

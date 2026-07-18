@@ -1,0 +1,11 @@
+{
+  "id": "simulation",
+  "prompt_file": ".orchestration/prompts/simulation.md",
+  "output": "src/simulation.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["docs/contracts/simulation.md", "data/game-data.json", "src/utils.js", "src/state.js"],
+  "max_tokens": 220000,
+  "max_turns": 40,
+  "max_price": 2.0
+}

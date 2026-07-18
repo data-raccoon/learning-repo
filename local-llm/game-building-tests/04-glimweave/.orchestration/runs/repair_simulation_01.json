@@ -1,0 +1,36 @@
+{
+  "job": "repair_simulation_01",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T17:52:25.716384+00:00",
+  "finished_utc": "2026-07-18T17:57:43.196570+00:00",
+  "duration_seconds": 317.48,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\repair_simulation_01.md",
+      "sha256": "bbd4cbb39af8240a482c0219d42d41cf67621360eb102afccb9ee3caca96a237"
+    },
+    {
+      "path": "src\\simulation.js",
+      "sha256": "4c2815f327bb791ca2889e29e4c6e0380b6fbd3ae1e0af7dfeca3096167f241b"
+    },
+    {
+      "path": "src\\state.js",
+      "sha256": "b221080ffe5f6a91d8996904d9d4133086e044f52a70c54e0e7ccf8b03dda695"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    }
+  ],
+  "output": {
+    "path": "src/simulation.js",
+    "bytes": 43121,
+    "sha256": "a9c4aed4f94f498c223f3fe413946e5b05ec91eb45f25ae022924f0a141c55bf"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 2.0
+  }
+}

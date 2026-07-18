@@ -1,0 +1,32 @@
+{
+  "job": "architecture",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T17:16:08.450294+00:00",
+  "finished_utc": "2026-07-18T17:19:31.642681+00:00",
+  "duration_seconds": 203.192,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\architecture.md",
+      "sha256": "3480333bd6bec73d576dc84ce890f28e745e07ca93e5918384e19d527c2ffe00"
+    },
+    {
+      "path": "EXPERIMENT_BRIEF.md",
+      "sha256": "f1133d97f99bc9eeaa13f14c065fec5840d11b236efbca2e1b677e8520f74568"
+    },
+    {
+      "path": "docs\\GAME_DESIGN.md",
+      "sha256": "f573296d0424d3120b9514df3500d7a008d514d414793588c3bc69935e21f0e6"
+    }
+  ],
+  "output": {
+    "path": "docs/ARCHITECTURE.md",
+    "bytes": 71080,
+    "sha256": "e944ba0314e963e262a882e5021cff86ece226f3a14bfdf1391ae0536e1448fa"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 2.0
+  }
+}

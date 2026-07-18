@@ -1,0 +1,11 @@
+{
+  "id": "ui",
+  "prompt_file": ".orchestration/prompts/ui.md",
+  "output": "src/ui.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["docs/contracts/ui.md", "index.html", "data/game-data.json"],
+  "max_tokens": 190000,
+  "max_turns": 40,
+  "max_price": 2.0
+}

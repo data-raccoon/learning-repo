@@ -1,0 +1,11 @@
+{
+  "id": "visual",
+  "prompt_file": ".orchestration/prompts/visual.md",
+  "output": "styles.css",
+  "kind": "code",
+  "language": "css",
+  "inputs": ["EXPERIMENT_BRIEF.md", "docs/GAME_DESIGN.md", "index.html", "src/ui.js"],
+  "max_tokens": 180000,
+  "max_turns": 40,
+  "max_price": 2.0
+}

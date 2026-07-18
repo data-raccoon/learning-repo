@@ -1,0 +1,10 @@
+{
+  "id": "utils",
+  "prompt_file": ".orchestration/prompts/utils.md",
+  "output": "src/utils.js",
+  "kind": "code",
+  "language": "javascript",
+  "inputs": ["docs/contracts/utils.md", "data/game-data.json"],
+  "max_tokens": 90000,
+  "max_price": 2.0
+}

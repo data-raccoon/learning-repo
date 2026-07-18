@@ -1,0 +1,40 @@
+{
+  "job": "visual",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T17:45:48.849196+00:00",
+  "finished_utc": "2026-07-18T17:47:29.539518+00:00",
+  "duration_seconds": 100.69,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\visual.md",
+      "sha256": "aac713851fd4512ce704bf5d212db4d52661395bc042bfcffa5adfd852b4451e"
+    },
+    {
+      "path": "EXPERIMENT_BRIEF.md",
+      "sha256": "f1133d97f99bc9eeaa13f14c065fec5840d11b236efbca2e1b677e8520f74568"
+    },
+    {
+      "path": "docs\\GAME_DESIGN.md",
+      "sha256": "f573296d0424d3120b9514df3500d7a008d514d414793588c3bc69935e21f0e6"
+    },
+    {
+      "path": "index.html",
+      "sha256": "801c38634b3149ec725aeaa19e3b5d075bd98d939d25b20e19181f081a0439a7"
+    },
+    {
+      "path": "src\\ui.js",
+      "sha256": "dcad05917ac73dc91cc69d1cfaa5109021347bcb4e1c4261e474a35b9fb02f49"
+    }
+  ],
+  "output": {
+    "path": "styles.css",
+    "bytes": 16699,
+    "sha256": "f8001a9e469078da60bbeed22650a1154a45c3616b2c3871e728003d50d98d26"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": "disabled",
+    "max_price_usd": 2.0
+  }
+}

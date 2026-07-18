@@ -1,0 +1,10 @@
+{
+  "id": "qa_review",
+  "prompt_file": ".orchestration/prompts/qa_review.md",
+  "output": "docs/QA_REVIEW.md",
+  "kind": "text",
+  "inputs": ["EXPERIMENT_BRIEF.md", "docs/VERIFICATION.md", "smoke.js", "src/integration.js", ".orchestration/NORMALIZATIONS.md"],
+  "max_tokens": 45000,
+  "max_turns": 12,
+  "max_price": 0.6
+}
