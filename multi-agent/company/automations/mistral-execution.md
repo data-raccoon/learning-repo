@@ -48,6 +48,9 @@ An authenticated local model endpoint is available on the Founder workstation as
 | Model storage | `C:\LLMs\models\mistral` outside this repository |
 | API key source | `C:\LLMs\config\api_key.txt` outside this repository; never copy its value here |
 | Operations | Python scripts under `C:\LLMs\python` |
+| Context | One 32,768-token server slot; Vibe compaction threshold 24,576 tokens |
+| Chat template | Native Ministral format with the strict role-alternation check removed for OpenAI/Vibe histories |
+| Vibe adapter | Project-local generic OpenAI provider `local-llama`; synthetic response, long-history, consecutive-role, and `read_file` tool-call canaries passed |
 | Transport canary | HTTP 401 without authentication; authenticated response `Bereit.` |
 | Observed hardware | NVIDIA RTX 2080 SUPER, 8 GB VRAM, GPU offload active |
 
@@ -59,7 +62,7 @@ Operational commands use the configured Python interpreter and do not require re
 & "${env:USERPROFILE}\.venvs\all\Scripts\python.exe" C:\LLMs\python\start_mistral.py --stop
 ```
 
-Availability is not admission. Do not point Vibe or another Company-OS agent at this endpoint until a separate Work Order verifies the adapter with synthetic, read-only data. Do not assign a model tier, role, tool permission, write authority, or automatic route until the admission and eligibility controls in `company/model-capability-backlog.md` are implemented and the exact quantized configuration passes them. Keep the endpoint on loopback, retain API-key enforcement, and never commit the key.
+Availability and adapter compatibility are not model admission. The endpoint has passed synthetic Vibe transport, history, and file-tool canaries in the separate `local-llm` project, but it has not passed Company-OS capability or eligibility evaluation. Do not provide Company-OS repository context, assign a model tier or Company-OS role, grant write authority, or create an automatic route until a new approved Work Order runs the admission controls in `company/model-capability-backlog.md` against the exact quantized configuration. Keep the endpoint on loopback, retain API-key enforcement, and never commit the key.
 
 See `company/reports/AR-2026-011-local-ministral-runtime-option.md` for evidence, limitations, and proposed next action.
 

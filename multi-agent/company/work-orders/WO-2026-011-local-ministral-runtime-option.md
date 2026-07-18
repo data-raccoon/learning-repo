@@ -78,3 +78,9 @@ The Founder explicitly requested documentation of the existing local option. Thi
 - Full unit test suite passed: 10/10.
 - The SOP records the local runtime as an unadmitted candidate and links the evidence report.
 - No `.vibe` configuration, provider selection, model route, agent permission, credential, or API-key value changed.
+
+## Post-Closure Update — 2026-07-18
+
+After this documentation-only Work Order closed, the separate sibling project `local-llm` added a project-local generic OpenAI provider and a restricted `Local Files` agent. Synthetic authenticated response, 35-message history, consecutive-role, and structured `read_file` tool-call canaries passed against a one-slot 32,768-token server with a 24,576-token Vibe compaction threshold.
+
+This later evidence resolves the transport-adapter question but does not expand this Work Order, admit the model to Company-OS, authorize Company-OS repository disclosure, or change any provider or agent configuration inside `multi-agent`. A new approved Work Order remains required for model-admission testing.
