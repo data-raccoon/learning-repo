@@ -1,0 +1,2 @@
+- Removed second duplicate `<script src="src/test-bridge.js"></script>` from index.html
+- Changed TEST.testRetuning Reservoir expectation from 0 to 100 in ui.js

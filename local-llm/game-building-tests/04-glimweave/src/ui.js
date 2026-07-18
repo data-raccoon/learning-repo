@@ -749,13 +749,11 @@
       var desc = createElement('span', 'purchase-desc', weftling.description);
       var costSpan = createElement('span', 'purchase-cost', ' - ' + cost + ' Glim');
       var btn = createButton('Buy', 'btn btn-buy', function() {
-        if (reservoir >= cost && !atMax) {
-          var canvas = document.getElementById('gameCanvas');
-          var rect = canvas.getBoundingClientRect();
-          var x = rect.width / 2 + Math.random() * 100 - 50;
-          var y = rect.height / 2 + Math.random() * 100 - 50;
-          dispatchAction({ type: 'BUY_WEFTLING', weftlingType: typeId, x: x, y: y });
-        }
+        var canvas = document.getElementById('gameCanvas');
+        var rect = canvas.getBoundingClientRect();
+        var x = rect.width / 2 + Math.random() * 100 - 50;
+        var y = rect.height / 2 + Math.random() * 100 - 50;
+        dispatchAction({ type: 'BUY_WEFTLING', weftlingType: typeId, x: x, y: y });
       });
       btn.disabled = reservoir < cost || atMax;
       btn.setAttribute('aria-label', 'Buy ' + weftling.id + ' for ' + cost + ' Glim');
@@ -1279,11 +1277,33 @@
       state = State.create();
     }
 
+    if (!actionHandler) {
+      actionHandler = function(action) {
+        try {
+          Simulation.handleAction(state, action);
+          saveState();
+          updateUI();
+          // Paint state-changing actions synchronously so the playfield never
+          // depends on the next animation-frame callback becoming available.
+          Renderer.render(state, 0);
+        } catch (e) {
+          var reason = e.message || String(e);
+          announce('Action rejected: ' + reason);
+          UI.showNotification('Cannot perform action: ' + reason, 'error');
+        }
+      };
+      UI.onAction(actionHandler);
+    }
+
     GW.Renderer.init(document.getElementById('gameCanvas'), state);
     startSimLoop();
     startRenderLoop();
 
     updateUI();
+    // Establish a real first frame immediately. Browsers may defer animation
+    // frames for background tabs and automation, which previously left the
+    // central playfield transparent until an rAF happened to run.
+    Renderer.render(state, 0);
 
     if (!loaded) {
       setTimeout(function() {
@@ -1300,6 +1320,7 @@
   UI.update = function(newState) {
     state = newState;
     updateUI();
+    Renderer.render(state, 0);
   };
 
   UI.onAction = function(handler) {
@@ -1316,12 +1337,6 @@
     var root = document.getElementById('uiRoot');
     if (root) {
       UI.init(root);
-    }
-    if (GW.Renderer && GW.Renderer.init) {
-      var canvas = document.getElementById('gameCanvas');
-      if (canvas) {
-        GW.Renderer.init(canvas, state);
-      }
     }
   };
 
@@ -1509,8 +1524,10 @@
       s.totalGlimCapturedThisRun = 2000;
       s.retuningCount = 0;
       s.iridescence = 0;
+      s.phase = 2;
+      s.highestPhaseUnlocked = 2;
       TEST.retune(s);
-      return s.weftlings.length === 0 && s.reservoir === 0 && s.totalGlimCapturedThisRun === 0 && s.iridescence > 0;
+      return s.weftlings.length === 0 && s.reservoir === 100 && s.totalGlimCapturedThisRun === 0 && s.iridescence > 0;
     };
 
     TEST.testOfflineProgress = function() {
@@ -1521,7 +1538,7 @@
       s.weftlings = [{ id: 'w1', type: 'Glimspinner', x: 100, y: 100 }];
       var offlineSec = 3600;
       var gained = TEST.applyOfflineProgress(s, offlineSec);
-      return gained > 0;
+      return gained.glimGained > 0;
     };
 
     TEST.testSaveLoad = function() {

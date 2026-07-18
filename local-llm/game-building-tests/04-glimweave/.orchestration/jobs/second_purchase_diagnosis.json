@@ -1,0 +1,14 @@
+{
+  "id": "second_purchase_diagnosis",
+  "prompt_file": ".orchestration/prompts/second_purchase_diagnosis.md",
+  "output": ".orchestration/qa/SECOND_PURCHASE_DIAGNOSIS.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": ["src/ui.js", "src/simulation.js", "src/integration.js", "smoke.js"],
+  "tools": ["read_file", "grep", "edit", "bash"],
+  "max_tokens": 240000,
+  "max_turns": 24,
+  "max_price": 1.5
+}

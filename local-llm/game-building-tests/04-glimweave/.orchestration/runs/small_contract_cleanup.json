@@ -1,0 +1,38 @@
+{
+  "job": "small_contract_cleanup",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T20:58:28.202605+00:00",
+  "finished_utc": "2026-07-18T20:58:47.194999+00:00",
+  "duration_seconds": 18.992,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\small_contract_cleanup.md",
+      "sha256": "40473d9f4b33c4a16c10bf019a057030de4fa9dea2058279c2768c92fb6ef4a3"
+    },
+    {
+      "path": "index.html",
+      "sha256": "2858268e6d29bc9aeab448922c3d55a86d117833b4885ca436340bcaab16ff60"
+    },
+    {
+      "path": "src\\ui.js",
+      "sha256": "7f0d36cda1ca6d0ad8165f0de64cc515f6bbb32ea78febac3bcb787a668d72a1"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/SMALL_CONTRACT_CLEANUP.md",
+    "bytes": 161,
+    "sha256": "d99b8d8e818ceea3c1099b4b5225bdd925dc27de4537e7669823846088a805aa"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file",
+      "edit"
+    ],
+    "read_only": false,
+    "native_images": 0,
+    "embedded_inputs": false,
+    "max_price_usd": 0.5
+  }
+}

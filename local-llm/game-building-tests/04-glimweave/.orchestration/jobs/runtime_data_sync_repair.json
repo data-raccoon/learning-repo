@@ -1,0 +1,14 @@
+{
+  "id": "runtime_data_sync_repair",
+  "prompt_file": ".orchestration/prompts/runtime_data_sync_repair.md",
+  "output": ".orchestration/qa/RUNTIME_DATA_SYNC_REPAIR.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": ["data/game-data.js", "data/game-data.json"],
+  "tools": ["read_file", "edit", "bash"],
+  "max_tokens": 60000,
+  "max_turns": 7,
+  "max_price": 0.5
+}

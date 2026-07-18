@@ -1,0 +1,14 @@
+{
+  "id": "production_smoke_repair",
+  "prompt_file": ".orchestration/prompts/production_smoke_repair.md",
+  "output": ".orchestration/qa/PRODUCTION_SMOKE_REPAIR.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": ["index.html", "smoke.js", "src/ui.js", "tools/verify_glimweave.py"],
+  "tools": ["read_file", "grep", "edit", "bash"],
+  "max_tokens": 220000,
+  "max_turns": 24,
+  "max_price": 1.5
+}

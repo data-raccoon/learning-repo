@@ -1,0 +1,30 @@
+{
+  "job": "vision_attachment_probe",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T20:14:40.518092+00:00",
+  "finished_utc": "2026-07-18T20:14:59.316748+00:00",
+  "duration_seconds": 18.799,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\vision_attachment_probe.md",
+      "sha256": "9bd3ee621b61551c2221c70ebebfc2102da61f7013ddac9acadc1f49548e8f11"
+    },
+    {
+      "path": ".orchestration\\qa\\first-run-1440x900.png",
+      "sha256": "ba4298c604a426955528727fba73aec5f93447e745d6aa7ac17d9155f4f54b49",
+      "kind": "native_image"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/VISION_ATTACHMENT_PROBE.md",
+    "bytes": 181,
+    "sha256": "b02ed5a9076a6a9cff4a45437d25fefbb2bb9cbb95df432a42244d729019f083"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [],
+    "native_images": 1,
+    "max_price_usd": 0.1
+  }
+}

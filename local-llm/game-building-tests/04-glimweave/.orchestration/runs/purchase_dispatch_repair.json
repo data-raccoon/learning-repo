@@ -1,0 +1,35 @@
+{
+  "job": "purchase_dispatch_repair",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T21:16:55.868874+00:00",
+  "finished_utc": "2026-07-18T21:18:58.608908+00:00",
+  "duration_seconds": 122.74,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\purchase_dispatch_repair.md",
+      "sha256": "7081acb58da59ba3811a593fd7cb41dc8e136ec51f92ab83a5d44b8f4f2ae81a"
+    },
+    {
+      "path": "src\\ui.js",
+      "sha256": "14526869cca1a3619b96e1052aaa4ea73daa2787deada19e254f83421eab63f5"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/PURCHASE_DISPATCH_REPAIR.md",
+    "bytes": 247,
+    "sha256": "85635f2d37e3c1c33f280825b5916828950a70a01fc9755a056039272c6677af"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file",
+      "edit",
+      "bash"
+    ],
+    "read_only": false,
+    "native_images": 0,
+    "embedded_inputs": false,
+    "max_price_usd": 0.5
+  }
+}

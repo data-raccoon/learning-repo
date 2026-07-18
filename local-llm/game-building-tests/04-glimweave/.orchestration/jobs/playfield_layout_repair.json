@@ -1,0 +1,14 @@
+{
+  "id": "playfield_layout_repair",
+  "prompt_file": ".orchestration/prompts/playfield_layout_repair.md",
+  "output": ".orchestration/qa/PLAYFIELD_LAYOUT_REPAIR.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": ["styles.css"],
+  "tools": ["read_file", "edit", "bash"],
+  "max_tokens": 180000,
+  "max_turns": 16,
+  "max_price": 1.0
+}

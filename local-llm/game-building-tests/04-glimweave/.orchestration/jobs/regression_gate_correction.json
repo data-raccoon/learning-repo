@@ -1,0 +1,14 @@
+{
+  "id": "regression_gate_correction",
+  "prompt_file": ".orchestration/prompts/regression_gate_correction.md",
+  "output": ".orchestration/qa/REGRESSION_GATE_CORRECTION.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": ["src/ui.js", "smoke.js", "tools/verify_glimweave.py"],
+  "tools": ["read_file", "edit", "bash"],
+  "max_tokens": 190000,
+  "max_turns": 20,
+  "max_price": 1.25
+}

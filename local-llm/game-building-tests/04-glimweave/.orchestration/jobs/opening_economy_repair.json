@@ -1,0 +1,21 @@
+{
+  "id": "opening_economy_repair",
+  "prompt_file": ".orchestration/prompts/opening_economy_repair.md",
+  "output": ".orchestration/qa/OPENING_ECONOMY_REPAIR.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": [
+    "src/state.js",
+    "data/game-data.json"
+  ],
+  "tools": [
+    "read_file",
+    "edit",
+    "bash"
+  ],
+  "max_tokens": 160000,
+  "max_turns": 16,
+  "max_price": 1.0
+}

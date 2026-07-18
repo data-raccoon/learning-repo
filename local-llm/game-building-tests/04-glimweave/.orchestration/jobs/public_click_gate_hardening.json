@@ -1,0 +1,14 @@
+{
+  "id": "public_click_gate_hardening",
+  "prompt_file": ".orchestration/prompts/public_click_gate_hardening.md",
+  "output": ".orchestration/qa/PUBLIC_CLICK_GATE_HARDENING.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": ["smoke.js"],
+  "tools": ["read_file", "edit", "bash"],
+  "max_tokens": 130000,
+  "max_turns": 14,
+  "max_price": 0.75
+}

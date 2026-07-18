@@ -115,7 +115,7 @@
     var iridescenceGained = test.retune(state);
     return typeof iridescenceGained === 'number' && iridescenceGained > 0 &&
            state.iridescence > initialIridescence && state.phase === 1 &&
-           state.reservoir === 0 && state.weftlings.length === 0;
+           state.reservoir === 100 && state.weftlings.length === 0;
   };
 
   test.testVictory = function() {
@@ -159,7 +159,7 @@
     }
     test.assertStateInvariants(reconstructed);
     var gained = test.applyOfflineProgress(reconstructed, 3600);
-    return gained > 0;
+    return gained.glimGained > 0;
   };
 
   test.testSaveLoad = function() {

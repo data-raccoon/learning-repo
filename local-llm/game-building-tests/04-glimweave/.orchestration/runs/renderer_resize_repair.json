@@ -1,0 +1,35 @@
+{
+  "job": "renderer_resize_repair",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T20:40:01.362202+00:00",
+  "finished_utc": "2026-07-18T20:41:07.380409+00:00",
+  "duration_seconds": 66.018,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\renderer_resize_repair.md",
+      "sha256": "4d9cdcc32773703ee8bf517a43b5720db97f28bb04c7e1a9c125549844e9dad5"
+    },
+    {
+      "path": "src\\render.js",
+      "sha256": "34b4fb5c7d593afe9537f1004b3ca177b034123d7f69888692bd804ccb4e5132"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/RENDERER_RESIZE_REPAIR.md",
+    "bytes": 611,
+    "sha256": "54c96885212e5d672171ace7a597e6dfc7333312baccba6eb0031e6fa98e00ce"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file",
+      "edit",
+      "bash"
+    ],
+    "read_only": false,
+    "native_images": 0,
+    "embedded_inputs": false,
+    "max_price_usd": 1.0
+  }
+}

@@ -1,0 +1,3 @@
+- Left sidebar panels (WEFTLINGS/RETUNING/SETTINGS) and right GLOBAL UPGRADES list
+- No distinct play field is visibly reserved
+- Small rendering artifact near "Glimspinner:" colon

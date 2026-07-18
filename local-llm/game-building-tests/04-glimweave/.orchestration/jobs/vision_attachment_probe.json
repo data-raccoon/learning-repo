@@ -1,0 +1,14 @@
+{
+  "id": "vision_attachment_probe",
+  "prompt_file": ".orchestration/prompts/vision_attachment_probe.md",
+  "output": ".orchestration/qa/VISION_ATTACHMENT_PROBE.md",
+  "kind": "text",
+  "inputs": [],
+  "images": [
+    ".orchestration/qa/first-run-1440x900.png"
+  ],
+  "tools": [],
+  "max_tokens": 1200,
+  "max_turns": 2,
+  "max_price": 0.10
+}

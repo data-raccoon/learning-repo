@@ -21,6 +21,7 @@
   var height = 0;
   var reducedMotion = false;
   var colorblindMode = 'DEFAULT';
+  var resizeObserver = null;
 
   var motePool = [];
   var weftlingPool = [];
@@ -31,7 +32,31 @@
     canvas = canvasElement;
     ctx = canvas.getContext('2d');
     dpr = window.devicePixelRatio || 1;
-    resize(canvas.width, canvas.height);
+
+    var rect = canvas.getBoundingClientRect();
+    resize(Math.floor(rect.width), Math.floor(rect.height));
+
+    resizeObserver = new ResizeObserver(function(entries) {
+      var entry = entries[0];
+      if (entry && entry.contentRect) {
+        var newWidth = Math.floor(entry.contentRect.width);
+        var newHeight = Math.floor(entry.contentRect.height);
+        if (newWidth !== width || newHeight !== height) {
+          resize(newWidth, newHeight);
+        }
+      }
+    });
+    resizeObserver.observe(canvas);
+
+    window.addEventListener('resize', function() {
+      var rect = canvas.getBoundingClientRect();
+      var newWidth = Math.floor(rect.width);
+      var newHeight = Math.floor(rect.height);
+      if (newWidth !== width || newHeight !== height) {
+        resize(newWidth, newHeight);
+      }
+    });
+
     reducedMotion = false;
     colorblindMode = 'DEFAULT';
     lastState = null;
@@ -46,16 +71,26 @@
 
   function resize(w, h) {
     if (!canvas) return;
-    width = w;
-    height = h;
+    var newWidth = w;
+    var newHeight = h;
+    if (newWidth === width && newHeight === height) return;
+
+    width = newWidth;
+    height = newHeight;
+
+    dpr = window.devicePixelRatio || 1;
+
     var displayWidth = Math.max(1, Math.floor(width * dpr));
     var displayHeight = Math.max(1, Math.floor(height * dpr));
     if (displayWidth > 2000) displayWidth = 2000;
     if (displayHeight > 1500) displayHeight = 1500;
+
     canvas.width = displayWidth;
     canvas.height = displayHeight;
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
   }
 

@@ -1,0 +1,35 @@
+{
+  "job": "ui_action_wiring_repair",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T20:36:14.526028+00:00",
+  "finished_utc": "2026-07-18T20:37:06.906499+00:00",
+  "duration_seconds": 52.38,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\ui_action_wiring_repair.md",
+      "sha256": "80a7b70a61522f83bebbef934847c9259ae7df5b757ecd2eee8894de05e30a38"
+    },
+    {
+      "path": "src\\ui.js",
+      "sha256": "8887e54030ba5fa668f3903f6e9a0ffc773a12bd1c1dd894be13027e818c590e"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/UI_ACTION_WIRING_REPAIR.md",
+    "bytes": 761,
+    "sha256": "ff3702196edbad1e5cc9864626c4ba54fd0e19870ef38f722f53caf0145ed66f"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file",
+      "edit",
+      "bash"
+    ],
+    "read_only": false,
+    "native_images": 0,
+    "embedded_inputs": false,
+    "max_price_usd": 1.0
+  }
+}

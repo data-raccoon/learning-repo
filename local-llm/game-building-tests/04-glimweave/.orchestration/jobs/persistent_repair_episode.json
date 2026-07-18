@@ -1,0 +1,16 @@
+{
+  "id": "persistent_repair_episode",
+  "prompt_file": ".orchestration/prompts/persistent_repair_episode.md",
+  "output": ".orchestration/qa/PERSISTENT_REPAIR_REPORT.md",
+  "kind": "text",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": [".orchestration/REPAIR_STATE.md", "index.html", "bootstrap.js", "smoke.js", "src/smoke-scenarios.js", "tools/verify_glimweave.py"],
+  "images": [],
+  "agent": "glimweave-repair",
+  "tools": ["read_file", "grep", "edit", "write_file", "bash"],
+  "vibe_output": "streaming",
+  "max_tokens": 600000,
+  "max_turns": 45,
+  "max_price": 4.0
+}

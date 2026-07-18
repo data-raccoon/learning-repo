@@ -1,0 +1,24 @@
+{
+  "id": "core_playability_repair",
+  "prompt_file": ".orchestration/prompts/core_playability_repair.md",
+  "output": ".orchestration/qa/CORE_PLAYABILITY_REPAIR.md",
+  "kind": "text",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": [
+    "bootstrap.js",
+    "src/integration.js",
+    "src/ui.js",
+    "src/state.js",
+    "data/game-data.json"
+  ],
+  "tools": [
+    "read_file",
+    "grep",
+    "edit",
+    "bash"
+  ],
+  "max_tokens": 600000,
+  "max_turns": 60,
+  "max_price": 2.0
+}

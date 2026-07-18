@@ -1,0 +1,14 @@
+{
+  "id": "purchase_dispatch_repair",
+  "prompt_file": ".orchestration/prompts/purchase_dispatch_repair.md",
+  "output": ".orchestration/qa/PURCHASE_DISPATCH_REPAIR.md",
+  "kind": "text",
+  "vibe_output": "streaming",
+  "embed_inputs": false,
+  "read_only": false,
+  "inputs": ["src/ui.js"],
+  "tools": ["read_file", "edit", "bash"],
+  "max_tokens": 80000,
+  "max_turns": 10,
+  "max_price": 0.5
+}

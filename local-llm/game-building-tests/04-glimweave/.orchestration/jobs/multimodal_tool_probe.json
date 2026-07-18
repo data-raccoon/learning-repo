@@ -1,0 +1,19 @@
+{
+  "id": "multimodal_tool_probe",
+  "prompt_file": ".orchestration/prompts/multimodal_tool_probe.md",
+  "output": ".orchestration/qa/MULTIMODAL_TOOL_PROBE.md",
+  "kind": "text",
+  "embed_inputs": false,
+  "inputs": [
+    "EXPERIMENT_BRIEF.md"
+  ],
+  "images": [
+    ".orchestration/qa/first-run-1440x900.png"
+  ],
+  "tools": [
+    "read_file"
+  ],
+  "max_tokens": 4000,
+  "max_turns": 4,
+  "max_price": 0.15
+}

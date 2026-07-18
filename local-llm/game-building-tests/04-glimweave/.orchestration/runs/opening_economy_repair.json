@@ -1,0 +1,39 @@
+{
+  "job": "opening_economy_repair",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T20:37:42.666859+00:00",
+  "finished_utc": "2026-07-18T20:39:14.120404+00:00",
+  "duration_seconds": 91.454,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\opening_economy_repair.md",
+      "sha256": "5557ba9832424aee008673b8304fe02c750540553c8b6410781c8937cf583bd7"
+    },
+    {
+      "path": "src\\state.js",
+      "sha256": "b221080ffe5f6a91d8996904d9d4133086e044f52a70c54e0e7ccf8b03dda695"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/OPENING_ECONOMY_REPAIR.md",
+    "bytes": 889,
+    "sha256": "0b6fec7323005d4f56c369232d9539df237050576e10dd7217493ddd14d995d7"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file",
+      "edit",
+      "bash"
+    ],
+    "read_only": false,
+    "native_images": 0,
+    "embedded_inputs": false,
+    "max_price_usd": 1.0
+  }
+}

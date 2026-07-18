@@ -1,0 +1,39 @@
+{
+  "job": "final_smoke_correction",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T21:07:27.847674+00:00",
+  "finished_utc": "2026-07-18T21:08:33.486771+00:00",
+  "duration_seconds": 65.639,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\final_smoke_correction.md",
+      "sha256": "039e652921189388d5f648295c7fe294b0f3bb8ef5773613c51be5fd0c48c7b9"
+    },
+    {
+      "path": "src\\smoke-scenarios.js",
+      "sha256": "2009abc80bf03c952dc5c9d0b0b598d9a9c8fe8242b754b3ffc3ea3a71246eab"
+    },
+    {
+      "path": "smoke.js",
+      "sha256": "133ec63b3986e465e8cc5a3ac69a6052f67506601d1c46bb62f57aacf33f5918"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/FINAL_SMOKE_CORRECTION.md",
+    "bytes": 181,
+    "sha256": "dafacb71545c3c33d942634b78550d4931c34fc10b00348e97c2d26cc980732b"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file",
+      "edit",
+      "bash"
+    ],
+    "read_only": false,
+    "native_images": 0,
+    "embedded_inputs": false,
+    "max_price_usd": 0.75
+  }
+}

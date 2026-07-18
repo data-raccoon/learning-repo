@@ -1,0 +1,30 @@
+{
+  "id": "full_qa_pass",
+  "prompt_file": ".orchestration/prompts/full_qa_pass.md",
+  "output": "docs/FULL_QA_REPORT.md",
+  "kind": "text",
+  "images": [
+    ".orchestration/qa/first-run-1440x900.png"
+  ],
+  "tools": [
+    "read_file"
+  ],
+  "inputs": [
+    ".orchestration/qa/FIRST_RUN_EVIDENCE.md",
+    "EXPERIMENT_BRIEF.md",
+    "index.html",
+    "bootstrap.js",
+    "data/game-data.json",
+    "src/state.js",
+    "src/simulation.js",
+    "src/render.js",
+    "src/ui.js",
+    "src/integration.js",
+    "styles.css",
+    "smoke.js",
+    "src/smoke-scenarios.js"
+  ],
+  "max_tokens": 240000,
+  "max_turns": 40,
+  "max_price": 2.0
+}

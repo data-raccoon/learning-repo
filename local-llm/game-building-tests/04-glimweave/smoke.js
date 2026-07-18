@@ -70,16 +70,126 @@
         check(test.testOfflineProgress() === true, 'OFFLINE_PROGRESS');
         check(test.testSaveLoad() === true, 'SAVE_LOAD');
         phase = 'UI';
-        check(document.querySelector('#uiRoot').children.length > 0, 'UI_RENDERED');
-        check(document.querySelector('#gameCanvas').width > 0, 'CANVAS_READY');
         check(document.querySelector('#announcer').getAttribute('aria-live') === 'polite', 'ARIA_LIVE');
         check(getComputedStyle(document.body).backgroundColor !== '', 'CSS_LOADED');
       } catch (error) {
         var trace = String(error.stack || '').split('\n').slice(1, 4).join('_').slice(0, 220).replace(/\W+/g, '_').toUpperCase();
         failures.push('RUNTIME_' + phase + '_' + error.name + '_' + String(error.message || '').slice(0, 320).replace(/\W+/g, '_').toUpperCase() + '_' + trace);
       }
-      var output = document.querySelector('#smoke-result');
-      output.textContent = failures.length ? 'FAIL:' + failures.join(',') : 'PASS';
+      window.setTimeout(function () {
+        try {
+          phase = 'UI_PROFILE';
+          var canvas = document.querySelector('#gameCanvas');
+          var rect = canvas.getBoundingClientRect();
+          check(rect.width > 0 && rect.height > 0, 'CANVAS_DIMENSIONS');
+          check(getComputedStyle(canvas).display !== 'none', 'CANVAS_DISPLAYED');
+
+          var leftCol = document.querySelector('.left-column');
+          var rightCol = document.querySelector('.right-column');
+          check(!!leftCol && !!rightCol, 'COLUMNS_EXIST');
+          if (leftCol && rightCol) {
+            var leftRect = leftCol.getBoundingClientRect();
+            var rightRect = rightCol.getBoundingClientRect();
+            var canvasRect = canvas.getBoundingClientRect();
+            var leftRightEdge = leftRect.right;
+            var rightLeftEdge = rightRect.left;
+            var gap = rightLeftEdge - leftRightEdge;
+            check(gap >= 300, 'CENTRAL_GAP_300PX');
+            var gapLeft = Math.max(leftRightEdge, canvasRect.left);
+            var gapRight = Math.min(rightLeftEdge, canvasRect.right);
+            check(gapRight > gapLeft, 'GAP_OVERLAPS_CANVAS');
+          }
+
+          var reservoirEl = document.querySelector('[data-testid="reservoir-display"]') || document.querySelector('#reservoirValue') || Array.from(document.querySelectorAll('*')).find(function(el) { return String(el.textContent || '').trim().match(/(?:Reservoir|reservoir):\s*100/); });
+          check(!!reservoirEl, 'RESERVOIR_ELEMENT');
+          var initialReservoir = parseInt(String(reservoirEl.textContent || '').replace(/\D/g, ''), 10);
+          check(initialReservoir === 100, 'RESERVOIR_INITIAL_100');
+
+          var glimspinnerBtn = document.querySelector('#purchaseList button[aria-label^="Buy Glimspinner"]');
+          var driftcatcherBtn = document.querySelector('#purchaseList button[aria-label^="Buy Driftcatcher"]');
+          check(!!glimspinnerBtn && !!driftcatcherBtn, 'PURCHASE_BUTTONS_EXIST');
+          check(glimspinnerBtn && !glimspinnerBtn.disabled && driftcatcherBtn && !driftcatcherBtn.disabled, 'PURCHASE_BUTTONS_ENABLED');
+
+          var fnvHash = function(imageData) {
+            var hash = 2166136261;
+            for (var i = 0; i < imageData.data.length; i += 16) {
+              hash ^= (imageData.data[i] + (imageData.data[i+1] << 8) + (imageData.data[i+2] << 16) + (imageData.data[i+3] << 24)) >>> 0;
+              hash = Math.imul(hash, 16777619);
+            }
+            return hash >>> 0;
+          };
+
+          var canvasCtx = canvas.getContext('2d');
+          var hashBefore = 0;
+          if (canvasCtx) {
+            var width = canvas.width;
+            var height = canvas.height;
+            var sampleImageData = canvasCtx.getImageData(0, 0, width, height);
+            hashBefore = fnvHash(sampleImageData);
+          }
+
+          glimspinnerBtn.click();
+          window.setTimeout(function () {
+            try {
+              var reservoirAfterGlimspinner = parseInt(String((document.querySelector('[data-testid="reservoir-display"]') || document.querySelector('#reservoirValue') || reservoirEl).textContent || '').replace(/\D/g, ''), 10);
+              check(reservoirAfterGlimspinner === 55, 'RESERVOIR_AFTER_GLIMSPINNER_55');
+
+              var driftcatcherBtnAfter = document.querySelector('#purchaseList button[aria-label^="Buy Driftcatcher"]');
+              if (!driftcatcherBtnAfter) failures.push('DRIFTCATCHER_BTN_MISSING');
+              else if (driftcatcherBtnAfter.disabled) failures.push('DRIFTCATCHER_BTN_DISABLED');
+              else driftcatcherBtnAfter.click();
+              window.setTimeout(function () {
+                try {
+                  var reservoirAfterDriftcatcher = parseInt(String((document.querySelector('[data-testid="reservoir-display"]') || document.querySelector('#reservoirValue') || reservoirEl).textContent || '').replace(/\D/g, ''), 10);
+                  if (reservoirAfterDriftcatcher !== 0) {
+                    var announcer = document.querySelector('#announcer');
+                    var announcerText = String(announcer && announcer.textContent || '').replace(/\W+/g, '_').toUpperCase().slice(0, 140);
+                    failures.push('RESERVOIR_AFTER_DRIFTCATCHER_' + reservoirAfterDriftcatcher + '_ACTION_MESSAGE_' + announcerText);
+                    check(!!announcer && String(announcer.textContent || '').toLowerCase().includes('rejected'), 'ANNOUNCER_REJECTED_ACTION');
+                  } else {
+                    check(true, 'RESERVOIR_AFTER_DRIFTCATCHER_0');
+                  }
+
+                  var ownedGlimspinner = document.querySelector('[data-testid="owned-glimspinner"]') || Array.from(document.querySelectorAll('*')).find(function(el) { return String(el.textContent || '').toLowerCase().match(/glimspinner.*1/); });
+                  var ownedDriftcatcher = document.querySelector('[data-testid="owned-driftcatcher"]') || Array.from(document.querySelectorAll('*')).find(function(el) { return String(el.textContent || '').toLowerCase().match(/driftcatcher.*1/); });
+                  check(!!ownedGlimspinner || String(document.body.textContent || '').toLowerCase().includes('glimspinner') && String(document.body.textContent || '').toLowerCase().includes('1'), 'OWNED_GLIMSPINNER_VISIBLE');
+                  check(!!ownedDriftcatcher || String(document.body.textContent || '').toLowerCase().includes('driftcatcher') && String(document.body.textContent || '').toLowerCase().includes('1'), 'OWNED_DRIFTCATCHER_VISIBLE');
+
+                  window.setTimeout(function () {
+                    try {
+                      var hashAfter = 0;
+                      if (canvasCtx) {
+                        var width = canvas.width;
+                        var height = canvas.height;
+                        var sampleImageDataAfter = canvasCtx.getImageData(0, 0, width, height);
+                        hashAfter = fnvHash(sampleImageDataAfter);
+                      }
+                      check(hashAfter !== hashBefore, 'CANVAS_PIXEL_CHANGED');
+                    } catch (e) {
+                      failures.push('PIXEL_CHECK_ERR');
+                    }
+                    var output = document.querySelector('#smoke-result');
+                    output.textContent = failures.length ? 'FAIL:' + failures.join(',') : 'PASS';
+                  }, 500);
+                } catch (e) {
+                  failures.push('AFTER_DRIFTCATCHER_ERR');
+                  var output = document.querySelector('#smoke-result');
+                  output.textContent = failures.length ? 'FAIL:' + failures.join(',') : 'PASS';
+                }
+              }, 200);
+            } catch (e) {
+              failures.push('AFTER_GLIMSPINNER_ERR');
+              var output = document.querySelector('#smoke-result');
+              output.textContent = failures.length ? 'FAIL:' + failures.join(',') : 'PASS';
+            }
+          }, 200);
+        } catch (error) {
+          var trace = String(error.stack || '').split('\n').slice(1, 4).join('_').slice(0, 220).replace(/\W+/g, '_').toUpperCase();
+          failures.push('RUNTIME_' + phase + '_' + error.name + '_' + String(error.message || '').slice(0, 320).replace(/\W+/g, '_').toUpperCase() + '_' + trace);
+          var output = document.querySelector('#smoke-result');
+          output.textContent = failures.length ? 'FAIL:' + failures.join(',') : 'PASS';
+        }
+      }, 150);
     }, 150);
   });
 })();

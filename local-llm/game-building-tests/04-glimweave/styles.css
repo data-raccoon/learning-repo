@@ -703,3 +703,57 @@ body {
 }
 
 @vibe-scratchpad-39751680-x
+
+/* PLAYFIELD LAYOUT OVERRIDES */
+#gameCanvas {
+  pointer-events: none;
+}
+
+.main-panels {
+  display: grid;
+  grid-template-columns: min-content minmax(320px, 1fr) min-content;
+}
+
+.left-column {
+  grid-column: 1;
+}
+
+.right-column {
+  grid-column: 3;
+}
+
+@media (max-width: 760px) {
+  #gameShell {
+    overflow-y: auto;
+  }
+
+  #gameCanvas {
+    position: absolute;
+    top: 0;
+    height: 40dvh;
+    min-height: 260px;
+    left: 0;
+    right: 0;
+  }
+
+  #uiRoot {
+    padding-top: 40dvh;
+  }
+
+  .main-panels {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .left-column,
+  .right-column {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .main-panels {
+    padding-inline: 0;
+    gap: 0;
+  }
+}

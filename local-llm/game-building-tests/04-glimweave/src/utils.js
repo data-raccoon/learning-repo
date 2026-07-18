@@ -25,12 +25,14 @@
       },
 
       random: function() {
-        state = (Math.imul(state, 6364136223846793005) + 1) >>> 0;
+        // Mulberry32. Keep every operation in JavaScript's exact 32-bit integer
+        // range; using a 64-bit LCG multiplier here collapses distinct states
+        // because Number cannot represent that multiplication precisely.
+        state = (state + 0x6D2B79F5) | 0;
         var z = state;
-        z = (z ^ (z >>> 15)) & 0xFFFFFFFF;
-        z = (z * 0x45D9F3B) & 0xFFFFFFFF;
-        z = z ^ (z >>> 16);
-        return (z >>> 0) / 4294967296;
+        z = Math.imul(z ^ (z >>> 15), z | 1);
+        z ^= z + Math.imul(z ^ (z >>> 7), z | 61);
+        return ((z ^ (z >>> 14)) >>> 0) / 4294967296;
       },
 
       integer: function(min, max) {

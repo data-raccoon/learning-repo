@@ -1,0 +1,34 @@
+{
+  "job": "playfield_layout_recovery",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T20:51:06.418282+00:00",
+  "finished_utc": "2026-07-18T20:52:02.700332+00:00",
+  "duration_seconds": 56.282,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\playfield_layout_recovery.md",
+      "sha256": "528e250a37c15204495110494489851178a27c842381b9e623d3b07aa18a2c9a"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "f8001a9e469078da60bbeed22650a1154a45c3616b2c3871e728003d50d98d26"
+    }
+  ],
+  "output": {
+    "path": ".orchestration/qa/PLAYFIELD_LAYOUT_RECOVERY.md",
+    "bytes": 127,
+    "sha256": "5e162e06578ab3fc557706e20db81cfd977d46e58147582b872bdd84cfd494d8"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file",
+      "bash"
+    ],
+    "read_only": false,
+    "native_images": 0,
+    "embedded_inputs": false,
+    "max_price_usd": 1.0
+  }
+}

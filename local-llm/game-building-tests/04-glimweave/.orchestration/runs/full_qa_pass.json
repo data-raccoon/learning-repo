@@ -1,0 +1,84 @@
+{
+  "job": "full_qa_pass",
+  "provider": "Mistral Cloud",
+  "model": "mistral-medium-3.5",
+  "started_utc": "2026-07-18T20:17:58.265102+00:00",
+  "finished_utc": "2026-07-18T20:19:08.416566+00:00",
+  "duration_seconds": 70.151,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\full_qa_pass.md",
+      "sha256": "9700f1307b35c9cec93402ca11775519c05fbef06b3a6669a3d164aae42d0f23"
+    },
+    {
+      "path": ".orchestration\\qa\\FIRST_RUN_EVIDENCE.md",
+      "sha256": "3931233d0b8f169a15474859fb4615605112440a52fb16918d0a6b62ee7601f8"
+    },
+    {
+      "path": "EXPERIMENT_BRIEF.md",
+      "sha256": "f1133d97f99bc9eeaa13f14c065fec5840d11b236efbca2e1b677e8520f74568"
+    },
+    {
+      "path": "index.html",
+      "sha256": "2858268e6d29bc9aeab448922c3d55a86d117833b4885ca436340bcaab16ff60"
+    },
+    {
+      "path": "bootstrap.js",
+      "sha256": "24483f3f343ee965ef39a85f5f2f17064ea4b896ec3a3d828f8388df1ce3e43d"
+    },
+    {
+      "path": "data\\game-data.json",
+      "sha256": "07289ba3ac8e55ef8b171f1c1f0d8ef2c27acf65200441f43640726916d25090"
+    },
+    {
+      "path": "src\\state.js",
+      "sha256": "b221080ffe5f6a91d8996904d9d4133086e044f52a70c54e0e7ccf8b03dda695"
+    },
+    {
+      "path": "src\\simulation.js",
+      "sha256": "742b6f17a5147995d90fc2b7047854cf6ab46506a338f21388bfc052f5bc2278"
+    },
+    {
+      "path": "src\\render.js",
+      "sha256": "34b4fb5c7d593afe9537f1004b3ca177b034123d7f69888692bd804ccb4e5132"
+    },
+    {
+      "path": "src\\ui.js",
+      "sha256": "dcad05917ac73dc91cc69d1cfaa5109021347bcb4e1c4261e474a35b9fb02f49"
+    },
+    {
+      "path": "src\\integration.js",
+      "sha256": "820b168991dafd377a44aa27ed736f1af618d281b6cadb3a926336b04004d78f"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "decf222901c187918e7e471a5396023a7043a28ebcab34822c65b7d6201138ea"
+    },
+    {
+      "path": "smoke.js",
+      "sha256": "df1e1f7cde64dc29c123c712c2ca9bcfe5ccebd7e23d2260bc135825453cdcdb"
+    },
+    {
+      "path": "src\\smoke-scenarios.js",
+      "sha256": "2009abc80bf03c952dc5c9d0b0b598d9a9c8fe8242b754b3ffc3ea3a71246eab"
+    },
+    {
+      "path": ".orchestration\\qa\\first-run-1440x900.png",
+      "sha256": "ba4298c604a426955528727fba73aec5f93447e745d6aa7ac17d9155f4f54b49",
+      "kind": "native_image"
+    }
+  ],
+  "output": {
+    "path": "docs/FULL_QA_REPORT.md",
+    "bytes": 24754,
+    "sha256": "d5233b6a59e86352e9c4b9455f0b86d80ba32291777c07be3f23f5f827842193"
+  },
+  "usage": {},
+  "command_policy": {
+    "tools": [
+      "read_file"
+    ],
+    "native_images": 1,
+    "max_price_usd": 2.0
+  }
+}

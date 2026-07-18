@@ -71,7 +71,7 @@
         "phase": 1,
         "totalGlimCaptured": 0
       },
-      "baseCost": 60,
+      "baseCost": 45,
       "maxOwned": 50,
       "description": "Produces 1 Glim every second."
     },
@@ -86,7 +86,7 @@
       "unlock": {
         "phase": 1
       },
-      "baseCost": 75,
+      "baseCost": 55,
       "maxOwned": 50,
       "description": "Captures drifting Glim within 100 px at 0.5 per second."
     },
