@@ -1,0 +1,26 @@
+{
+  "job": "technology",
+  "model": "ministral-3b-q4",
+  "started_utc": "2026-07-18T16:30:16.409036+00:00",
+  "finished_utc": "2026-07-18T16:30:21.430565+00:00",
+  "duration_seconds": 5.022,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\technology.md",
+      "sha256": "30b76e2ef966497c5585fb7263f054449d91d12fb80e3734c154c26cdc7431cb"
+    }
+  ],
+  "output": {
+    "path": "data\\technology.json",
+    "sha256": "cc0cc37eef53d1fffe45d08d50ad7fab62106cde7659b95b19229dd12c7abc29",
+    "bytes": 1806
+  },
+  "usage": {
+    "completion_tokens": 531,
+    "prompt_tokens": 197,
+    "total_tokens": 728,
+    "prompt_tokens_details": {
+      "cached_tokens": 16
+    }
+  }
+}

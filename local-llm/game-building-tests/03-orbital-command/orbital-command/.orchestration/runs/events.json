@@ -1,0 +1,26 @@
+{
+  "job": "events",
+  "model": "ministral-3b-q4",
+  "started_utc": "2026-07-18T16:30:28.189036+00:00",
+  "finished_utc": "2026-07-18T16:30:52.671323+00:00",
+  "duration_seconds": 24.482,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\events.md",
+      "sha256": "10e26762df49e5e6f7359246241f6254025b0201ea3f45ab8519e97b404e1b4e"
+    }
+  ],
+  "output": {
+    "path": "data\\events.json",
+    "sha256": "7a21be10241bd6e413fa8542602ee7e58bf37172d9ad693f3ddba409ceda3ef6",
+    "bytes": 8208
+  },
+  "usage": {
+    "completion_tokens": 2433,
+    "prompt_tokens": 237,
+    "total_tokens": 2670,
+    "prompt_tokens_details": {
+      "cached_tokens": 16
+    }
+  }
+}

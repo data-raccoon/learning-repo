@@ -1,0 +1,26 @@
+{
+  "job": "economy",
+  "model": "ministral-3b-q4",
+  "started_utc": "2026-07-18T16:30:02.549386+00:00",
+  "finished_utc": "2026-07-18T16:30:10.402086+00:00",
+  "duration_seconds": 7.853,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\economy.md",
+      "sha256": "8b1886a29a1acd88456d4ea41d1de5602c0a8fa0a81eafe7d143d86efaf6ab23"
+    }
+  ],
+  "output": {
+    "path": "data\\economy.json",
+    "sha256": "febde3716fcde6de28d69c644a16170bf78178fcbcf51da9e48cfa43489db959",
+    "bytes": 2785
+  },
+  "usage": {
+    "completion_tokens": 825,
+    "prompt_tokens": 240,
+    "total_tokens": 1065,
+    "prompt_tokens_details": {
+      "cached_tokens": 16
+    }
+  }
+}

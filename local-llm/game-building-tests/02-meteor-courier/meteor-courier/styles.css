@@ -1,0 +1,193 @@
+:root{--ship:#58e1ff;--orb:#ffe66d;--meteor:#ff5d73;--space:#070b1b;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--space);color:#f5f7ff;font-family:system-ui,sans-serif}
+.game-shell{width:min(94vw,900px);padding:1rem}.topbar,.hud{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+h1{margin:.15rem 0}.subtitle,.help{opacity:.78}.hud{margin:.8rem 0}.hud strong{color:var(--orb)}
+.stage{position:relative}canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;border:1px solid #ffffff2b;border-radius:16px;background:#040713}
+.overlay{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:2rem;background:#030615c9;border-radius:16px}.overlay[hidden]{display:none}
+button{font:inherit;padding:.7rem 1.1rem;border:0;border-radius:999px;background:var(--ship);color:#03101a;font-weight:800;cursor:pointer}
+button:focus-visible{outline:3px solid white;outline-offset:4px}.help{text-align:center}@media(max-width:600px){.game-shell{padding:.5rem}.hud{font-size:.9rem}}
+/* ORBIT RUNNER - Sci-Fi Glowing Orbital Theme */
+
+body {
+    background: linear-gradient(135deg, #0a0e23 0%, #1a1030 100%);
+    color: #f8f8f8;
+    font-family: 'Orbitron', 'Space Invaders', 'Arial', sans-serif;
+    overflow-x: hidden;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(100, 200, 255, 0.1) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(200, 100, 255, 0.1) 0%, transparent 30%);
+}
+
+.game-shell {
+    position: relative;
+    z-index: 1;
+    border-radius: 12px;
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 10px 15px rgba(100, 200, 255, 0.2);
+    background: rgba(20, 25, 40, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(30, 30, 50, 0.7);
+    backdrop-filter: blur(5px);
+    border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+}
+
+.topbar button {
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+    transition: all 0.3s ease;
+}
+
+.topbar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 172, 254, 0.5);
+}
+
+h1 {
+    font-size: 2.5rem;
+    text-shadow: 0 0 8px rgba(100, 200, 255, 0.7),
+                 0 0 12px rgba(200, 100, 255, 0.5);
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    text-shadow: 0 0 6px rgba(100, 200, 255, 0.4);
+    color: #a0a0ff;
+    margin-bottom: 20px;
+}
+
+.hud {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(30, 30, 50, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}
+
+.stage {
+    position: relative;
+    height: 100vh;
+    background: linear-gradient(135deg, #0a0e23, #1a1030);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stage::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(100, 200, 255, 0.1) 0%, transparent 70%);
+    animation: orbitalPulse 8s infinite linear;
+}
+
+@keyframes orbitalPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    backdrop-filter: blur(10px);
+}
+
+.help {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    color: #000;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.help:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.6);
+}
+
+button {
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    animation: glow 2s ease infinite;
+}
+
+@keyframes glow {
+    0% { opacity: 0.7; }
+    100% { opacity: 0.2; }
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.6);
+    background: linear-gradient(45deg, #3a8bef, #00d4ff);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4);
+}

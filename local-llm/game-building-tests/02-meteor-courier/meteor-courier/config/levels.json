@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Cosmic Spark",
+    "target_score": 4,
+    "meteor_speed": 80,
+    "meteor_count": 2,
+    "orb_count": 1
+  },
+  {
+    "name": "Galactic Storm",
+    "target_score": 7,
+    "meteor_speed": 120,
+    "meteor_count": 3,
+    "orb_count": 2
+  },
+  {
+    "name": "Nebula Blitz",
+    "target_score": 11,
+    "meteor_speed": 160,
+    "meteor_count": 5,
+    "orb_count": 3
+  },
+  {
+    "name": "Void Convergence",
+    "target_score": 14,
+    "meteor_speed": 260,
+    "meteor_count": 9,
+    "orb_count": 4
+  }
+]

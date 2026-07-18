@@ -1,0 +1,26 @@
+{
+  "job": "copy",
+  "model": "ministral-3b-q4",
+  "started_utc": "2026-07-18T16:31:00.037341+00:00",
+  "finished_utc": "2026-07-18T16:31:02.475551+00:00",
+  "duration_seconds": 2.438,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\copy.md",
+      "sha256": "26452991cf130628d9ad303c8e1819f242de1f7ae26549e284d00be59fb3d416"
+    }
+  ],
+  "output": {
+    "path": "data\\copy.json",
+    "sha256": "0ba5ab7c6693e8b62dbfbe5b8ab8bee4e6474eb2d9732bf9a9ac993ed2d68b92",
+    "bytes": 875
+  },
+  "usage": {
+    "completion_tokens": 249,
+    "prompt_tokens": 166,
+    "total_tokens": 415,
+    "prompt_tokens_details": {
+      "cached_tokens": 16
+    }
+  }
+}

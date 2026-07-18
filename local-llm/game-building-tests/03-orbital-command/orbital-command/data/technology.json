@@ -1,0 +1,73 @@
+[
+  {
+    "id": "efficient-routing",
+    "name": "Advanced Navigation",
+    "description": "Optimizes ship routing for reduced fuel consumption.",
+    "cost": 12,
+    "prerequisite": null,
+    "effect": {
+      "type": "production_bonus",
+      "resource": "energy",
+      "amount": 2
+    }
+  },
+  {
+    "id": "fusion-grid",
+    "name": "Fusion Reactor Upgrade",
+    "description": "Improves reactor efficiency and power output.",
+    "cost": 18,
+    "prerequisite": "efficient-routing",
+    "effect": {
+      "type": "production_bonus",
+      "resource": "energy",
+      "amount": 3
+    }
+  },
+  {
+    "id": "diplomatic-protocols",
+    "name": "Allied Relations",
+    "description": "Boosts diplomatic influence and trade negotiations.",
+    "cost": 14,
+    "prerequisite": null,
+    "effect": {
+      "type": "morale_bonus",
+      "resource": "morale",
+      "amount": 1
+    }
+  },
+  {
+    "id": "deep-scan",
+    "name": "Advanced Sensor Suite",
+    "description": "Enhances detection and targeting accuracy.",
+    "cost": 20,
+    "prerequisite": "efficient-routing",
+    "effect": {
+      "type": "production_bonus",
+      "resource": "science",
+      "amount": 2
+    }
+  },
+  {
+    "id": "quantum-computing",
+    "name": "Quantum Processing Core",
+    "description": "Accelerates AI-driven mission planning and analysis.",
+    "cost": 24,
+    "prerequisite": "deep-scan",
+    "effect": {
+      "type": "unlock",
+      "resource": "module_id: AI_Advisor"
+    }
+  },
+  {
+    "id": "closed-loop-life-support",
+    "name": "Self-Sustaining Systems",
+    "description": "Reduces crew dependency on resupply and extends mission duration.",
+    "cost": 16,
+    "prerequisite": "diplomatic-protocols",
+    "effect": {
+      "type": "production_bonus",
+      "resource": "alloys",
+      "amount": 1
+    }
+  }
+]

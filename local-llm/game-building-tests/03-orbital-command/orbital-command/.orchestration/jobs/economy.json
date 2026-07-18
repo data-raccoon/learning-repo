@@ -1,0 +1,1 @@
+{"id":"economy","system":"You are a systems designer who follows JSON schemas exactly.","prompt_file":".orchestration/prompts/economy.md","output":"data/economy.json","kind":"json","max_tokens":3600,"temperature":0.1}

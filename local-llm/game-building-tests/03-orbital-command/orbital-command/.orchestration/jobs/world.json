@@ -1,0 +1,1 @@
+{"id":"world","system":"You are a strategy-game world designer who follows JSON schemas exactly.","prompt_file":".orchestration/prompts/world.md","output":"data/world.json","kind":"json","max_tokens":2200,"temperature":0.2}

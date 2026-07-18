@@ -1,0 +1,1 @@
+{"id":"visual_system","system":"You are a focused responsive CSS systems designer. Implement only the declared stylesheet.","prompt_file":".orchestration/prompts/visual_system.md","output":"styles.css","kind":"code","language":"css","inputs":["index.html","DOM_CONTRACT.md","data/copy.json"],"max_tokens":6500,"temperature":0.2}

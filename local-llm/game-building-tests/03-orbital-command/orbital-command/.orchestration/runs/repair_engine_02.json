@@ -1,0 +1,42 @@
+{
+  "job": "repair_engine_02",
+  "model": "ministral-3b-q4",
+  "started_utc": "2026-07-18T16:41:46.000105+00:00",
+  "finished_utc": "2026-07-18T16:42:09.618811+00:00",
+  "duration_seconds": 23.619,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\repair_engine_02.md",
+      "sha256": "be079e9bcdcf2290be85beb45284993c6ec2480babc7faf4a8f7cbfabbb141fa"
+    },
+    {
+      "path": "PROJECT_CONTRACT.md",
+      "sha256": "c717e9d7a525bffdd5e5dc61ff1b902cb54babd17cd5339e711ab4bf5e9c54f0"
+    },
+    {
+      "path": ".orchestration\\prompts\\engine_module.md",
+      "sha256": "6172c48262f84704667ff354b1df118e7394cc5d41d53d9780ffbc642fa7980e"
+    },
+    {
+      "path": "src\\engine.js",
+      "sha256": "6dfd7c3b9e1e1b3c48691635427ab65d6952d117af874e293e3a16540a66dd85"
+    },
+    {
+      "path": "data\\content.js",
+      "sha256": "3a2e63bdfb11d4a553678d140d839cb959b90328e4c4f845572ceb49b5d1bcb6"
+    }
+  ],
+  "output": {
+    "path": "src\\engine.js",
+    "sha256": "d36f8e9e7b7ee7a8156c569869b8c77cc89c1d6d685f84bdd6b9efdd5811a1fe",
+    "bytes": 9103
+  },
+  "usage": {
+    "completion_tokens": 1888,
+    "prompt_tokens": 5672,
+    "total_tokens": 7560,
+    "prompt_tokens_details": {
+      "cached_tokens": 19
+    }
+  }
+}

@@ -1,0 +1,366 @@
+[
+  {
+    "id": "orbital-hazard-meteor-shower",
+    "title": "Meteor Storm",
+    "text": "A sudden meteor shower disrupts your orbital path. Small impacts knock out your sensors.",
+    "min_turn": 2,
+    "choices": [
+      {
+        "label": "Dodge with evasive maneuvers",
+        "effects": {
+          "energy": -3,
+          "alloys": 0,
+          "science": -2,
+          "credits": 0,
+          "morale": 8
+        }
+      },
+      {
+        "label": "Activate shields briefly",
+        "effects": {
+          "energy": -7,
+          "alloys": 1,
+          "science": -1,
+          "credits": 0,
+          "morale": 5
+        }
+      }
+    ]
+  },
+  {
+    "id": "diplomacy-negotiate-with-rogue-merchant",
+    "title": "Rogue Trader Offers Deal",
+    "text": "A smuggler contacts you with a high-risk, high-reward offer.",
+    "min_turn": 3,
+    "choices": [
+      {
+        "label": "Accept the deal (black-market alloys)",
+        "effects": {
+          "energy": 0,
+          "alloys": 5,
+          "science": -3,
+          "credits": -10,
+          "morale": -8
+        }
+      },
+      {
+        "label": "Reject and warn them",
+        "effects": {
+          "energy": -1,
+          "alloys": 0,
+          "science": 2,
+          "credits": 0,
+          "morale": 6
+        }
+      }
+    ]
+  },
+  {
+    "id": "crew-story-pilot-fails-test",
+    "title": "Pilot’s Trial",
+    "text": "Your pilot is forced to perform a high-risk maneuver during a training exercise.",
+    "min_turn": 4,
+    "choices": [
+      {
+        "label": "Trust the pilot’s judgment",
+        "effects": {
+          "energy": -2,
+          "alloys": 0,
+          "science": -1,
+          "credits": 0,
+          "morale": 10
+        }
+      },
+      {
+        "label": "Override and correct them",
+        "effects": {
+          "energy": -5,
+          "alloys": 1,
+          "science": -4,
+          "credits": 0,
+          "morale": 4
+        }
+      }
+    ]
+  },
+  {
+    "id": "discovery-unexpected-ship",
+    "title": "Encountered Ship",
+    "text": "You spot a derelict ship in your path. It could be a hazard or a discovery.",
+    "min_turn": 5,
+    "choices": [
+      {
+        "label": "Investigate cautiously",
+        "effects": {
+          "energy": -4,
+          "alloys": 3,
+          "science": 5,
+          "credits": -2,
+          "morale": 7
+        }
+      },
+      {
+        "label": "Avoid and continue",
+        "effects": {
+          "energy": -1,
+          "alloys": 0,
+          "science": -2,
+          "credits": 0,
+          "morale": 9
+        }
+      }
+    ]
+  },
+  {
+    "id": "crew-story-crew-unionize",
+    "title": "Union Strike",
+    "text": "Your crew demands better working conditions, threatening a strike.",
+    "min_turn": 6,
+    "choices": [
+      {
+        "label": "Negotiate with the crew",
+        "effects": {
+          "energy": 0,
+          "alloys": 0,
+          "science": -1,
+          "credits": 3,
+          "morale": 10
+        }
+      },
+      {
+        "label": "Ignore and enforce discipline",
+        "effects": {
+          "energy": -3,
+          "alloys": 0,
+          "science": -3,
+          "credits": 0,
+          "morale": -5
+        }
+      }
+    ]
+  },
+  {
+    "id": "hazard-system-failure",
+    "title": "Critical Engine Burnout",
+    "text": "Your main propulsion system fails mid-flight. You must improvise.",
+    "min_turn": 7,
+    "choices": [
+      {
+        "label": "Use emergency thrusters (risky)",
+        "effects": {
+          "energy": -6,
+          "alloys": 2,
+          "science": -1,
+          "credits": 0,
+          "morale": 6
+        }
+      },
+      {
+        "label": "Attempt manual repairs",
+        "effects": {
+          "energy": -8,
+          "alloys": 4,
+          "science": 3,
+          "credits": 0,
+          "morale": 4
+        }
+      }
+    ]
+  },
+  {
+    "id": "diplomacy-alliance-proposal",
+    "title": "Trade Alliance Offer",
+    "text": "A neighboring station extends an offer for mutual defense and trade.",
+    "min_turn": 8,
+    "choices": [
+      {
+        "label": "Accept the alliance",
+        "effects": {
+          "energy": 0,
+          "alloys": 0,
+          "science": 2,
+          "credits": 15,
+          "morale": 8
+        }
+      },
+      {
+        "label": "Reject and seek another partner",
+        "effects": {
+          "energy": -2,
+          "alloys": 0,
+          "science": -1,
+          "credits": 0,
+          "morale": 10
+        }
+      }
+    ]
+  },
+  {
+    "id": "crew-story-crew-mission",
+    "title": "Crew Assignment",
+    "text": "Your crew is assigned a dangerous salvage mission.",
+    "min_turn": 9,
+    "choices": [
+      {
+        "label": "Accept the mission (high risk)",
+        "effects": {
+          "energy": -5,
+          "alloys": 6,
+          "science": 4,
+          "credits": -5,
+          "morale": 7
+        }
+      },
+      {
+        "label": "Decline and focus on maintenance",
+        "effects": {
+          "energy": -1,
+          "alloys": 0,
+          "science": -2,
+          "credits": 0,
+          "morale": 12
+        }
+      }
+    ]
+  },
+  {
+    "id": "discovery-ai-discovery",
+    "title": "AI Alert",
+    "text": "Your ship’s AI detects an anomaly in a nearby asteroid field.",
+    "min_turn": 10,
+    "choices": [
+      {
+        "label": "Investigate the anomaly",
+        "effects": {
+          "energy": -4,
+          "alloys": 4,
+          "science": 7,
+          "credits": -3,
+          "morale": 9
+        }
+      },
+      {
+        "label": "Ignore and continue scanning",
+        "effects": {
+          "energy": -1,
+          "alloys": 0,
+          "science": -1,
+          "credits": 0,
+          "morale": 10
+        }
+      }
+    ]
+  },
+  {
+    "id": "hazard-space-debris",
+    "title": "Space Debris Collision",
+    "text": "A large piece of debris approaches your ship. Time to react.",
+    "min_turn": 11,
+    "choices": [
+      {
+        "label": "Dodge with evasive maneuvers",
+        "effects": {
+          "energy": -3,
+          "alloys": 0,
+          "science": -2,
+          "credits": 0,
+          "morale": 8
+        }
+      },
+      {
+        "label": "Activate shields (high energy cost)",
+        "effects": {
+          "energy": -8,
+          "alloys": 1,
+          "science": -1,
+          "credits": 0,
+          "morale": 6
+        }
+      }
+    ]
+  },
+  {
+    "id": "diplomacy-espionage-threat",
+    "title": "Sabotage Warning",
+    "text": "A rival faction has planted a spy on your station.",
+    "min_turn": 12,
+    "choices": [
+      {
+        "label": "Investigate the spy (risky)",
+        "effects": {
+          "energy": -5,
+          "alloys": 3,
+          "science": 5,
+          "credits": -4,
+          "morale": 7
+        }
+      },
+      {
+        "label": "Assume it’s a false alarm",
+        "effects": {
+          "energy": -1,
+          "alloys": 0,
+          "science": -1,
+          "credits": 0,
+          "morale": 11
+        }
+      }
+    ]
+  },
+  {
+    "id": "crew-story-crew-retirement",
+    "title": "Retirement Offer",
+    "text": "A senior crew member offers to retire early for a bonus.",
+    "min_turn": 1,
+    "choices": [
+      {
+        "label": "Accept the offer (secure funds)",
+        "effects": {
+          "energy": 0,
+          "alloys": 0,
+          "science": -1,
+          "credits": 12,
+          "morale": 10
+        }
+      },
+      {
+        "label": "Decline and keep them",
+        "effects": {
+          "energy": -2,
+          "alloys": 0,
+          "science": 1,
+          "credits": 0,
+          "morale": 8
+        }
+      }
+    ]
+  },
+  {
+    "id": "discovery-black-market-find",
+    "title": "Black Market Deal",
+    "text": "A contact offers rare components for a price.",
+    "min_turn": 12,
+    "choices": [
+      {
+        "label": "Buy the components (risky)",
+        "effects": {
+          "energy": -6,
+          "alloys": 5,
+          "science": -3,
+          "credits": -8,
+          "morale": 6
+        }
+      },
+      {
+        "label": "Ignore and seek another source",
+        "effects": {
+          "energy": -1,
+          "alloys": 0,
+          "science": -1,
+          "credits": 0,
+          "morale": 12
+        }
+      }
+    ]
+  }
+]

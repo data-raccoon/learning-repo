@@ -1,0 +1,54 @@
+{
+  "job": "repair_engine_03",
+  "model": "ministral-3b-q4",
+  "started_utc": "2026-07-18T16:43:52.213124+00:00",
+  "finished_utc": "2026-07-18T16:44:16.828012+00:00",
+  "duration_seconds": 24.615,
+  "inputs": [
+    {
+      "path": ".orchestration\\prompts\\repair_engine_03.md",
+      "sha256": "7d9ac88704b670c70d309463437b219dda68480c27abb7a5e42616ce1d9a8cd1"
+    },
+    {
+      "path": "PROJECT_CONTRACT.md",
+      "sha256": "c717e9d7a525bffdd5e5dc61ff1b902cb54babd17cd5339e711ab4bf5e9c54f0"
+    },
+    {
+      "path": ".orchestration\\prompts\\engine_module.md",
+      "sha256": "6172c48262f84704667ff354b1df118e7394cc5d41d53d9780ffbc642fa7980e"
+    },
+    {
+      "path": "src\\state.js",
+      "sha256": "cfad18aba503d2a5d828523708bd7ca458fbcfa2939fd592811f3b7f108e375c"
+    },
+    {
+      "path": "src\\engine.js",
+      "sha256": "abf34bc0ce05de5844dcc4cc085e29bbc224137f0f926c5d02491bbb79843f5b"
+    },
+    {
+      "path": "data\\economy.json",
+      "sha256": "b172275c258557a94881d8a76b5ee1819131fe68a6c5b182d5b1a8e8a43d02e5"
+    },
+    {
+      "path": "data\\technology.json",
+      "sha256": "8d05bca02bbeb5cd7e01c0ae52146a2b2a8d03dfffaef39936e2cc03334f9584"
+    },
+    {
+      "path": "data\\world.json",
+      "sha256": "2a134872f8e5ea23831f5f28cf5720adaf29ddf107b4cca7b7d35f575ac29dde"
+    }
+  ],
+  "output": {
+    "path": "src\\engine.js",
+    "sha256": "7fd503fd85a1614821e3282168ce8a34d0803746e4be878dfdfa800f9ad2f83c",
+    "bytes": 9752
+  },
+  "usage": {
+    "completion_tokens": 2002,
+    "prompt_tokens": 5752,
+    "total_tokens": 7754,
+    "prompt_tokens_details": {
+      "cached_tokens": 19
+    }
+  }
+}

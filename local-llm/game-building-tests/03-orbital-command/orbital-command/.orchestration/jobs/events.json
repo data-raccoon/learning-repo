@@ -1,0 +1,1 @@
+{"id":"events","system":"You are a narrative systems designer who follows JSON schemas exactly.","prompt_file":".orchestration/prompts/events.md","output":"data/events.json","kind":"json","max_tokens":6000,"temperature":0.2}

@@ -1,0 +1,49 @@
+{
+  "station_name": "Aurora-9",
+  "setting": "The year is 2187, and humanity’s first orbital outpost stands as a beacon of hope in the void. The *Aurora-9* is a frontier stronghold where daring engineers and scientists push the limits of space exploration, balancing survival against the relentless demands of the cosmos.",
+  "starting_resources": {
+    "energy": 20,
+    "alloys": 16,
+    "science": 0,
+    "credits": 12,
+    "morale": 70
+  },
+  "crew_total": 12,
+  "roles": [
+    {
+      "id": "engineering",
+      "name": "Overseer of the Void",
+      "description": "You maintain life support, repair failing systems, and ensure the station’s survival against the harshness of space."
+    },
+    {
+      "id": "science",
+      "name": "Starborn Explorer",
+      "description": "You analyze data, unlock new technologies, and uncover the mysteries of the universe—though every discovery demands sacrifice."
+    },
+    {
+      "id": "operations",
+      "name": "Commander of the Orbit",
+      "description": "You coordinate missions, allocate resources, and keep morale high—while ensuring the station’s fate rests in your hands."
+    }
+  ],
+  "mission_goals": [
+    {
+      "id": "energy_goal",
+      "label": "Power the Future",
+      "resource": "energy",
+      "target": 60
+    },
+    {
+      "id": "science_goal",
+      "label": "Unlock the Unknown",
+      "resource": "science",
+      "target": 45
+    },
+    {
+      "id": "morale_goal",
+      "label": "Keep the Dream Alive",
+      "resource": "morale",
+      "target": 85
+    }
+  ]
+}

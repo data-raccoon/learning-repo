@@ -1,0 +1,1 @@
+{"id":"technology","system":"You are a technology-tree designer who follows JSON schemas exactly.","prompt_file":".orchestration/prompts/technology.md","output":"data/technology.json","kind":"json","max_tokens":3000,"temperature":0.1}

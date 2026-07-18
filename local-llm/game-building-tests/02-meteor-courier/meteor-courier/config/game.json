@@ -1,0 +1,16 @@
+{
+  "title": "ORBIT RUNNER",
+  "subtitle": "DODGE & COLLECT",
+  "intro": "Avoid meteors to collect energy orbs. Survive longer for higher scores!",
+  "start_label": "START",
+  "controls_help": "\u2191/\u2193: Move | \u2190/\u2192: Rotate | Tap: Boost",
+  "score_label": "SCORE:",
+  "lives_label": "LIVES:",
+  "level_label": "LEVEL:",
+  "game_over": "GAME OVER",
+  "victory": "ORBIT DOMINATION!",
+  "ship_color": "#00FF88",
+  "orb_color": "#FF00AA",
+  "meteor_color": "#880000",
+  "background_color": "#0A0A2A"
+}

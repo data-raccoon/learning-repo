@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orbital Command</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead"><div><p class="kicker">STATION MANAGEMENT SYSTEM</p><h1>Orbital Command</h1><p id="subtitle"></p></div><div class="turn-card">Cycle <strong id="turn">1</strong></div></header>
+  <main>
+    <section class="resource-bar" aria-label="Resources">
+      <span>Energy <strong id="energy">0</strong></span><span>Alloys <strong id="alloys">0</strong></span><span>Science <strong id="science">0</strong></span><span>Credits <strong id="credits">0</strong></span><span>Morale <strong id="morale">0</strong></span>
+    </section>
+    <div id="game-banner" class="banner" hidden></div>
+    <div class="command-grid">
+      <section class="panel construction"><h2>Construction</h2><div id="module-list" class="card-list"></div></section>
+      <section class="panel research"><h2>Research</h2><div id="tech-list" class="card-list"></div></section>
+      <section class="panel crew"><h2>Crew</h2><div id="crew-list" class="card-list"></div></section>
+      <section class="panel mission"><h2>Mission</h2><div id="mission-list" class="card-list"></div></section>
+      <section class="panel log"><h2>Station Log</h2><ol id="event-log"></ol></section>
+    </div>
+    <footer class="command-bar"><button id="advance-turn" type="button">Advance Cycle</button><button id="reset-game" class="secondary" type="button">Reset Campaign</button><p id="help"></p></footer>
+  </main>
+  <dialog id="event-modal"><article><h2 id="event-title"></h2><p id="event-text"></p><div id="event-choices"></div></article></dialog>
+  <p id="announcer" class="sr-only" aria-live="polite"></p>
+  <script src="bootstrap.js"></script><script src="data/content.js"></script><script src="src/state.js"></script><script src="src/engine.js"></script><script src="src/ui.js"></script><script src="smoke.js"></script>
+</body>
+</html>

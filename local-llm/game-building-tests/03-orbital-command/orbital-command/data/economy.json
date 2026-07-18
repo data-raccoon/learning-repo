@@ -1,0 +1,138 @@
+[
+  {
+    "id": "solar-array",
+    "name": "Solar Array",
+    "description": "Generates renewable energy from sunlight.",
+    "cost": {
+      "alloys": 8,
+      "credits": 3
+    },
+    "production": {
+      "energy": 5,
+      "alloys": 1,
+      "science": 0,
+      "credits": 0,
+      "morale": 0
+    },
+    "required_tech": null
+  },
+  {
+    "id": "refinery",
+    "name": "Refinery",
+    "description": "Processes raw materials into usable alloys and credits.",
+    "cost": {
+      "alloys": 9,
+      "credits": 4
+    },
+    "production": {
+      "energy": 2,
+      "alloys": 2,
+      "science": 0,
+      "credits": 1,
+      "morale": 1
+    },
+    "required_tech": null
+  },
+  {
+    "id": "research-lab",
+    "name": "Research Lab",
+    "description": "Advances scientific knowledge and unlocks new tech.",
+    "cost": {
+      "alloys": 10,
+      "credits": 5
+    },
+    "production": {
+      "energy": 3,
+      "alloys": 1,
+      "science": 3,
+      "credits": 0,
+      "morale": 2
+    },
+    "required_tech": null
+  },
+  {
+    "id": "trade-dock",
+    "name": "Trade Dock",
+    "description": "Facilitates trade and credit exchange with other colonies.",
+    "cost": {
+      "alloys": 11,
+      "credits": 6
+    },
+    "production": {
+      "energy": 1,
+      "alloys": 0,
+      "science": 1,
+      "credits": 2,
+      "morale": 3
+    },
+    "required_tech": null
+  },
+  {
+    "id": "habitat-ring",
+    "name": "Habitat Ring",
+    "description": "Provides living space and supports large populations.",
+    "cost": {
+      "alloys": 12,
+      "credits": 7
+    },
+    "production": {
+      "energy": 4,
+      "alloys": 2,
+      "science": 0,
+      "credits": 0,
+      "morale": 4
+    },
+    "required_tech": null
+  },
+  {
+    "id": "fusion-core",
+    "name": "Fusion Core",
+    "description": "Generates high-energy power via nuclear fusion.",
+    "cost": {
+      "alloys": 10,
+      "credits": 8
+    },
+    "production": {
+      "energy": 8,
+      "alloys": 3,
+      "science": 2,
+      "credits": 0,
+      "morale": 0
+    },
+    "required_tech": "fusion-grid"
+  },
+  {
+    "id": "quantum-lab",
+    "name": "Quantum Lab",
+    "description": "Develops advanced quantum computing and cryptography.",
+    "cost": {
+      "alloys": 12,
+      "credits": 6
+    },
+    "production": {
+      "energy": 6,
+      "alloys": 2,
+      "science": 5,
+      "credits": 1,
+      "morale": -1
+    },
+    "required_tech": "quantum-computing"
+  },
+  {
+    "id": "observatory",
+    "name": "Observatory",
+    "description": "Scans for asteroids, alien signals, and distant stars.",
+    "cost": {
+      "alloys": 11,
+      "credits": 5
+    },
+    "production": {
+      "energy": 3,
+      "alloys": 1,
+      "science": 4,
+      "credits": 0,
+      "morale": 2
+    },
+    "required_tech": "deep-scan"
+  }
+]

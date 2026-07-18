@@ -1,0 +1,19 @@
+{
+  "title": "Orbital Command",
+  "subtitle": "Command the stars, outwit the enemy.",
+  "new_game": "Start fresh with a new planet.",
+  "continue_game": "Load your last saved mission.",
+  "advance_turn": "Faster, smarter decisions—next turn now.",
+  "build_heading": "Construct & Upgrade",
+  "research_heading": "Unlock New Tech",
+  "crew_heading": "Assign Crew to Missions",
+  "mission_heading": "Launch & Manage Missions",
+  "log_heading": "Mission Log",
+  "resources_heading": "Fuel & Supplies",
+  "event_heading": "Random Encounters",
+  "save_notice": "Auto-save enabled—no risk of loss!",
+  "loss_message": "Too late. The enemy won. Game over.",
+  "victory_message": "Victory! Your empire stands supreme.",
+  "reset_game": "Delete all progress—start over.",
+  "help_text": "Select actions: Build/Research, Assign Crew, Advance Turns. Auto-save ensures no loss."
+}

@@ -1,0 +1,1 @@
+{"id":"ui_module","system":"You are a focused accessible vanilla-JavaScript UI engineer. Implement only the declared module.","prompt_file":".orchestration/prompts/ui_module.md","output":"src/ui.js","kind":"code","language":"javascript","inputs":["PROJECT_CONTRACT.md","DOM_CONTRACT.md","src/state.js","src/engine.js","data/content.js"],"max_tokens":9000,"temperature":0.1}

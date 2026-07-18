@@ -1,0 +1,240 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Classic Tic-Tac-Toe</title>
+<style>:root{--x-color:#FF5733;--o-color:#33A1FF}main.game-shell {
+  background: linear-gradient(135deg, #0a0e23, #1a1030);
+  min-height: 100vh;
+  overflow: hidden;
+  perspective: 1px;
+  position: relative;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.eyebrow {
+  color: var(--neon-accent, #00ff88);
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  color: var(--neon-accent, #00ff88);
+  font-size: 2.5rem;
+  margin: 0;
+  text-shadow: 0 0 5px var(--neon-accent, #00ff88);
+}
+
+section.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  margin: 1rem auto;
+  max-width: 400px;
+}
+
+div.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin: 1rem auto;
+  box-shadow: 0 0 10px rgba(0, 0, 255, 0.3);
+}
+
+button.cell {
+  background: transparent;
+  border: none;
+  color: var(--neon-accent, #00ff88);
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.8rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--neon-accent, #00ff88);
+  transition: all 0.2s ease;
+  transform: translateY(0);
+  z-index: 1;
+}
+
+button.cell:hover {
+  transform: translateY(-3px);
+}
+
+button.cell:focus-visible {
+  outline: 3px solid var(--neon-accent, #00ff88);
+  outline-offset: 3px;
+  box-shadow: 0 0 10px var(--neon-accent, #00ff88);
+}
+
+button.cell.x {
+  color: var(--x-color, #ff0000);
+  background: rgba(255, 0, 0, 0.2);
+}
+
+button.cell.o {
+  color: var(--o-color, #00ff00);
+  background: rgba(0, 255, 0, 0.2);
+}
+
+button.cell.center-required {
+  background: rgba(0, 0, 255, 0.2);
+  color: var(--neon-accent, #00ff88);
+}
+
+button.cell.winning {
+  color: var(--neon-accent, #00ff88);
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 10px var(--neon-accent, #00ff88);
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+button.restart {
+  background: var(--neon-accent, #00ff88);
+  color: black;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0.5rem auto;
+  box-shadow: 0 0 5px var(--neon-accent, #00ff88);
+}
+
+button.restart:hover {
+  background: #00ffaa;
+  transform: scale(1.05);
+}
+
+button.restart:focus-visible {
+  outline: 3px solid black;
+}
+
+p.status {
+  color: var(--neon-accent, #00ff88);
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+p.help {
+  color: var(--neon-accent, #00ff88);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Small-screen adjustments */
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  section.scoreboard {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  button.cell {
+    font-size: 1.5rem;
+    padding: 1rem;
+  }
+
+  button.restart {
+    padding: 0.7rem 1.2rem;
+  }
+}</style></head><body>
+<main class="game-shell"><header><p class="eyebrow">First player to get 3 in a row wins!</p><h1>Classic Tic-Tac-Toe</h1></header>
+<section class="scoreboard" aria-label="Scoreboard"><div>Player X <strong id="x-score">0</strong></div><div>Player O <strong id="o-score">0</strong></div></section>
+<p id="status" class="status" aria-live="polite"></p><div id="board" class="board" aria-label="Tic-tac-toe board"><button class="cell" data-index="0" type="button"></button>
+<button class="cell" data-index="1" type="button"></button>
+<button class="cell" data-index="2" type="button"></button>
+<button class="cell" data-index="3" type="button"></button>
+<button class="cell" data-index="4" type="button"></button>
+<button class="cell" data-index="5" type="button"></button>
+<button class="cell" data-index="6" type="button"></button>
+<button class="cell" data-index="7" type="button"></button>
+<button class="cell" data-index="8" type="button"></button></div>
+<button id="restart-btn" class="restart" type="button">Play Again</button><p class="help">Click squares to mark your {player} symbol. First to 3 in a row wins!</p>
+<output id="smoke-result" hidden>PENDING</output></main><script id="game-config" type="application/json">{"o_color": "#33A1FF", "center_instruction": "Choose X or O, then click a square to start!", "title": "Classic Tic-Tac-Toe", "x_wins": "X wins: {player}", "restart_label": "Play Again", "eyebrow": "First player to get 3 in a row wins!", "tie": "Game ended in a tie!", "o_wins": "O wins: {player}", "help_text": "Click squares to mark your {player} symbol. First to 3 in a row wins!", "x_color": "#FF5733", "x_turn": "Your {player}’s turn (X)", "o_turn": "Player {player}: O’s turn (O)"}</script><script>
+const config = JSON.parse(document.querySelector('#game-config').textContent);
+const cells = [...document.querySelectorAll('button.cell')];
+const statusEl = document.querySelector('#status');
+const xScoreEl = document.querySelector('#x-score');
+const oScoreEl = document.querySelector('#o-score');
+const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let boardState = Array(9).fill('');
+let currentPlayer = 'X';
+let scores = {X: 0, O: 0};
+let roundActive = true;
+let winningLine = [];
+
+function lineFor(player) {
+  return wins.find(line => line.every(index => boardState[index] === player)) || [];
+}
+function isMoveAllowed(index) {
+  return roundActive && boardState[index] === '' && (boardState[4] !== '' || index === 4);
+}
+function message(template, player) { return template.replace('{player}', player); }
+function render() {
+  cells.forEach((cell, index) => {
+    cell.textContent = boardState[index];
+    cell.disabled = !isMoveAllowed(index);
+    cell.classList.toggle('x', boardState[index] === 'X');
+    cell.classList.toggle('o', boardState[index] === 'O');
+    cell.classList.toggle('center-required', boardState[4] === '' && index === 4);
+    cell.classList.toggle('winning', winningLine.includes(index));
+    const state = boardState[index] || (cell.disabled ? 'unavailable' : 'empty');
+    cell.setAttribute('aria-label', `Cell ${index + 1}: ${state}`);
+  });
+  xScoreEl.textContent = String(scores.X);
+  oScoreEl.textContent = String(scores.O);
+  if (roundActive) statusEl.textContent = boardState[4] === ''
+    ? config.center_instruction
+    : message(currentPlayer === 'X' ? config.x_turn : config.o_turn, currentPlayer);
+}
+function finishRound() {
+  winningLine = lineFor(currentPlayer);
+  if (winningLine.length) {
+    roundActive = false;
+    scores[currentPlayer] += 1;
+    statusEl.textContent = message(currentPlayer === 'X' ? config.x_wins : config.o_wins, currentPlayer);
+    return true;
+  }
+  if (boardState.every(Boolean)) {
+    roundActive = false;
+    statusEl.textContent = config.tie;
+    return true;
+  }
+  return false;
+}
+function playMove(index) {
+  if (!isMoveAllowed(index)) return;
+  boardState[index] = currentPlayer;
+  if (!finishRound()) currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  render();
+}
+function resetRound() {
+  boardState = Array(9).fill(''); currentPlayer = 'X'; roundActive = true; winningLine = [];
+  render();
+}
+cells.forEach((cell, index) => cell.addEventListener('click', () => playMove(index)));
+document.querySelector('#restart-btn').addEventListener('click', resetRound);
+document.addEventListener('keydown', event => {
+  const key = event.key.toLowerCase();
+  if (key === 'e') resetRound();
+  else if (key === 'w' && currentPlayer === 'X') playMove(4);
+  else if (key === 's' && currentPlayer === 'O') playMove(4);
+});
+render();
+</script>
+</body></html>
