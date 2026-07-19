@@ -27,6 +27,10 @@ WORKER_COMMAND_ALLOWLIST = {
     "npm run build",
     "git diff --",
     "git status --short",
+    "git add",
+    "git add .",
+    "git commit -m",
+    "git status",
 }
 
 

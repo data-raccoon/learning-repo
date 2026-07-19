@@ -25,7 +25,7 @@ Run evidence therefore reports Gemini as `free-quota` with zero direct marginal 
 - A target directory must be an existing repository subdirectory containing every context file the worker needs.
 - Write jobs may declare `allowed_write_paths`; any changed file outside those target-relative files or directory prefixes fails the ownership gate and triggers quarantine plus rollback. Omitting the field preserves the version-1 whole-target behavior for existing jobs.
 - `candidate`, `deferred`, and unavailable profiles cannot be routed.
-- Gemini via a free Google account is an executable option through the official Antigravity CLI. OpenAI/ChatGPT remains inventory-only.
+- Gemini via a free Google account is an executable option through the official Antigravity CLI.
 
 ## Gemini with a Google account
 

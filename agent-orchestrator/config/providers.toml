@@ -33,23 +33,14 @@ notes = "Inventory-only scaffold. Select an exact artifact and runtime before ca
 
 [[providers]]
 id = "local-kolibri"
-display_name = "Local Kolibri (unconfigured)"
-kind = "local-runtime-placeholder"
-status = "deferred"
-auth_kind = "not-configured"
+display_name = "Local Kolibri (GLM-5.2)"
+kind = "openai-compatible-local"
+status = "candidate"
+auth_kind = "external-file"
+auth_env = "KOLIBRI_API_KEY"
+base_url = "http://127.0.0.1:8082/v1"
 billing = "local-compute"
-notes = "Inventory-only scaffold. Select an exact artifact and runtime before candidate admission."
-
-[[providers]]
-id = "openai-chatgpt"
-display_name = "OpenAI / ChatGPT"
-kind = "cli-cloud"
-status = "deferred"
-auth_kind = "codex-login-or-api"
-auth_env = "CODEX_API_KEY"
-billing = "included-subscription-or-api"
-executable = "codex"
-notes = "Inventory-only in milestone 1."
+notes = "Pure C zero-dependency MoE inference engine. Streaming experts from disk. Loopback-only runtime; key and weights remain outside the repository."
 
 [[providers]]
 id = "gemini-google-account"
@@ -61,3 +52,5 @@ billing = "free-account-quota"
 plan = "free"
 executable = "agy"
 notes = "Consumer access moved from Gemini CLI to the official Antigravity CLI on 2026-06-18. Uses its external OS-keyring session; API and Vertex credentials are removed from worker environments."
+
+

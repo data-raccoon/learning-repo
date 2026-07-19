@@ -37,17 +37,17 @@ capabilities = []
 notes = "Deferred placeholder; artifact, format, quantization, checksum, context, and capabilities are unknown."
 
 [[models]]
-id = "kolibri-local-unselected"
+id = "glm-5.2-744b-moe-local"
 provider = "local-kolibri"
-remote_id = "unselected"
-quality = 0.0
-context_tokens = 0
+remote_id = "GLM-5.2-744B-MoE"
+quality = 0.92
+context_tokens = 131072
 input_cost_per_million = 0.0
 output_cost_per_million = 0.0
 price_effective_at = "2026-07-19"
 modalities = ["text"]
-capabilities = []
-notes = "Deferred placeholder; artifact, format, quantization, checksum, context, and capabilities are unknown."
+capabilities = ["architecture", "planning", "coding", "review", "reasoning", "summarization"]
+notes = "GLM-5.2 (744B parameters) running via Kolibri with disk-streaming MoE experts. Uses Kolibri's custom container format (NOT GGUF). Quality estimate based on upstream model capabilities; actual performance depends on disk I/O."
 
 [[models]]
 id = "devstral-small-cloud"
@@ -62,19 +62,6 @@ modalities = ["text"]
 capabilities = ["coding", "review", "file-editing", "tool-use"]
 
 [[models]]
-id = "openai-flagship"
-provider = "openai-chatgpt"
-remote_id = "provider-current-flagship"
-quality = 0.96
-context_tokens = 0
-input_cost_per_million = -1.0
-output_cost_per_million = -1.0
-price_effective_at = "2026-07-19"
-modalities = ["text", "image"]
-capabilities = ["architecture", "planning", "coding", "review", "reasoning", "tool-use", "multimodal"]
-notes = "Deferred placeholder; refresh before admission."
-
-[[models]]
 id = "gemini-auto-free"
 provider = "gemini-google-account"
 remote_id = "Gemini 3.5 Flash (Medium)"
@@ -86,3 +73,5 @@ price_effective_at = "2026-07-19"
 modalities = ["text", "image"]
 capabilities = ["architecture", "planning", "coding", "review", "reasoning", "summarization", "file-editing", "tool-use", "multimodal"]
 notes = "Explicit Antigravity CLI 1.1.4 model name observed from the signed-in account. Consumer availability is quota-based, not a guaranteed API price; revalidate the name after CLI upgrades."
+
+

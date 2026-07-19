@@ -62,7 +62,7 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("run_id", nargs="?", default="latest")
     runtime = commands.add_parser("runtime", help="Manage a registered local runtime")
     runtime.add_argument("action", choices=("start", "status", "stop"))
-    runtime.add_argument("runtime_id", nargs="?", default="local-ministral")
+    runtime.add_argument("runtime_id", nargs="?", default="local-ministral", choices=["local-ministral", "local-kolibri"])
     evaluate = commands.add_parser("eval", help="Audit profiles or run one live candidate job")
     evaluate.add_argument("action", choices=("run",))
     evaluate.add_argument("--job", type=Path)
@@ -72,7 +72,7 @@ def build_parser() -> argparse.ArgumentParser:
 def doctor(registry: Registry) -> dict[str, Any]:
     inventory = registry.inventory()
     manager = RuntimeManager(WORKSPACE, ORCHESTRATOR_ROOT / ".runtime")
-    commands = {name: shutil.which(name) for name in ("vibe", "agy", "codex", "llama-server", "ollama")}
+    commands = {name: shutil.which(name) for name in ("vibe", "agy", "codex", "llama-server", "ollama", "kolibri-server")}
     if not commands["agy"] and os.environ.get("LOCALAPPDATA"):
         installed = Path(os.environ["LOCALAPPDATA"]) / "agy" / "bin" / "agy.exe"
         commands["agy"] = str(installed) if installed.is_file() else None

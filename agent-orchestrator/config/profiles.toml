@@ -46,15 +46,16 @@ max_parallel = 1
 benchmark_version = "unbenchmarked"
 
 [[profiles]]
-id = "kolibri-local-deferred"
-model = "kolibri-local-unselected"
-harness = "kolibri-runtime-deferred"
-status = "deferred"
-success_probability = 0.0
-capabilities = []
+id = "kolibri-glm-5.2-inference"
+model = "glm-5.2-744b-moe-local"
+harness = "kolibri-openai-chat"
+status = "candidate"
+success_probability = 0.85
+capabilities = ["architecture", "planning", "coding", "review", "reasoning", "summarization"]
 tool_class = "inference"
 max_parallel = 1
-benchmark_version = "unbenchmarked"
+benchmark_version = "kolibri-initial-v1"
+evaluated_at = "2026-07-19"
 
 [[profiles]]
 id = "mistral-medium-files"
@@ -78,16 +79,6 @@ capabilities = ["coding", "review", "file-editing"]
 tool_class = "files_write"
 max_parallel = 2
 benchmark_version = "unbenchmarked"
-
-[[profiles]]
-id = "openai-codex-deferred"
-model = "openai-flagship"
-harness = "codex-cli-deferred"
-status = "deferred"
-success_probability = 0.0
-capabilities = ["architecture", "planning", "coding", "review", "reasoning"]
-tool_class = "commands"
-max_parallel = 1
 
 [[profiles]]
 id = "gemini-auto-free-read"
@@ -124,3 +115,5 @@ tool_class = "commands"
 max_parallel = 1
 benchmark_version = "antigravity-command-canary-v1"
 evaluated_at = "2026-07-19"
+
+

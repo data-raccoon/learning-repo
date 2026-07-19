@@ -35,12 +35,12 @@ max_parallel = 1
 status = "deferred"
 
 [[harnesses]]
-id = "kolibri-runtime-deferred"
-kind = "unconfigured-local-runtime"
+id = "kolibri-openai-chat"
+kind = "openai-chat"
 provider = "local-kolibri"
 tool_class = "inference"
 max_parallel = 1
-status = "deferred"
+status = "candidate"
 
 [[harnesses]]
 id = "mistral-vibe-files"
@@ -51,15 +51,6 @@ executable = "vibe"
 agent = "accept-edits"
 max_parallel = 2
 status = "eligible"
-
-[[harnesses]]
-id = "codex-cli-deferred"
-kind = "codex"
-provider = "openai-chatgpt"
-tool_class = "commands"
-executable = "codex"
-max_parallel = 1
-status = "deferred"
 
 [[harnesses]]
 id = "antigravity-cli-read"
@@ -87,3 +78,5 @@ tool_class = "commands"
 executable = "agy"
 max_parallel = 1
 status = "eligible"
+
+
