@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "glimweave-creative-producer",
+  "objective": "Create the approved procedural or placeholder art, UI, and audio package. Produce every declared Creative artifact and record complete provenance in the asset manifest.",
+  "target_dir": "orchestration-experiments/game-building/04-glimweave",
+  "mode": "write",
+  "importance": "normal",
+  "risk": "medium",
+  "tool_class": "files_write",
+  "required_capabilities": [
+    "coding",
+    "file-editing"
+  ],
+  "context": [
+    ".game-agents/context/roles/creative-producer.md",
+    ".game-agents/context/templates/handoff.md",
+    "docs/game-brief.md",
+    "docs/acceptance-contract.md",
+    "docs/game-spec.json"
+  ],
+  "expected_artifacts": [
+    "docs/style-guide.md",
+    "assets/asset-manifest.json",
+    "assets/visual-tokens.json",
+    "assets/audio-cues.json"
+  ],
+  "allowed_write_paths": [
+    "assets",
+    "docs/style-guide.md"
+  ],
+  "verifiers": [],
+  "dependencies": [],
+  "limits": {
+    "timeout_seconds": 900,
+    "max_turns": 12,
+    "max_tokens": 30000
+  }
+}

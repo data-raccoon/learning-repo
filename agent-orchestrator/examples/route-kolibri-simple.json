@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "example-kolibri-summarization",
+  "objective": "Summarize the provided document.",
+  "target_dir": "agent-orchestrator/examples/context",
+  "mode": "read",
+  "importance": "normal",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["summarization"],
+  "context": ["brief.md"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": [],
+  "limits": {"timeout_seconds": 300, "max_turns": 4, "max_tokens": 4000}
+}

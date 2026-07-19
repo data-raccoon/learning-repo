@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "id": "glimweave-living-loom-audio",
+  "provenance": {
+    "generator": "OpenAI Codex Creative Producer",
+    "method": "Original Web Audio oscillator and deterministic noise recipes",
+    "license": "Project-owned original configuration; no third-party samples",
+    "externalAssets": false
+  },
+  "engine": {
+    "api": "Web Audio API",
+    "initiallyMuted": true,
+    "requireUserGesture": true,
+    "createContextOnlyWhenUnmuted": true,
+    "muteStopsActiveNodes": true,
+    "mutePreventsCueCreation": true,
+    "autoplayFailurePolicy": "ignore-and-preserve-visual-feedback",
+    "masterGain": 0.18,
+    "compressor": {
+      "thresholdDb": -20,
+      "kneeDb": 12,
+      "ratio": 5,
+      "attackSeconds": 0.003,
+      "releaseSeconds": 0.2
+    },
+    "globalPolyphony": 6,
+    "noiseBufferSeconds": 0.18,
+    "noiseSeed": 17413
+  },
+  "aggregation": {
+    "automaticCapture": {"windowMs": 140, "maximumEventsPerWindow": 1},
+    "fade": {"windowMs": 650, "maximumEventsPerWindow": 1},
+    "overflow": {"windowMs": 900, "maximumEventsPerWindow": 1},
+    "pressure": {"windowMs": 2400, "maximumEventsPerWindow": 1}
+  },
+  "cues": {
+    "purchaseAccepted": {
+      "family": "placement",
+      "cooldownMs": 120,
+      "polyphony": 1,
+      "gain": 0.42,
+      "voices": [
+        {"wave": "triangle", "frequencyHz": 392, "startMs": 0, "durationMs": 90, "attackMs": 8, "releaseMs": 62},
+        {"wave": "sine", "frequencyHz": 523.25, "startMs": 62, "durationMs": 120, "attackMs": 6, "releaseMs": 90}
+      ]
+    },
+    "placementConfirmed": {
+      "family": "placement",
+      "cooldownMs": 180,
+      "polyphony": 1,
+      "gain": 0.5,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 440, "startMs": 0, "durationMs": 130, "attackMs": 8, "releaseMs": 92},
+        {"wave": "triangle", "frequencyHz": 659.25, "startMs": 74, "durationMs": 170, "attackMs": 8, "releaseMs": 125}
+      ]
+    },
+    "placementRejected": {
+      "family": "warning",
+      "cooldownMs": 350,
+      "polyphony": 1,
+      "gain": 0.25,
+      "voices": [
+        {"wave": "triangle", "frequencyHz": 196, "endFrequencyHz": 164.81, "startMs": 0, "durationMs": 130, "attackMs": 4, "releaseMs": 90}
+      ]
+    },
+    "manualCapture": {
+      "family": "capture",
+      "cooldownMs": 65,
+      "polyphony": 2,
+      "gain": 0.4,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 783.99, "endFrequencyHz": 987.77, "startMs": 0, "durationMs": 115, "attackMs": 3, "releaseMs": 92}
+      ]
+    },
+    "automaticCapture": {
+      "family": "capture",
+      "cooldownMs": 140,
+      "polyphony": 2,
+      "gain": 0.2,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 659.25, "startMs": 0, "durationMs": 78, "attackMs": 2, "releaseMs": 62}
+      ]
+    },
+    "fade": {
+      "family": "loss",
+      "cooldownMs": 650,
+      "polyphony": 1,
+      "gain": 0.19,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 329.63, "endFrequencyHz": 220, "startMs": 0, "durationMs": 210, "attackMs": 5, "releaseMs": 155}
+      ]
+    },
+    "overflow": {
+      "family": "warning",
+      "cooldownMs": 900,
+      "polyphony": 1,
+      "gain": 0.38,
+      "voices": [
+        {"wave": "noise", "filter": "bandpass", "frequencyHz": 720, "q": 1.4, "startMs": 0, "durationMs": 120, "attackMs": 2, "releaseMs": 96},
+        {"wave": "triangle", "frequencyHz": 233.08, "endFrequencyHz": 174.61, "startMs": 25, "durationMs": 210, "attackMs": 5, "releaseMs": 150}
+      ]
+    },
+    "pressureRaised": {
+      "family": "warning",
+      "cooldownMs": 2400,
+      "polyphony": 1,
+      "gain": 0.3,
+      "voices": [
+        {"wave": "triangle", "frequencyHz": 146.83, "startMs": 0, "durationMs": 100, "attackMs": 5, "releaseMs": 70},
+        {"wave": "triangle", "frequencyHz": 146.83, "startMs": 155, "durationMs": 100, "attackMs": 5, "releaseMs": 70}
+      ]
+    },
+    "phaseTransition": {
+      "family": "progression",
+      "cooldownMs": 1400,
+      "polyphony": 1,
+      "gain": 0.5,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 261.63, "startMs": 0, "durationMs": 330, "attackMs": 18, "releaseMs": 230},
+        {"wave": "triangle", "frequencyHz": 392, "startMs": 145, "durationMs": 360, "attackMs": 18, "releaseMs": 245},
+        {"wave": "sine", "frequencyHz": 587.33, "startMs": 300, "durationMs": 470, "attackMs": 22, "releaseMs": 325}
+      ]
+    },
+    "doctrineCommitted": {
+      "family": "progression",
+      "cooldownMs": 1000,
+      "polyphony": 1,
+      "gain": 0.45,
+      "voices": [
+        {"wave": "triangle", "frequencyHz": 293.66, "startMs": 0, "durationMs": 220, "attackMs": 15, "releaseMs": 150},
+        {"wave": "sine", "frequencyHz": 440, "startMs": 105, "durationMs": 300, "attackMs": 14, "releaseMs": 210}
+      ]
+    },
+    "abilityActivated": {
+      "family": "ability",
+      "cooldownMs": 320,
+      "polyphony": 1,
+      "gain": 0.4,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 523.25, "endFrequencyHz": 783.99, "startMs": 0, "durationMs": 270, "attackMs": 15, "releaseMs": 190},
+        {"wave": "triangle", "frequencyHz": 1046.5, "startMs": 110, "durationMs": 180, "attackMs": 12, "releaseMs": 135}
+      ]
+    },
+    "abilityReady": {
+      "family": "ability",
+      "cooldownMs": 500,
+      "polyphony": 1,
+      "gain": 0.23,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 698.46, "startMs": 0, "durationMs": 110, "attackMs": 6, "releaseMs": 82}
+      ]
+    },
+    "retuneConfirmed": {
+      "family": "restart",
+      "cooldownMs": 1800,
+      "polyphony": 1,
+      "gain": 0.45,
+      "voices": [
+        {"wave": "triangle", "frequencyHz": 523.25, "endFrequencyHz": 261.63, "startMs": 0, "durationMs": 440, "attackMs": 12, "releaseMs": 280},
+        {"wave": "sine", "frequencyHz": 392, "startMs": 360, "durationMs": 480, "attackMs": 25, "releaseMs": 340}
+      ]
+    },
+    "victory": {
+      "family": "victory",
+      "cooldownMs": 5000,
+      "polyphony": 1,
+      "gain": 0.58,
+      "voices": [
+        {"wave": "sine", "frequencyHz": 261.63, "startMs": 0, "durationMs": 520, "attackMs": 18, "releaseMs": 350},
+        {"wave": "triangle", "frequencyHz": 329.63, "startMs": 135, "durationMs": 520, "attackMs": 18, "releaseMs": 350},
+        {"wave": "sine", "frequencyHz": 392, "startMs": 270, "durationMs": 560, "attackMs": 18, "releaseMs": 380},
+        {"wave": "triangle", "frequencyHz": 523.25, "startMs": 405, "durationMs": 650, "attackMs": 22, "releaseMs": 450},
+        {"wave": "sine", "frequencyHz": 783.99, "startMs": 550, "durationMs": 900, "attackMs": 30, "releaseMs": 680}
+      ]
+    }
+  }
+}

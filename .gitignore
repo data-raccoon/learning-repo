@@ -9,6 +9,9 @@ local-models/ministral/.vibe/connector_bootstrap_cache.json
 local-models/ministral/.vibe/trusted_folders.toml
 local-models/ministral/.vibe/vibehistory
 
+# Cline task-queue handoff directory (managed by agent-orchestrator).
+.cline-jobs/
+
 # Generated LaTeX output.
 *.aux
 *.fdb_latexmk

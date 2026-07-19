@@ -1,5 +1,11 @@
 # Verification Evidence
 
+> **Superseded experiment evidence (2026-07-18).** This page describes the legacy
+> pre–Living Loom runtime. Do **not** run `tools/assemble_runtime.py`; it targets the
+> old layout and can overwrite the checked-in upgraded runtime. Current verification
+> is defined by `docs/acceptance-contract.md` and runs
+> `python tools/verify_glimweave.py --json` directly against checked-in files.
+
 Final deterministic assembly and headless Edge run:
 
 ```text

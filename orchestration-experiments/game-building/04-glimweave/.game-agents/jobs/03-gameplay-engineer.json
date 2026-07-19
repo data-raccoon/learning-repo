@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "glimweave-gameplay-engineer",
+  "objective": "Implement and integrate the approved playable MVP. Preserve the approved contracts and Creative package, add developer tests, and produce the architecture and implementation handoff.",
+  "target_dir": "orchestration-experiments/game-building/04-glimweave",
+  "mode": "write",
+  "importance": "normal",
+  "risk": "medium",
+  "tool_class": "files_write",
+  "required_capabilities": [
+    "coding",
+    "reasoning",
+    "file-editing"
+  ],
+  "context": [
+    ".game-agents/context/roles/gameplay-engineer.md",
+    ".game-agents/context/templates/handoff.md",
+    "docs/game-brief.md",
+    "docs/acceptance-contract.md",
+    "docs/game-spec.json",
+    "docs/style-guide.md",
+    "assets/asset-manifest.json",
+    "assets/visual-tokens.json",
+    "assets/audio-cues.json"
+  ],
+  "expected_artifacts": [
+    "index.html",
+    "styles.css",
+    "bootstrap.js",
+    "smoke.js",
+    "config/game-data.js",
+    "src/utils.js",
+    "src/state.js",
+    "src/simulation.js",
+    "src/integration.js",
+    "src/test-bridge.js",
+    "src/render.js",
+    "src/ui.js",
+    "src/smoke-scenarios.js",
+    "tests/deterministic-tests.js",
+    "tests/trajectory-scenarios.js",
+    "docs/architecture.md",
+    "docs/implementation-handoff.md"
+  ],
+  "allowed_write_paths": [
+    "src",
+    "tests",
+    "config",
+    "docs/architecture.md",
+    "docs/implementation-handoff.md",
+    "index.html",
+    "styles.css",
+    "bootstrap.js",
+    "smoke.js"
+  ],
+  "verifiers": [],
+  "dependencies": [
+    "glimweave-creative-producer"
+  ],
+  "limits": {
+    "timeout_seconds": 1200,
+    "max_turns": 16,
+    "max_tokens": 40000
+  }
+}

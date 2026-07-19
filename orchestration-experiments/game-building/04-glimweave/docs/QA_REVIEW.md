@@ -1,5 +1,10 @@
 # QA Review: Glimweave Release Readiness
 
+> **Superseded experiment review (2026-07-18).** This verdict applies only to the
+> legacy pre–Living Loom build. It is retained as historical evidence, not current
+> release approval. Do **not** run `tools/assemble_runtime.py`; use the current
+> `docs/acceptance-contract.md` and `python tools/verify_glimweave.py --json`.
+
 ## Release Verdict
 **Conditional Green** – Glimweave meets its core experimental objectives as an offline, single-file browser game. All acceptance tests pass in headless Edge, the simulation is deterministic, and the full surface (4 phases, 5 Weftling classes, 3 doctrines, 18 upgrades) is verified. It is ready for experimental release to early players willing to tolerate rough edges. It is not yet polished for a general audience.
 

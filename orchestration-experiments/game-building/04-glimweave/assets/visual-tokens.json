@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "id": "glimweave-living-loom-visuals",
+  "provenance": {
+    "generator": "OpenAI Codex Creative Producer",
+    "method": "Original procedural design tokens authored for Glimweave: Living Loom",
+    "license": "Project-owned original configuration; no third-party media",
+    "externalAssets": false
+  },
+  "appearanceModeIds": [
+    "default",
+    "high-contrast",
+    "deuteranopia",
+    "protanopia"
+  ],
+  "defaultAppearanceMode": "default",
+  "typography": {
+    "family": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "monoFamily": "ui-monospace, \"Cascadia Mono\", \"Segoe UI Mono\", monospace",
+    "weight": {
+      "regular": 400,
+      "medium": 560,
+      "strong": 700,
+      "display": 760
+    },
+    "sizePx": {
+      "caption": 12,
+      "bodyCompact": 14,
+      "body": 15,
+      "label": 13,
+      "title": 22,
+      "display": 34
+    },
+    "lineHeight": {
+      "compact": 1.25,
+      "body": 1.5,
+      "display": 1.1
+    },
+    "letterSpacingEm": {
+      "label": 0.04,
+      "display": 0.02
+    },
+    "numericVariant": "tabular-nums"
+  },
+  "layout": {
+    "minimumTouchTargetPx": 44,
+    "minimumTargetGapPx": 8,
+    "compactBreakpointPx": 720,
+    "desktopFieldMinimumWidthRatio": 0.6,
+    "compactPlacementFieldMinimumHeightPx": 300,
+    "spacePx": [4, 8, 12, 16, 24, 32, 48],
+    "radiusPx": {
+      "control": 10,
+      "panel": 16,
+      "modal": 20,
+      "pill": 999
+    }
+  },
+  "stroke": {
+    "hairlinePx": 1,
+    "standardPx": 2,
+    "emphasisPx": 3,
+    "focusPx": 4,
+    "rangeDashPx": {
+      "production": [],
+      "capture": [10, 7],
+      "support": [9, 4, 2, 4],
+      "resonance": [2, 6],
+      "guard": [14, 4]
+    }
+  },
+  "motion": {
+    "durationMs": {
+      "instant": 0,
+      "fast": 120,
+      "standard": 240,
+      "event": 520,
+      "ceremony": 1100,
+      "staticFeedbackHold": 1200
+    },
+    "easing": {
+      "enter": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "exit": "cubic-bezier(0.7, 0, 0.84, 0)",
+      "linear": "linear"
+    },
+    "ambient": {
+      "maximumDisplacementPx": 6,
+      "minimumCycleMs": 6000,
+      "maximumOpacityDelta": 0.12
+    },
+    "reducedMotion": {
+      "disableAmbientDrift": true,
+      "disableParallax": true,
+      "disableParticles": true,
+      "disableShake": true,
+      "transitionDurationMs": 0,
+      "eventSubstitute": "static-stamp-and-label"
+    }
+  },
+  "patterns": {
+    "drifting": {"shape": "diamond", "interior": "solid", "line": "solid"},
+    "endangered": {"shape": "diamond", "interior": "hourglass-cutout", "line": "three-segment-arc"},
+    "capture": {"shape": "square-knot", "interior": "open", "line": "long-dash"},
+    "invalid": {"shape": "crossed-ring", "interior": "diagonal-hatch", "line": "double"},
+    "pressure": {"shape": "inward-triangle", "interior": "diagonal-hatch", "line": "perimeter-ticks"},
+    "overflow": {"shape": "down-triangle", "interior": "broken-bar", "line": "chevron"}
+  },
+  "weftlingGlyphs": {
+    "glimspinner": "four-ray-star",
+    "driftcatcher": "open-crescent",
+    "threadweaver": "crossed-shuttle",
+    "harmonizer": "hexagonal-knot",
+    "loomguard": "shield-double-ring"
+  },
+  "feedback": {
+    "validPlacement": {"glyph": "check", "pattern": "solid-ring", "label": "VALID"},
+    "invalidPlacement": {"glyph": "cross", "pattern": "diagonal-hatch", "label": "INVALID"},
+    "manualCapture": {"glyph": "square-knot", "label": "+GLIM"},
+    "automaticCapture": {"glyph": "tether-knot", "pattern": "long-dash"},
+    "fade": {"glyph": "broken-thread", "label": "FADED"},
+    "overflow": {"glyph": "down-triangle", "pattern": "broken-bar", "label": "FULL"},
+    "phase": {"glyph": "four-knot-thread", "label": "PHASE"},
+    "victory": {"glyph": "five-thread-dawn", "label": "DAWN WOVEN"}
+  },
+  "modes": {
+    "default": {
+      "colors": {
+        "page": "#071019",
+        "surface": "#0C1825",
+        "surfaceRaised": "#122536",
+        "field": "#050D16",
+        "fieldGrid": "#25465A",
+        "text": "#EAFBFF",
+        "textMuted": "#A6C1CB",
+        "border": "#365B6B",
+        "focus": "#FFE478",
+        "glim": "#F5FDFF",
+        "production": "#6EF3DA",
+        "capture": "#62CAFF",
+        "support": "#B89CFF",
+        "guard": "#FFD36A",
+        "valid": "#7BF4C4",
+        "invalid": "#FF7A8C",
+        "warning": "#FFB24A",
+        "pressure": "#FF718D",
+        "iridescence": "#E39CFF",
+        "selection": "#8CEEFF",
+        "scrim": "rgba(1, 6, 12, 0.78)"
+      },
+      "effects": {"haloAlpha": 0.34, "rangeFillAlpha": 0.12, "gridAlpha": 0.32, "shadowAlpha": 0.3}
+    },
+    "high-contrast": {
+      "colors": {
+        "page": "#000000",
+        "surface": "#090909",
+        "surfaceRaised": "#151515",
+        "field": "#000000",
+        "fieldGrid": "#767676",
+        "text": "#FFFFFF",
+        "textMuted": "#E6E6E6",
+        "border": "#FFFFFF",
+        "focus": "#00FFFF",
+        "glim": "#FFFFFF",
+        "production": "#00FFFF",
+        "capture": "#FFFF00",
+        "support": "#FF4DFF",
+        "guard": "#FFFFFF",
+        "valid": "#00FFFF",
+        "invalid": "#FF4DFF",
+        "warning": "#FFFF00",
+        "pressure": "#FF4DFF",
+        "iridescence": "#FFFF00",
+        "selection": "#FFFFFF",
+        "scrim": "rgba(0, 0, 0, 0.92)"
+      },
+      "effects": {"haloAlpha": 0.18, "rangeFillAlpha": 0.2, "gridAlpha": 0.65, "shadowAlpha": 0}
+    },
+    "deuteranopia": {
+      "colors": {
+        "page": "#08111C",
+        "surface": "#0E1B2A",
+        "surfaceRaised": "#172B3F",
+        "field": "#050D18",
+        "fieldGrid": "#31516A",
+        "text": "#F5FAFF",
+        "textMuted": "#B7C7D8",
+        "border": "#48677E",
+        "focus": "#FFE15A",
+        "glim": "#FFFFFF",
+        "production": "#53C7FF",
+        "capture": "#FFD65A",
+        "support": "#B9A2FF",
+        "guard": "#F4F4F4",
+        "valid": "#53C7FF",
+        "invalid": "#C5A5FF",
+        "warning": "#FFD65A",
+        "pressure": "#D6A6FF",
+        "iridescence": "#8BB8FF",
+        "selection": "#FFFFFF",
+        "scrim": "rgba(2, 7, 15, 0.82)"
+      },
+      "effects": {"haloAlpha": 0.32, "rangeFillAlpha": 0.14, "gridAlpha": 0.4, "shadowAlpha": 0.25}
+    },
+    "protanopia": {
+      "colors": {
+        "page": "#07121D",
+        "surface": "#0D1D2B",
+        "surfaceRaised": "#152D40",
+        "field": "#040E18",
+        "fieldGrid": "#31566B",
+        "text": "#F4FBFF",
+        "textMuted": "#B5CBD6",
+        "border": "#426D7B",
+        "focus": "#FFE66B",
+        "glim": "#FFFFFF",
+        "production": "#47D3FF",
+        "capture": "#FFD45E",
+        "support": "#9CB5FF",
+        "guard": "#F2F2F2",
+        "valid": "#47D3FF",
+        "invalid": "#8FA9FF",
+        "warning": "#FFD45E",
+        "pressure": "#B5A3FF",
+        "iridescence": "#77C2FF",
+        "selection": "#FFFFFF",
+        "scrim": "rgba(2, 8, 16, 0.82)"
+      },
+      "effects": {"haloAlpha": 0.32, "rangeFillAlpha": 0.14, "gridAlpha": 0.4, "shadowAlpha": 0.25}
+    }
+  }
+}

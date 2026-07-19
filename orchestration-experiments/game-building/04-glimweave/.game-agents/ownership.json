@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "game_id": "glimweave",
+  "owners": {
+    "game-director": [
+      "docs/game-brief.md",
+      "docs/acceptance-contract.md",
+      "docs/game-spec.json"
+    ],
+    "creative-producer": [
+      "assets",
+      "docs/style-guide.md"
+    ],
+    "gameplay-engineer": [
+      "src",
+      "tests",
+      "config",
+      "docs/architecture.md",
+      "docs/implementation-handoff.md",
+      "index.html",
+      "styles.css",
+      "bootstrap.js",
+      "smoke.js"
+    ],
+    "qa-playtest": []
+  }
+}

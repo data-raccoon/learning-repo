@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "game_id": "glimweave",
+  "approved_by": "human-cli",
+  "approved_at": "2026-07-19T10:24:08.083475+00:00",
+  "sha256": {
+    "docs/game-brief.md": "8ff1c059300f1f2edf6f0002d3e7923dc5d904c8bcec2ade50eac74b2d58fcb5",
+    "docs/acceptance-contract.md": "8012be74575919760266335bdedf7eb9fa99da1c0f8ed5ea947eb51dbf3608d7",
+    "docs/game-spec.json": "b314ad1f509aa8bbc9a22f669b3a66dc440c9e3c8acc4f0af1dadcec1ba197e9"
+  }
+}

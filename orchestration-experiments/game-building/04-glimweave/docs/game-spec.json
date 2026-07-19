@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "game_id": "glimweave",
+  "engine": "Offline HTML5 Canvas with classic JavaScript (ES5+), no dependencies or build step",
+  "entrypoint": "index.html",
+  "run_argv": ["index.html"],
+  "creative_artifacts": [
+    "assets/visual-tokens.json",
+    "assets/audio-cues.json"
+  ],
+  "engineer_artifacts": [
+    "index.html",
+    "styles.css",
+    "bootstrap.js",
+    "smoke.js",
+    "config/game-data.js",
+    "src/utils.js",
+    "src/state.js",
+    "src/simulation.js",
+    "src/integration.js",
+    "src/test-bridge.js",
+    "src/render.js",
+    "src/ui.js",
+    "src/smoke-scenarios.js",
+    "tests/deterministic-tests.js",
+    "tests/trajectory-scenarios.js"
+  ],
+  "verifiers": [
+    {
+      "id": "glimweave-independent-browser-suite",
+      "argv": ["{python}", "tools/verify_glimweave.py", "--json"],
+      "timeout_seconds": 180
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "glimweave-game-director",
+  "objective": "Create the complete approved-design candidate described by the intent. Write exactly docs/game-brief.md, docs/acceptance-contract.md, and docs/game-spec.json from the supplied templates and role contract.",
+  "target_dir": "orchestration-experiments/game-building/04-glimweave",
+  "mode": "write",
+  "importance": "critical",
+  "risk": "medium",
+  "tool_class": "files_write",
+  "required_capabilities": [
+    "reasoning",
+    "review",
+    "file-editing"
+  ],
+  "context": [
+    ".game-agents/intent.md",
+    ".game-agents/context/roles/game-director.md",
+    ".game-agents/context/templates/game-brief.md",
+    ".game-agents/context/templates/acceptance-contract.md",
+    ".game-agents/context/templates/game-spec.example.json"
+  ],
+  "expected_artifacts": [
+    "docs/game-brief.md",
+    "docs/acceptance-contract.md",
+    "docs/game-spec.json"
+  ],
+  "allowed_write_paths": [
+    "docs/game-brief.md",
+    "docs/acceptance-contract.md",
+    "docs/game-spec.json"
+  ],
+  "verifiers": [],
+  "dependencies": [],
+  "limits": {
+    "timeout_seconds": 900,
+    "max_turns": 12,
+    "max_tokens": 30000
+  }
+}

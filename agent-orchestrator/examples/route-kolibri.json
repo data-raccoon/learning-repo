@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "example-kolibri-architecture",
+  "objective": "Explain the architecture of the Kolibri inference engine based on the documentation.",
+  "target_dir": "agent-orchestrator/examples/context",
+  "mode": "read",
+  "importance": "normal",
+  "risk": "low",
+  "tool_class": "inference",
+  "model_profile": "kolibri-glm-5.2-inference",
+  "required_capabilities": ["architecture", "reasoning"],
+  "context": ["brief.md"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": [],
+  "limits": {"timeout_seconds": 300, "max_turns": 4, "max_tokens": 4000}
+}

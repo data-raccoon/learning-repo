@@ -29,7 +29,9 @@ def main() -> None:
         screenshot_path.unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(prefix="glimweave-edge-") as profile:
         command = [
-            str(EDGE), "--headless=new", "--disable-gpu", "--no-first-run",
+            str(EDGE), "--headless=new", "--disable-gpu", "--disable-gpu-compositing",
+            "--disable-software-rasterizer", "--disable-features=Vulkan,Dawn,SkiaGraphite",
+            "--no-first-run",
             "--allow-file-access-from-files", f"--user-data-dir={profile}",
             "--virtual-time-budget=5000", "--dump-dom", "--window-size=1440,900",
         ]

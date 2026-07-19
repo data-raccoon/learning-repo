@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "glimweave-qa-playtest",
+  "objective": "Independently audit the implemented MVP against the approved acceptance contract and return only one QA report JSON object. Do not edit any file.",
+  "target_dir": "orchestration-experiments/game-building/04-glimweave",
+  "mode": "read",
+  "importance": "high",
+  "risk": "medium",
+  "tool_class": "files_read",
+  "required_capabilities": [
+    "review",
+    "reasoning"
+  ],
+  "context": [
+    ".game-agents/context/roles/qa-playtest.md",
+    ".game-agents/context/templates/qa-report.schema.json",
+    "docs/game-brief.md",
+    "docs/acceptance-contract.md",
+    "docs/game-spec.json",
+    "docs/style-guide.md",
+    "assets/asset-manifest.json",
+    "assets/visual-tokens.json",
+    "assets/audio-cues.json",
+    "index.html",
+    "styles.css",
+    "bootstrap.js",
+    "smoke.js",
+    "config/game-data.js",
+    "src/utils.js",
+    "src/state.js",
+    "src/simulation.js",
+    "src/integration.js",
+    "src/test-bridge.js",
+    "src/render.js",
+    "src/ui.js",
+    "src/smoke-scenarios.js",
+    "tests/deterministic-tests.js",
+    "tests/trajectory-scenarios.js",
+    "docs/architecture.md",
+    "docs/implementation-handoff.md"
+  ],
+  "expected_artifacts": [],
+  "verifiers": [
+    {
+      "id": "glimweave-independent-browser-suite",
+      "argv": [
+        "{python}",
+        "tools/verify_glimweave.py",
+        "--json"
+      ],
+      "timeout_seconds": 180
+    }
+  ],
+  "dependencies": [
+    "glimweave-gameplay-engineer"
+  ],
+  "output_schema": ".game-agents/context/templates/qa-report.schema.json",
+  "limits": {
+    "timeout_seconds": 900,
+    "max_turns": 10,
+    "max_tokens": 20000
+  }
+}

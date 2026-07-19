@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "game_id": "example-game",
+  "engine": "engine-name-and-version",
+  "entrypoint": "src/game.file",
+  "run_argv": ["runtime", "src/game.file"],
+  "creative_artifacts": ["assets/example.asset"],
+  "engineer_artifacts": ["src/game.file", "tests/test_game.file"],
+  "verifiers": [
+    {
+      "id": "game-tests",
+      "argv": ["{python}", "-m", "unittest", "-v"],
+      "timeout_seconds": 120
+    }
+  ]
+}

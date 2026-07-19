@@ -34,7 +34,7 @@ Open [`index.html`](index.html) directly in any modern browser. It is the multi-
 |------|---------|
 | [`index.html`](index.html) | Multi-file browser entry point; loads all modules |
 | [`bootstrap.js`](bootstrap.js) | Production module loader for the multi-file runtime |
-| [`data/game-data.js`](data/game-data.js) | Generated wrapper exposing `data/game-data.json` |
+| [`config/game-data.js`](config/game-data.js) | Canonical Living Loom data, visual tokens, audio recipes, and progression definitions |
 | [`src/state.js`](src/state.js) | Core state management, save/load, offline progress |
 | [`src/simulation.js`](src/simulation.js) | Deterministic simulation: production, drift, fade, capture, overflow |
 | [`src/render.js`](src/render.js) | Procedural vector/canvas rendering of Glim, Weftlings, and Loom |
@@ -44,7 +44,7 @@ Open [`index.html`](index.html) directly in any modern browser. It is the multi-
 | [`src/smoke-scenarios.js`](src/smoke-scenarios.js) | Smoke-only test scenarios |
 | [`smoke.js`](smoke.js) | Smoke-only harness |
 | [`styles.css`](styles.css) | Styling and responsive layout |
-| [`data/game-data.json`](data/game-data.json) | Unit classes, doctrines, upgrades, and phase definitions |
+| [`tests/deterministic-tests.js`](tests/deterministic-tests.js) | Gameplay-boundary, persistence, progression, ability, and invariant checks |
 
 ### Design & Contracts
 | File | Purpose |
@@ -69,32 +69,32 @@ Open [`index.html`](index.html) directly in any modern browser. It is the multi-
 |------|---------|
 | [`tools/run_cloud_vibe_job.py`](tools/run_cloud_vibe_job.py) | Runs a single Cloud job and records evidence |
 | [`tools/extract_contract_packets.py`](tools/extract_contract_packets.py) | Extracts contract packets for orchestration |
-| [`tools/assemble_runtime.py`](tools/assemble_runtime.py) | Bundles modules for deterministic assembly |
+| [`tools/assemble_runtime.py`](tools/assemble_runtime.py) | **Legacy only; do not run against Living Loom** |
 | [`tools/verify_glimweave.py`](tools/verify_glimweave.py) | Headless Edge test suite and deterministic checks |
 
 ---
 ## Verification
 
-**Status.** All acceptance tests pass. The automated browser suite verifies mechanics, cardinalities, phase progression, Retuning invariants, and save/load round-trips.
+**Status.** The automated release gate passes against the checked-in Living Loom runtime. It verifies boot, public smoke interactions, spatial placement and capture, declared upgrade and ability effects, phase progression, exact victory timing, Retuning invariants, version-3 persistence, invalid-state rejection, and offline progress.
 
 **Output:**
-```
-PASS phases=4 weftlings=5 doctrines=3 upgrades=18
-PASS browser_suite=core+integration
+```json
+{"status":"pass","result":"PASS"}
 ```
 
 **Reproduce it yourself:**
-```text
-python 04-glimweave/tools/assemble_runtime.py
-python 04-glimweave/tools/verify_glimweave.py
+```powershell
+python 04-glimweave/tools/verify_glimweave.py --json
 ```
 
-**Limitations.** This is automated, deterministic verification. The covered mechanics and integration paths pass. No claim is made that the economy is balanced or that a human playthrough is complete; pacing and balance remain unproven.
+Do not run `tools/assemble_runtime.py`; it targets the superseded experiment layout and can overwrite current files.
+
+**Limitations.** Automated checks do not prove the 25–40 minute balance target, doctrine parity, listening quality, assistive-technology behavior, or real-device touch comfort. Those remain explicit physical release gates rather than implied passes.
 
 ---
 ## Provenance
 
-Mistral Cloud `mistral-medium-3.5` authored/repaired the game design and architecture, `data/game-data.json`, `src/utils.js`, `src/state.js`, `src/simulation.js`, `src/render.js`, `src/ui.js`, `src/integration.js`, `src/test-bridge.js`, `src/smoke-scenarios.js`, `smoke.js`, `styles.css`, and the final README/QA/learnings documents. The outer orchestrator authored `EXPERIMENT_BRIEF.md`, `bootstrap.js`, deterministic `index.html` and `data/game-data.js` assembly, the Python runner/contract extractor/assembler/verifier, job/prompt routing, acceptance and rejection decisions, and compact run evidence handling. Cloud credentials never entered the repository or any prompt.
+The original experiment and retained historical evidence were produced through the recorded Mistral Cloud workflow. The Living Loom elevation was planned, implemented, repaired, and independently audited through the repository's `gaming-agents` workflow using Codex sub-agents with disjoint Director, Creative, Engineering, and read-only QA ownership. Creative media remains original, procedural, dependency-free, and documented in `assets/asset-manifest.json`.
 
 ---
 ## Learn More

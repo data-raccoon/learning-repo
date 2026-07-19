@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "max_parallel": 1,
+  "jobs": [
+    "01-game-director.json"
+  ]
+}

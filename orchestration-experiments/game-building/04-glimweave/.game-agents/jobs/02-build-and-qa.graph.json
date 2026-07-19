@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "max_parallel": 1,
+  "jobs": [
+    "02-creative-producer.json",
+    "03-gameplay-engineer.json",
+    "04-qa-playtest.json"
+  ]
+}

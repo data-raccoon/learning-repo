@@ -1,10 +1,1 @@
-(function() {
-  if (!/[?&]smoke(=|&|$)/.test(location.search)) return;
-  var gw = window.GW;
-  if (!gw || 'object' !== typeof gw) gw = window.GW = {};
-  if (Object.prototype.hasOwnProperty.call(gw, '__glimweaveTestBackup')) {
-    window.__glimweaveTest = gw.__glimweaveTestBackup;
-  } else if (window.__glimweaveTest) {
-    gw.__glimweaveTestBackup = window.__glimweaveTest;
-  }
-})()
+(function(){'use strict';var GW=window.GW;window.__glimweaveTest={createState:GW.State.create,cloneState:GW.State.copy,step:function(s,ms){while(ms>0){var d=Math.min(ms,GW.Simulation.TICK_MS);GW.Simulation.step(s,d);ms-=d;}return s;},dispatch:function(s,a){return GW.Simulation.handleAction(s,a);},spawn:GW.Simulation.spawnMote,metrics:GW.Simulation.metrics,directive:GW.Simulation.directive,victoryProgress:GW.Simulation.victoryProgress,retuneInfo:GW.Simulation.retuneInfo,retune:GW.Simulation.retune,serialize:GW.State.serialize,parse:GW.State.parse,validate:GW.State.validate,offline:GW.State.applyOffline};})();

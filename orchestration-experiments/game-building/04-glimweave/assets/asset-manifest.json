@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "gameId": "glimweave",
+  "policy": {
+    "runtimeDownloadsAllowed": false,
+    "unknownLicenseAssetsAllowed": false,
+    "externalDependencies": false,
+    "placeholderDefinition": "An artifact intended to be replaced before release"
+  },
+  "assets": [
+    {
+      "path": "assets/visual-tokens.json",
+      "category": "procedural-visual-configuration",
+      "format": "JSON",
+      "generatorOrAuthor": "OpenAI Codex Creative Producer",
+      "provenance": "Original project-specific living-aurora palette, shape, pattern, layout, typography, feedback, and motion tokens; contains no copied media",
+      "license": "Project-owned original configuration",
+      "placeholder": false,
+      "integrationIntent": "Canonical creative token input for DOM and Canvas appearance modes, procedural glyphs, range patterns, responsive hierarchy, focus, event feedback, and reduced-motion substitutions"
+    },
+    {
+      "path": "assets/audio-cues.json",
+      "category": "procedural-audio-configuration",
+      "format": "JSON",
+      "generatorOrAuthor": "OpenAI Codex Creative Producer",
+      "provenance": "Original project-specific oscillator, envelope, deterministic-noise, throttling, and polyphony recipes; contains no samples or copied compositions",
+      "license": "Project-owned original configuration",
+      "placeholder": false,
+      "integrationIntent": "Optional muted-by-default Web Audio cue recipes emitted only after accepted canonical game events, with aggregation for high-frequency simulation events"
+    },
+    {
+      "path": "assets/asset-manifest.json",
+      "category": "asset-provenance-manifest",
+      "format": "JSON",
+      "generatorOrAuthor": "OpenAI Codex Creative Producer",
+      "provenance": "Original manifest authored for the approved Glimweave: Living Loom Creative handoff",
+      "license": "Project-owned original configuration",
+      "placeholder": false,
+      "integrationIntent": "Audit record for every Creative asset path, its provenance, license, placeholder status, and runtime intent"
+    }
+  ]
+}

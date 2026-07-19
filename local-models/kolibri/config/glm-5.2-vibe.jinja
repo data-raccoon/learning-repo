@@ -1,0 +1,37 @@
+{%- set allowed = ['read_file', 'grep', 'edit', 'write_file'] -%}
+{{- bos_token -}}
+{%- if messages and messages[0]['role'] == 'system' -%}
+{{- '[SYSTEM]' + messages[0]['content'] + '[/SYSTEM]' -}}
+{%- set chat = messages[1:] -%}
+{%- else -%}
+{%- set chat = messages -%}
+{%- endif -%}
+{%- if tools -%}
+{{- '[TOOLS]' -}}
+{%- set ns = namespace(first=true) -%}
+{%- for tool in tools -%}
+{%- if tool['function']['name'] in allowed -%}
+{%- if not ns.first -%}{{- ', ' -}}{%- endif -%}
+{{- tool['function']['name'] + ':' + (tool['function']['description']|default('')) -}}
+{%- set ns.first = false -%}
+{%- endif -%}
+{%- endfor -%}
+{{- '[/TOOLS]' -}}
+{%- endif -%}
+{%- for message in chat -%}
+{%- if message['role'] == 'user' -%}
+{{- '[INST]' + (message['content']|string) + '[/INST]' -}}
+{%- elif message['role'] == 'assistant' -%}
+{%- if message['content'] is string -%}{{- message['content'] -}}{%- endif -%}
+{%- if message['tool_calls'] is defined and message['tool_calls'] -%}
+{%- for tool in message['tool_calls'] -%}
+{%- set arguments = tool['function']['arguments'] -%}
+{%- if arguments is not string -%}{%- set arguments = arguments|tojson -%}{%- endif -%}
+{{- '[TOOL_CALL]' + tool['function']['name'] + '[ARGS]' + (arguments or '{}') + '[/TOOL_CALL]' -}}
+{%- endfor -%}
+{%- endif -%}
+{{- eos_token -}}
+{%- elif message['role'] == 'tool' -%}
+{{- '[TOOL_RESULT]' + (message['content']|string) + '[/TOOL_RESULT]' -}}
+{%- endif -%}
+{%- endfor -%}

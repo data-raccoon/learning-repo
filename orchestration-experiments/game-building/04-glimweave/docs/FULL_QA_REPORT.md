@@ -1,5 +1,10 @@
 # Glimweave Full QA Audit Report
 
+> **Historical audit only.** This report concerns the initial 2026-07-18 build and
+> is not a verdict on Living Loom. Current release evidence is governed by
+> `docs/acceptance-contract.md`; `tools/assemble_runtime.py` is retired for current
+> verification and must not overwrite the upgraded runtime.
+
 - **Audit Date:** 2026-07-18
 - **Auditor:** Independent Release QA (Mistral Vibe)
 - **Build:** `cc4b65b` (initial non-working state)
