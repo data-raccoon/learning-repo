@@ -55,13 +55,19 @@ class RunnerTests(unittest.TestCase):
         self.assertTrue((self.orchestrator / result["quarantine"] / "changes.json").is_file())
 
     def test_readonly_snapshot_directory_can_be_discarded(self):
-        run_dir = self.orchestrator / ".runtime" / "readonly"
-        run_dir.mkdir(parents=True)
-        snapshot = TargetSnapshot(self.target, run_dir)
-        snapshot.capture()
-        os.chmod(snapshot.snapshot_dir, stat.S_IREAD)
-        snapshot.discard()
-        self.assertFalse(snapshot.snapshot_dir.exists())
+        # Set runtime directory to be within test temp dir for this test
+        runtime_dir = self.orchestrator / ".runtime"
+        os.environ["AGENT_ORCHESTRATOR_RUNTIME"] = str(runtime_dir)
+        try:
+            run_dir = runtime_dir / "readonly"
+            run_dir.mkdir(parents=True)
+            snapshot = TargetSnapshot(self.target, run_dir)
+            snapshot.capture()
+            os.chmod(snapshot.snapshot_dir, stat.S_IREAD)
+            snapshot.discard()
+            self.assertFalse(snapshot.snapshot_dir.exists())
+        finally:
+            os.environ.pop("AGENT_ORCHESTRATOR_RUNTIME", None)
 
     def test_failed_verifier_rolls_back(self):
         verifier = Verifier("fails", (sys.executable, "-c", "raise SystemExit(3)"), 10)

@@ -10,7 +10,7 @@ Repository-local, vendor-neutral routing and execution for bounded local and clo
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" .\orchestrate.py route .\examples\route-local.json
 ```
 
-The CLI prints compact JSON. Raw trajectories, snapshots, locks, evaluation candidates, and quarantine patches stay under the ignored `.runtime/` directory.
+The CLI prints compact JSON. Raw trajectories, snapshots, locks, evaluation candidates, and quarantine patches stay under the `.runtime/` directory, which defaults to `%LOCALAPPDATA%\agent-orchestrator\.runtime` outside OneDrive to avoid sync issues. Override with the `AGENT_ORCHESTRATOR_RUNTIME` environment variable if needed.
 
 ## Billing semantics
 

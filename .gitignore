@@ -2,6 +2,8 @@
 *.py[cod]
 
 # Model-orchestrator runtime evidence, snapshots, locks, and trajectories.
+# Runtime directory can be outside repository via AGENT_ORCHESTRATOR_RUNTIME env var.
+# Legacy location (kept for backwards compatibility):
 agent-orchestrator/.runtime/
 
 # Vibe runtime sidecars generated when the project-local provider config is used headlessly.

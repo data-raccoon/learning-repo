@@ -34,11 +34,23 @@ def _run_id(job_id: str) -> str:
     return f"{stamp}-{safe}-{uuid.uuid4().hex[:8]}"
 
 
+def get_runtime_root(orchestrator_root: Path | None = None) -> Path:
+    """Get the runtime directory path, preferring environment variable or defaulting outside OneDrive."""
+    env_runtime = os.environ.get("AGENT_ORCHESTRATOR_RUNTIME")
+    if env_runtime:
+        return Path(env_runtime).resolve()
+    
+    # Default to user's local app data directory, outside OneDrive
+    local_app_data = Path(os.environ.get("LOCALAPPDATA", "~")).resolve()
+    runtime_dir = local_app_data / "agent-orchestrator" / ".runtime"
+    return runtime_dir
+
+
 class JobRunner:
     def __init__(self, workspace: Path, orchestrator_root: Path, registry: Registry, adapters: dict[str, Any] | None = None):
         self.workspace = workspace.resolve()
         self.orchestrator_root = orchestrator_root.resolve()
-        self.runtime_root = self.orchestrator_root / ".runtime"
+        self.runtime_root = get_runtime_root(orchestrator_root)
         self.runtime_root.mkdir(parents=True, exist_ok=True)
         self.registry = registry
         self.runtime = RuntimeManager(self.workspace, self.runtime_root)

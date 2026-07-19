@@ -27,6 +27,18 @@ ORCHESTRATOR_ROOT = Path(__file__).resolve().parents[2]
 WORKSPACE = ORCHESTRATOR_ROOT.parent
 
 
+def get_runtime_root() -> Path:
+    """Get the runtime directory path, preferring environment variable or defaulting outside OneDrive."""
+    env_runtime = os.environ.get("AGENT_ORCHESTRATOR_RUNTIME")
+    if env_runtime:
+        return Path(env_runtime).resolve()
+    
+    # Default to user's local app data directory, outside OneDrive
+    local_app_data = Path(os.environ.get("LOCALAPPDATA", "~")).resolve()
+    runtime_dir = local_app_data / "agent-orchestrator" / ".runtime"
+    return runtime_dir
+
+
 def _emit(value: Any) -> None:
     print(json.dumps(value, indent=2, ensure_ascii=False))
 
@@ -71,7 +83,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def doctor(registry: Registry) -> dict[str, Any]:
     inventory = registry.inventory()
-    manager = RuntimeManager(WORKSPACE, ORCHESTRATOR_ROOT / ".runtime")
+    manager = RuntimeManager(WORKSPACE, get_runtime_root())
     commands = {name: shutil.which(name) for name in ("vibe", "agy", "codex", "llama-server", "ollama", "kolibri-server")}
     if not commands["agy"] and os.environ.get("LOCALAPPDATA"):
         installed = Path(os.environ["LOCALAPPDATA"]) / "agy" / "bin" / "agy.exe"
@@ -88,7 +100,7 @@ def doctor(registry: Registry) -> dict[str, Any]:
 
 
 def read_status(run_id: str) -> dict[str, Any]:
-    run_root = ORCHESTRATOR_ROOT / ".runtime" / "runs"
+    run_root = get_runtime_root() / "runs"
     if run_id == "latest":
         candidates = sorted((path for path in run_root.glob("*/summary.json")), key=lambda path: path.stat().st_mtime, reverse=True)
         if not candidates:
@@ -121,12 +133,12 @@ def main(argv: list[str] | None = None) -> None:
         elif args.command == "status":
             result = read_status(args.run_id)
         elif args.command == "runtime":
-            manager = RuntimeManager(WORKSPACE, ORCHESTRATOR_ROOT / ".runtime")
+            manager = RuntimeManager(WORKSPACE, get_runtime_root())
             result = getattr(manager, args.action)(args.runtime_id)
         elif args.command == "eval":
             if args.job:
                 job = load_job(_scoped_spec(args.job))
-                destination = ORCHESTRATOR_ROOT / ".runtime" / "evals" / f"{job.id}.json"
+                destination = get_runtime_root() / "evals" / f"{job.id}.json"
                 result = run_candidate(_runner(registry), job, destination)
             else:
                 result = audit_profiles(registry)
