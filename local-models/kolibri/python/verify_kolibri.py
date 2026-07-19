@@ -49,7 +49,7 @@ def main() -> None:
             capture_output=True,
             text=True,
         )
-        gpu_processes = [line for line in result.stdout.splitlines() if "kolibri" in line.lower()]
+        gpu_processes = [line for line in result.stdout.splitlines() if "kolibri" in line.lower() or "glm" in line.lower() or "openai_server" in line.lower()]
     except (subprocess.CalledProcessError, FileNotFoundError):
         # nvidia-smi not available or no GPU
         pass
