@@ -1,0 +1,7 @@
+[[harnesses]]
+id = "kolibri-openai-chat"
+kind = "openai-chat"
+provider = "local-kolibri"
+tool_class = "inference"
+max_parallel = 1
+status = "deferred"

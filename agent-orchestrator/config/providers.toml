@@ -32,17 +32,6 @@ billing = "local-compute"
 notes = "Inventory-only scaffold. Select an exact artifact and runtime before candidate admission."
 
 [[providers]]
-id = "local-kolibri"
-display_name = "Local Kolibri (GLM-5.2)"
-kind = "openai-compatible-local"
-status = "candidate"
-auth_kind = "external-file"
-auth_env = "KOLIBRI_API_KEY"
-base_url = "http://127.0.0.1:8082/v1"
-billing = "local-compute"
-notes = "Pure C zero-dependency MoE inference engine. Streaming experts from disk. Loopback-only runtime; key and weights remain outside the repository."
-
-[[providers]]
 id = "gemini-google-account"
 display_name = "Google Gemini via Antigravity CLI (Google account)"
 kind = "cli-cloud"

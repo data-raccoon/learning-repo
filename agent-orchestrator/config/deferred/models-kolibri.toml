@@ -1,0 +1,12 @@
+[[models]]
+id = "glm-5.2-744b-moe-local"
+provider = "local-kolibri"
+remote_id = "GLM-5.2-744B-MoE"
+quality = 0.92
+context_tokens = 131072
+input_cost_per_million = 0.0
+output_cost_per_million = 0.0
+price_effective_at = "2026-07-19"
+modalities = ["text"]
+capabilities = ["architecture", "planning", "coding", "review", "reasoning", "summarization"]
+notes = "GLM-5.2 (744B parameters) running via Kolibri with disk-streaming MoE experts. Uses Kolibri's custom container format (NOT GGUF). Quality estimate based on upstream model capabilities; actual performance depends on disk I/O. DEACTIVATED: Too slow for current use - POC only."

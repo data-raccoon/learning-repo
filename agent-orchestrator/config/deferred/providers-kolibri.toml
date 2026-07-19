@@ -1,0 +1,10 @@
+[[providers]]
+id = "local-kolibri"
+display_name = "Local Kolibri (GLM-5.2)"
+kind = "openai-compatible-local"
+status = "deferred"
+auth_kind = "external-file"
+auth_env = "KOLIBRI_API_KEY"
+base_url = "http://127.0.0.1:8082/v1"
+billing = "local-compute"
+notes = "Pure C zero-dependency MoE inference engine. Streaming experts from disk. Loopback-only runtime; key and weights remain outside the repository. DEACTIVATED: Too slow for current use - POC only."

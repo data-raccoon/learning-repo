@@ -35,14 +35,6 @@ max_parallel = 1
 status = "deferred"
 
 [[harnesses]]
-id = "kolibri-openai-chat"
-kind = "openai-chat"
-provider = "local-kolibri"
-tool_class = "inference"
-max_parallel = 1
-status = "candidate"
-
-[[harnesses]]
 id = "mistral-vibe-files"
 kind = "vibe"
 provider = "mistral-cloud"
