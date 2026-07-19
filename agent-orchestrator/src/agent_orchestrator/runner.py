@@ -60,7 +60,7 @@ class JobRunner:
 
     @staticmethod
     def _cost(model: Any, provider: Any, usage: dict[str, int | float]) -> dict[str, Any]:
-        if provider.billing == "free-account-quota":
+        if provider.billing in ("free-account-quota", "free-vscode-extension"):
             return {
                 "kind": "free-quota",
                 "amount_usd": 0.0,
