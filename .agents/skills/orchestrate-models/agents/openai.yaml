@@ -1,0 +1,5 @@
+interface:
+  display_name: "Orchestrate Models"
+  short_description: "Route bounded work across local and cloud models"
+  default_prompt: "Use $orchestrate-models to route and run this bounded task with compact evidence."
+

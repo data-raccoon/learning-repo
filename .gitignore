@@ -1,6 +1,14 @@
 **/__pycache__/
 *.py[cod]
 
+# Model-orchestrator runtime evidence, snapshots, locks, and trajectories.
+agent-orchestrator/.runtime/
+
+# Vibe runtime sidecars generated when the project-local provider config is used headlessly.
+local-models/ministral/.vibe/connector_bootstrap_cache.json
+local-models/ministral/.vibe/trusted_folders.toml
+local-models/ministral/.vibe/vibehistory
+
 # Generated LaTeX output.
 *.aux
 *.fdb_latexmk

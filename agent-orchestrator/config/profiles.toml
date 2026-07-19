@@ -1,0 +1,126 @@
+[[profiles]]
+id = "local-ministral-inference"
+model = "ministral-3b-q4-local"
+harness = "local-openai-chat"
+status = "eligible"
+success_probability = 0.78
+capabilities = ["extraction", "classification", "summarization", "formatting"]
+tool_class = "inference"
+max_parallel = 1
+benchmark_version = "experiments-01-03"
+evaluated_at = "2026-07-18"
+
+[[profiles]]
+id = "local-ministral-files"
+model = "ministral-3b-q4-local"
+harness = "local-vibe-files"
+status = "eligible"
+success_probability = 0.78
+capabilities = ["file-editing", "formatting"]
+tool_class = "files_write"
+max_parallel = 1
+benchmark_version = "game-building-canaries"
+evaluated_at = "2026-07-18"
+
+[[profiles]]
+id = "mistral-medium-read"
+model = "mistral-medium-cloud"
+harness = "mistral-vibe-read"
+status = "eligible"
+success_probability = 0.97
+capabilities = ["architecture", "planning", "review", "reasoning", "multimodal"]
+tool_class = "files_read"
+max_parallel = 3
+benchmark_version = "glimweave-read"
+evaluated_at = "2026-07-19"
+
+[[profiles]]
+id = "soofi-local-deferred"
+model = "soofi-local-unselected"
+harness = "soofi-runtime-deferred"
+status = "deferred"
+success_probability = 0.0
+capabilities = []
+tool_class = "inference"
+max_parallel = 1
+benchmark_version = "unbenchmarked"
+
+[[profiles]]
+id = "kolibri-local-deferred"
+model = "kolibri-local-unselected"
+harness = "kolibri-runtime-deferred"
+status = "deferred"
+success_probability = 0.0
+capabilities = []
+tool_class = "inference"
+max_parallel = 1
+benchmark_version = "unbenchmarked"
+
+[[profiles]]
+id = "mistral-medium-files"
+model = "mistral-medium-cloud"
+harness = "mistral-vibe-files"
+status = "eligible"
+success_probability = 0.93
+capabilities = ["coding", "review", "file-editing", "reasoning"]
+tool_class = "files_write"
+max_parallel = 2
+benchmark_version = "glimweave-write"
+evaluated_at = "2026-07-19"
+
+[[profiles]]
+id = "devstral-small-files"
+model = "devstral-small-cloud"
+harness = "mistral-vibe-files"
+status = "candidate"
+success_probability = 0.84
+capabilities = ["coding", "review", "file-editing"]
+tool_class = "files_write"
+max_parallel = 2
+benchmark_version = "unbenchmarked"
+
+[[profiles]]
+id = "openai-codex-deferred"
+model = "openai-flagship"
+harness = "codex-cli-deferred"
+status = "deferred"
+success_probability = 0.0
+capabilities = ["architecture", "planning", "coding", "review", "reasoning"]
+tool_class = "commands"
+max_parallel = 1
+
+[[profiles]]
+id = "gemini-auto-free-read"
+model = "gemini-auto-free"
+harness = "antigravity-cli-read"
+status = "eligible"
+success_probability = 0.90
+capabilities = ["architecture", "planning", "review", "reasoning", "summarization", "multimodal"]
+tool_class = "files_read"
+max_parallel = 2
+benchmark_version = "antigravity-read-canary-v1"
+evaluated_at = "2026-07-19"
+
+[[profiles]]
+id = "gemini-auto-free-files"
+model = "gemini-auto-free"
+harness = "antigravity-cli-files"
+status = "eligible"
+success_probability = 0.80
+capabilities = ["coding", "review", "file-editing", "reasoning"]
+tool_class = "files_write"
+max_parallel = 1
+benchmark_version = "antigravity-file-canary-v1"
+evaluated_at = "2026-07-19"
+
+[[profiles]]
+id = "gemini-auto-free-commands"
+model = "gemini-auto-free"
+harness = "antigravity-cli-commands"
+status = "eligible"
+success_probability = 0.80
+capabilities = ["coding", "review", "reasoning", "tool-use", "file-editing"]
+tool_class = "commands"
+max_parallel = 1
+benchmark_version = "antigravity-command-canary-v1"
+evaluated_at = "2026-07-19"

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "example-local-summary",
+  "objective": "Read brief.md and return a concise summary.",
+  "target_dir": "agent-orchestrator/examples/context",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["summarization"],
+  "context": ["brief.md"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": [],
+  "limits": {"timeout_seconds": 180, "max_turns": 2, "max_tokens": 1000}
+}
+

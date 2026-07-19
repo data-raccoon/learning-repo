@@ -1,0 +1,9 @@
+*.gguf
+*.safetensors
+*.bin
+*.onnx
+.env
+.runtime/
+logs/
+*.log
+*.pid

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "gemini-command-canary",
+  "objective": "Run the one permitted unittest command, inspect its result, and report whether the test passed. Do not edit files.",
+  "target_dir": "agent-orchestrator/examples/gemini-command-canary",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "commands",
+  "required_capabilities": ["tool-use"],
+  "context": ["test_smoke.py"],
+  "expected_artifacts": [],
+  "allowed_commands": ["python -m unittest -v"],
+  "verifiers": [
+    {
+      "id": "independent-unittest",
+      "argv": ["{python}", "-m", "unittest", "-v"],
+      "timeout_seconds": 30
+    }
+  ],
+  "dependencies": [],
+  "model_profile": "gemini-auto-free-commands",
+  "limits": {"timeout_seconds": 180, "max_turns": 5, "max_tokens": 5000}
+}

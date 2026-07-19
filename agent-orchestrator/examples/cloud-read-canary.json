@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "mistral-cloud-read-canary",
+  "objective": "Read brief.md and return exactly one sentence describing the orchestration boundary.",
+  "target_dir": "agent-orchestrator/examples/context",
+  "mode": "read",
+  "importance": "critical",
+  "risk": "low",
+  "tool_class": "files_read",
+  "required_capabilities": ["planning"],
+  "context": ["brief.md"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": [],
+  "limits": {"timeout_seconds": 180, "max_turns": 3, "max_tokens": 6000}
+}

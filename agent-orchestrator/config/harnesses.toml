@@ -1,0 +1,89 @@
+[[harnesses]]
+id = "local-openai-chat"
+kind = "openai-chat"
+provider = "local-ministral"
+tool_class = "inference"
+max_parallel = 1
+status = "eligible"
+
+[[harnesses]]
+id = "local-vibe-files"
+kind = "vibe"
+provider = "local-ministral"
+tool_class = "files_write"
+executable = "vibe"
+agent = "local-files"
+max_parallel = 1
+status = "eligible"
+
+[[harnesses]]
+id = "mistral-vibe-read"
+kind = "vibe"
+provider = "mistral-cloud"
+tool_class = "files_read"
+executable = "vibe"
+agent = "default"
+max_parallel = 3
+status = "eligible"
+
+[[harnesses]]
+id = "soofi-runtime-deferred"
+kind = "unconfigured-local-runtime"
+provider = "local-soofi"
+tool_class = "inference"
+max_parallel = 1
+status = "deferred"
+
+[[harnesses]]
+id = "kolibri-runtime-deferred"
+kind = "unconfigured-local-runtime"
+provider = "local-kolibri"
+tool_class = "inference"
+max_parallel = 1
+status = "deferred"
+
+[[harnesses]]
+id = "mistral-vibe-files"
+kind = "vibe"
+provider = "mistral-cloud"
+tool_class = "files_write"
+executable = "vibe"
+agent = "accept-edits"
+max_parallel = 2
+status = "eligible"
+
+[[harnesses]]
+id = "codex-cli-deferred"
+kind = "codex"
+provider = "openai-chatgpt"
+tool_class = "commands"
+executable = "codex"
+max_parallel = 1
+status = "deferred"
+
+[[harnesses]]
+id = "antigravity-cli-read"
+kind = "antigravity-cli"
+provider = "gemini-google-account"
+tool_class = "files_read"
+executable = "agy"
+max_parallel = 2
+status = "eligible"
+
+[[harnesses]]
+id = "antigravity-cli-files"
+kind = "antigravity-cli"
+provider = "gemini-google-account"
+tool_class = "files_write"
+executable = "agy"
+max_parallel = 1
+status = "eligible"
+
+[[harnesses]]
+id = "antigravity-cli-commands"
+kind = "antigravity-cli"
+provider = "gemini-google-account"
+tool_class = "commands"
+executable = "agy"
+max_parallel = 1
+status = "eligible"

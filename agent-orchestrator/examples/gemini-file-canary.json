@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "gemini-file-tools-canary",
+  "objective": "Read instructions.md with a file tool and create result.txt exactly as requested using file-editing tools only.",
+  "target_dir": "agent-orchestrator/examples/gemini-file-canary",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "files_write",
+  "required_capabilities": ["file-editing"],
+  "context": ["instructions.md"],
+  "expected_artifacts": ["result.txt"],
+  "verifiers": [
+    {
+      "id": "exact-content",
+      "argv": ["{python}", "-c", "from pathlib import Path; raise SystemExit(0 if Path('result.txt').read_text(encoding='utf-8') == 'FILE_ONLY_CANARY_PASS\\n' else 1)"],
+      "timeout_seconds": 10
+    }
+  ],
+  "dependencies": [],
+  "model_profile": "gemini-auto-free-files",
+  "limits": {"timeout_seconds": 240, "max_turns": 6, "max_tokens": 6000}
+}

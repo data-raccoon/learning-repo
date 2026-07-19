@@ -1,0 +1,63 @@
+[[providers]]
+id = "local-ministral"
+display_name = "Local Ministral via llama.cpp"
+kind = "openai-compatible-local"
+status = "active"
+auth_kind = "external-file"
+auth_env = "LOCAL_LLM_API_KEY"
+base_url = "http://127.0.0.1:8081/v1"
+billing = "local-compute"
+notes = "Loopback-only runtime; key and weights remain outside the repository."
+
+[[providers]]
+id = "mistral-cloud"
+display_name = "Mistral Cloud"
+kind = "cli-cloud"
+status = "active"
+auth_kind = "environment"
+auth_env = "MISTRAL_API_KEY"
+base_url = "https://api.mistral.ai/v1"
+billing = "included-subscription"
+plan = "pro"
+executable = "vibe"
+notes = "Vibe uses the user's Mistral PRO subscription. Public per-token model prices remain reference data and are not treated as per-run charges for this provider path."
+
+[[providers]]
+id = "local-soofi"
+display_name = "Local Soofi (unconfigured)"
+kind = "local-runtime-placeholder"
+status = "deferred"
+auth_kind = "not-configured"
+billing = "local-compute"
+notes = "Inventory-only scaffold. Select an exact artifact and runtime before candidate admission."
+
+[[providers]]
+id = "local-kolibri"
+display_name = "Local Kolibri (unconfigured)"
+kind = "local-runtime-placeholder"
+status = "deferred"
+auth_kind = "not-configured"
+billing = "local-compute"
+notes = "Inventory-only scaffold. Select an exact artifact and runtime before candidate admission."
+
+[[providers]]
+id = "openai-chatgpt"
+display_name = "OpenAI / ChatGPT"
+kind = "cli-cloud"
+status = "deferred"
+auth_kind = "codex-login-or-api"
+auth_env = "CODEX_API_KEY"
+billing = "included-subscription-or-api"
+executable = "codex"
+notes = "Inventory-only in milestone 1."
+
+[[providers]]
+id = "gemini-google-account"
+display_name = "Google Gemini via Antigravity CLI (Google account)"
+kind = "cli-cloud"
+status = "active"
+auth_kind = "google-account-oauth"
+billing = "free-account-quota"
+plan = "free"
+executable = "agy"
+notes = "Consumer access moved from Gemini CLI to the official Antigravity CLI on 2026-06-18. Uses its external OS-keyring session; API and Vertex credentials are removed from worker environments."

@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Gaming Agents Offline Canary</title>
+<button id="score" type="button" aria-live="polite">Score: 0</button>
+<script>
+  const score = document.querySelector('#score');
+  let value = 0;
+  score.addEventListener('click', () => { value += 1; score.textContent = `Score: ${value}`; });
+</script>
+</html>

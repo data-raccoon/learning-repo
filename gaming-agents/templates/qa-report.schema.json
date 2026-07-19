@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision", "findings", "evidence", "limitations"],
+  "properties": {
+    "decision": {"type": "string"},
+    "findings": {"type": "array"},
+    "evidence": {"type": "array"},
+    "limitations": {"type": "array"}
+  }
+}

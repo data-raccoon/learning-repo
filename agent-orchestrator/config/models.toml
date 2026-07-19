@@ -1,0 +1,88 @@
+[[models]]
+id = "ministral-3b-q4-local"
+provider = "local-ministral"
+remote_id = "ministral-3b-q4"
+quality = 0.48
+context_tokens = 32768
+input_cost_per_million = 0.0
+output_cost_per_million = 0.0
+price_effective_at = "2026-07-19"
+modalities = ["text"]
+capabilities = ["extraction", "classification", "summarization", "formatting", "file-editing"]
+notes = "Exact Q4_K_M configuration on the local workstation."
+
+[[models]]
+id = "mistral-medium-cloud"
+provider = "mistral-cloud"
+remote_id = "mistral-medium-3.5"
+quality = 0.88
+context_tokens = 200000
+input_cost_per_million = 1.5
+output_cost_per_million = 7.5
+price_effective_at = "2026-07-19"
+modalities = ["text", "image"]
+capabilities = ["architecture", "planning", "coding", "review", "reasoning", "tool-use", "multimodal"]
+
+[[models]]
+id = "soofi-local-unselected"
+provider = "local-soofi"
+remote_id = "unselected"
+quality = 0.0
+context_tokens = 0
+input_cost_per_million = 0.0
+output_cost_per_million = 0.0
+price_effective_at = "2026-07-19"
+modalities = ["text"]
+capabilities = []
+notes = "Deferred placeholder; artifact, format, quantization, checksum, context, and capabilities are unknown."
+
+[[models]]
+id = "kolibri-local-unselected"
+provider = "local-kolibri"
+remote_id = "unselected"
+quality = 0.0
+context_tokens = 0
+input_cost_per_million = 0.0
+output_cost_per_million = 0.0
+price_effective_at = "2026-07-19"
+modalities = ["text"]
+capabilities = []
+notes = "Deferred placeholder; artifact, format, quantization, checksum, context, and capabilities are unknown."
+
+[[models]]
+id = "devstral-small-cloud"
+provider = "mistral-cloud"
+remote_id = "devstral-small-latest"
+quality = 0.72
+context_tokens = 200000
+input_cost_per_million = 0.1
+output_cost_per_million = 0.3
+price_effective_at = "2026-07-19"
+modalities = ["text"]
+capabilities = ["coding", "review", "file-editing", "tool-use"]
+
+[[models]]
+id = "openai-flagship"
+provider = "openai-chatgpt"
+remote_id = "provider-current-flagship"
+quality = 0.96
+context_tokens = 0
+input_cost_per_million = -1.0
+output_cost_per_million = -1.0
+price_effective_at = "2026-07-19"
+modalities = ["text", "image"]
+capabilities = ["architecture", "planning", "coding", "review", "reasoning", "tool-use", "multimodal"]
+notes = "Deferred placeholder; refresh before admission."
+
+[[models]]
+id = "gemini-auto-free"
+provider = "gemini-google-account"
+remote_id = "Gemini 3.5 Flash (Medium)"
+quality = 0.86
+context_tokens = 0
+input_cost_per_million = 0.0
+output_cost_per_million = 0.0
+price_effective_at = "2026-07-19"
+modalities = ["text", "image"]
+capabilities = ["architecture", "planning", "coding", "review", "reasoning", "summarization", "file-editing", "tool-use", "multimodal"]
+notes = "Explicit Antigravity CLI 1.1.4 model name observed from the signed-in account. Consumer availability is quota-based, not a guaranteed API price; revalidate the name after CLI upgrades."
