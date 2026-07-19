@@ -27,6 +27,33 @@ Run evidence therefore reports Gemini as `free-quota` with zero direct marginal 
 - `candidate`, `deferred`, and unavailable profiles cannot be routed.
 - Gemini via a free Google account is an executable option through the official Antigravity CLI.
 
+## Creating jobs
+
+**Target directory rules:** Use relative paths only; absolute paths raise `absolute paths are forbidden`. Target must be a subdirectory (not the workspace root); targeting `.` raises `path escapes its allowed root`. Do not use parent traversal (`..`). All context files must live inside the target.
+
+**Required workflow:** Always `route` before `run`. The `route` command validates the job, selects the weakest eligible profile meeting the 0.85 success threshold, and explains acceptance/rejection reasons for each candidate. This catches path errors and capability mismatches before execution.
+
+**Profile selection:** Specify `model_profile` in the job to pin a profile, or let the orchestrator auto-select. Ensure `required_capabilities` in the job are a subset of the profile's capabilities. Use `route` to verify the selected profile matches expectations.
+
+**Worker isolation:** Each job gets exactly one target subdirectory. Provide all needed context within that directory. For cross-directory work, create separate jobs per subdirectory.
+
+Example minimal read job:
+```json
+{
+  "schema_version": 1,
+  "id": "analyze-subdir",
+  "objective": "Review and summarize code in target directory",
+  "target_dir": "src/module",
+  "mode": "read",
+  "importance": "normal",
+  "risk": "low",
+  "tool_class": "files_read",
+  "model_profile": "gemini-auto-free-read",
+  "required_capabilities": ["review", "reasoning", "summarization"],
+  "limits": {"timeout_seconds": 180, "max_turns": 5, "max_tokens": 40000}
+}
+```
+
 ## Gemini with a Google account
 
 Google ended free/individual request serving through the former Gemini CLI on June 18, 2026. The current consumer route is the official Antigravity CLI (`agy`), which still serves Gemini models. Install it outside the repository, without changing shell aliases or the profile `PATH`, then run it once for browser sign-in:
