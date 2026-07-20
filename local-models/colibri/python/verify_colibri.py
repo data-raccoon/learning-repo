@@ -10,8 +10,8 @@ from pathlib import Path
 
 
 URL = "http://127.0.0.1:8082/v1/chat/completions"
-PID_FILE = Path(r"C:\LLMs\logs\kolibri.pid")
-API_KEY_FILE = Path(r"C:\LLMs\config\kolibri_api_key.txt")
+PID_FILE = Path(r"C:\LLMs\logs\colibri.pid")
+API_KEY_FILE = Path(r"C:\LLMs\config\colibri_api_key.txt")
 
 
 def request(headers: dict[str, str]) -> dict:
@@ -49,7 +49,7 @@ def main() -> None:
             capture_output=True,
             text=True,
         )
-        gpu_processes = [line for line in result.stdout.splitlines() if "kolibri" in line.lower() or "glm" in line.lower() or "openai_server" in line.lower()]
+        gpu_processes = [line for line in result.stdout.splitlines() if "colibri" in line.lower() or "glm" in line.lower() or "openai_server" in line.lower()]
     except (subprocess.CalledProcessError, FileNotFoundError):
         # nvidia-smi not available or no GPU
         pass
@@ -69,7 +69,7 @@ def main() -> None:
 
     report = {
         "pid": int(pid),
-        "gpu_kolibri_processes": gpu_processes,
+        "gpu_colibri_processes": gpu_processes,
         "unauthenticated_http_status": unauthenticated_status,
         "authenticated_answer": answer,
     }
@@ -77,7 +77,7 @@ def main() -> None:
 
     # Validation checks
     if gpu_processes and not any(line.startswith(pid + ",") for line in gpu_processes):
-        print("Warning: No GPU-backed kolibri process matching the PID file.")
+        print("Warning: No GPU-backed colibri process matching the PID file.")
     if unauthenticated_status not in (401, 403):
         raise SystemExit("The API accepted an unauthenticated request.")
 

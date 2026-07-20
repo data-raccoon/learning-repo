@@ -9,4 +9,4 @@ output_cost_per_million = 0.0
 price_effective_at = "2026-07-19"
 modalities = ["text"]
 capabilities = ["architecture", "planning", "coding", "review", "reasoning", "summarization"]
-notes = "GLM-5.2 (744B parameters) running via Kolibri with disk-streaming MoE experts. Uses Colibri's custom container format (NOT GGUF). Quality estimate based on upstream model capabilities; actual performance depends on disk I/O. DEACTIVATED: Too slow for current use - POC only."
+notes = "GLM-5.2 (744B parameters) running via Colibri with disk-streaming MoE experts. Uses Colibri's custom container format (NOT GGUF). Quality estimate based on upstream model capabilities; actual performance depends on disk I/O. DEACTIVATED: Too slow for current use — POC only."

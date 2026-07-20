@@ -1,5 +1,5 @@
 [[profiles]]
-id = "kolibri-glm-5.2-inference"
+id = "colibri-glm-5.2-inference"
 model = "glm-5.2-744b-moe-local"
 harness = "colibri-openai-chat"
 status = "deferred"

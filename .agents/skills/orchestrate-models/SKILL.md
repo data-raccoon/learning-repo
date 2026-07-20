@@ -38,10 +38,10 @@ Invoke the CLI on Windows with:
 ## Common commands
 
 ```powershell
-python agent-orchestrator\orchestrate.py inventory
-python agent-orchestrator\orchestrate.py route path\to\job.json
-python agent-orchestrator\orchestrate.py run path\to\job.json
-python agent-orchestrator\orchestrate.py run-graph path\to\graph.json
-python agent-orchestrator\orchestrate.py status latest
-python agent-orchestrator\orchestrate.py eval run
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" agent-orchestrator\orchestrate.py inventory
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" agent-orchestrator\orchestrate.py route path\to\job.json
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" agent-orchestrator\orchestrate.py run path\to\job.json
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" agent-orchestrator\orchestrate.py run-graph path\to\graph.json
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" agent-orchestrator\orchestrate.py status latest
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" agent-orchestrator\orchestrate.py eval run
 ```

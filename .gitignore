@@ -1,18 +1,11 @@
 **/__pycache__/
 *.py[cod]
-
-# Model-orchestrator runtime evidence, snapshots, locks, and trajectories.
-# Runtime directory can be outside repository via AGENT_ORCHESTRATOR_RUNTIME env var.
-# Legacy location (kept for backwards compatibility):
-agent-orchestrator/.runtime/
-
-# Vibe runtime sidecars generated when the project-local provider config is used headlessly.
-local-models/ministral/.vibe/connector_bootstrap_cache.json
-local-models/ministral/.vibe/trusted_folders.toml
-local-models/ministral/.vibe/vibehistory
-
-# Cline task-queue handoff directory (managed by agent-orchestrator).
-.cline-jobs/
+*.pyc
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.python-version
 
 # Generated LaTeX output.
 *.aux
@@ -24,3 +17,19 @@ local-models/ministral/.vibe/vibehistory
 *.synctex.gz
 *.toc
 *.xdv
+
+**/.env
+**/.runtime/
+**/logs/
+
+*.gguf
+*.safetensors
+*.bin
+*.onnx
+*.pid
+
+.DS_Store
+Thumbs.db
+
+*.err
+*.db

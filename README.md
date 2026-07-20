@@ -11,7 +11,7 @@ AI-Learn/
 |-- local-models/                  Local model runtimes and model-specific assets
 |   |-- ministral/                 Ministral download, server, and Vibe integration
 |   |-- soofi/                     Deferred Soofi local-model family scaffold
-|   `-- colibri/                   Deferred Kolibri local-model family scaffold
+|   `-- colibri/                   Deferred Colibri local-model family scaffold (POC)
 |-- orchestration-experiments/     Agent-controller experiments and generated artifacts
 |   |-- compliance-check/          EU AI compliance orchestration
 |   `-- game-building/             Four game-building orchestration experiments
@@ -30,6 +30,6 @@ AI-Learn/
 - Put controllers, prompts, run evidence, and generated test products in `orchestration-experiments/`.
 - Keep reusable operating policy, agent definitions, skills, and governance in `company-os/`.
 - Keep topic-specific hypotheses, sources, assessments, and reports in `initiatives/`.
-- Keep Soofi and Kolibri deferred until exact artifacts, runtimes, hardware limits, and evaluated capabilities are recorded.
+- Keep Soofi and Colibri deferred until exact artifacts, runtimes, hardware limits, and evaluated capabilities are recorded.
 
 Historical run records can contain old absolute paths. They are provenance and should not be rewritten merely because the workspace moved.

@@ -80,8 +80,8 @@ class Registry:
             if provider.id == "local-ministral" and Path(r"C:\LLMs\config\api_key.txt").is_file():
                 if Path(r"C:\LLMs\models\mistral\Ministral-3-3B-Instruct-2512-Q4_K_M.gguf").is_file():
                     return "available", "external local credential and model are present"
-            if provider.id == "local-kolibri" and Path(r"C:\LLMs\config\kolibri_api_key.txt").is_file():
-                model_dir = Path(r"C:\LLMs\models\kolibri")
+            if provider.id == "local-colibri" and Path(r"C:\LLMs\config\colibri_api_key.txt").is_file():
+                model_dir = Path(r"C:\LLMs\models\colibri")
                 if model_dir.is_dir() and (model_dir / "config.json").is_file():
                     return "available", "external local credential and model are present"
             return "unavailable", f"credential {provider.auth_env} is not configured"

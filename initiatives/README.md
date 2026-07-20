@@ -1,6 +1,7 @@
-# Initiatives
+# Initiativen
 
-Domain-specific ideas, research, evidence, and proof-of-concept work live here, separate from reusable Company-OS machinery.
+Domänenspezifische Ideen, Recherchen, Belege und Proof-of-Concept-Arbeiten — getrennt von der wiederverwendbaren Company-OS-Infrastruktur.
 
-- `cologne-tax-improvements/`: POC-001, a Cologne public-spending investigation focused on traceable review candidates rather than allegations or rankings.
-- `vector-earth/`: geospatial product experiment using Natural Earth data.
+- `cologne-tax-improvements/`: POC-001 – Untersuchung der Kölner Öffentlichkeitsausgaben, fokussiert auf nachvollziehbare Prüfkandidaten statt Vorwürfe oder Rankings.
+- `vector-earth/`: Geospatiales Produktexperiment auf Basis von Natural Earth-Daten.
+- `demokratische-partizipation-ki/`: Initiative zur Verbesserung demokratischer Partizipation durch KI-Technologien.

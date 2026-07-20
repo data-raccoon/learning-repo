@@ -23,7 +23,7 @@ from pathlib import Path
 
 
 REPO_ID = "jlnsrk/GLM-5.2-colibri-int4"
-DEFAULT_TARGET_DIR = Path(r"C:\LLMs\models\kolibri")
+DEFAULT_TARGET_DIR = Path(r"C:\LLMs\models\colibri")
 EXPECTED_FILES = [
     "config.json",
     "generation_config.json", 
@@ -122,7 +122,7 @@ def main() -> None:
         "--target-dir",
         type=Path,
         default=DEFAULT_TARGET_DIR,
-        help="Target directory (default: C:\\LLMs\\models\\kolibri)"
+        help="Target directory (default: C:\\LLMs\\models\\colibri)"
     )
     parser.add_argument(
         "--method",

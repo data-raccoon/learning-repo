@@ -19,9 +19,9 @@ class RuntimeManager:
         self.state_dir = runtime_root / "runtimes"
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.external_pid = Path(r"C:\LLMs\logs\ministral.pid")
-        self.kolibri_pid = Path(r"C:\LLMs\logs\kolibri.pid")
+        self.colibri_pid = Path(r"C:\LLMs\logs\colibri.pid")
         self.script = workspace / "local-models" / "ministral" / "python" / "start_mistral.py"
-        self.kolibri_script = workspace / "local-models" / "kolibri" / "python" / "start_kolibri.py"
+        self.colibri_script = workspace / "local-models" / "colibri" / "python" / "start_colibri.py"
 
     @staticmethod
     def _health() -> bool:
@@ -33,7 +33,7 @@ class RuntimeManager:
             return False
 
     @staticmethod
-    def _kolibri_health() -> bool:
+    def _colibri_health() -> bool:
         request = urllib.request.Request("http://127.0.0.1:8082/health", method="GET")
         try:
             with urllib.request.urlopen(request, timeout=2) as response:
@@ -47,11 +47,11 @@ class RuntimeManager:
             state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.is_file() else {}
             pid = int(self.external_pid.read_text(encoding="ascii").strip()) if self.external_pid.is_file() else None
             return {"runtime": runtime_id, "healthy": self._health(), "pid": pid, "owned": bool(state.get("owned") and state.get("pid") == pid)}
-        elif runtime_id == "local-kolibri":
+        elif runtime_id == "local-colibri":
             state_path = self.state_dir / f"{runtime_id}.json"
             state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.is_file() else {}
-            pid = int(self.kolibri_pid.read_text(encoding="ascii").strip()) if self.kolibri_pid.is_file() else None
-            return {"runtime": runtime_id, "healthy": self._kolibri_health(), "pid": pid, "owned": bool(state.get("owned") and state.get("pid") == pid)}
+            pid = int(self.colibri_pid.read_text(encoding="ascii").strip()) if self.colibri_pid.is_file() else None
+            return {"runtime": runtime_id, "healthy": self._colibri_health(), "pid": pid, "owned": bool(state.get("owned") and state.get("pid") == pid)}
         else:
             raise ValueError(f"unknown runtime: {runtime_id}")
 
@@ -66,12 +66,12 @@ class RuntimeManager:
             script = self.script
             health_check = self._health
             pid_file = self.external_pid
-        elif runtime_id == "local-kolibri":
-            if not self.kolibri_script.is_file():
-                raise RuntimeError(f"runtime script missing: {self.kolibri_script}")
-            script = self.kolibri_script
-            health_check = self._kolibri_health
-            pid_file = self.kolibri_pid
+        elif runtime_id == "local-colibri":
+            if not self.colibri_script.is_file():
+                raise RuntimeError(f"runtime script missing: {self.colibri_script}")
+            script = self.colibri_script
+            health_check = self._colibri_health
+            pid_file = self.colibri_pid
         else:
             raise ValueError(f"unknown runtime: {runtime_id}")
         
@@ -98,8 +98,8 @@ class RuntimeManager:
         
         if runtime_id == "local-ministral":
             script = self.script
-        elif runtime_id == "local-kolibri":
-            script = self.kolibri_script
+        elif runtime_id == "local-colibri":
+            script = self.colibri_script
         else:
             raise ValueError(f"unknown runtime: {runtime_id}")
         

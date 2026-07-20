@@ -13,19 +13,19 @@ from pathlib import Path
 
 # Colibri uses a different port than Ministral to avoid conflicts
 DEFAULT_PORT = 8082
-PID_FILE = Path(r"C:\LLMs\logs\kolibri.pid")
-LOG_FILE = Path(r"C:\LLMs\logs\kolibri.log")
-API_KEY_FILE = Path(r"C:\LLMs\config\kolibri_api_key.txt")
+PID_FILE = Path(r"C:\LLMs\logs\colibri.pid")
+LOG_FILE = Path(r"C:\LLMs\logs\colibri.log")
+API_KEY_FILE = Path(r"C:\LLMs\config\colibri_api_key.txt")
 # Default model directory for GLM-5.2 in Colibri's custom format (NOT GGUF)
 # Colibri uses its own container format with multiple .safetensors shards
 # Model is a directory, not a single file
-DEFAULT_MODEL_DIR = Path(r"C:\LLMs\models\kolibri")
+DEFAULT_MODEL_DIR = Path(r"C:\LLMs\models\colibri")
 
 
 def find_server() -> Path:
-    """Find the kolibri server (openai_server.py from colibri project)."""
-    # Check local repository first (local-models/kolibri/c/)
-    workspace = Path(__file__).parent.parent  # local-models/kolibri/
+    """Find the colibri server (openai_server.py from colibri project)."""
+    # Check local repository first (local-models/colibri/c/)
+    workspace = Path(__file__).parent.parent  # local-models/colibri/
     colibri_c = workspace / "c"
     if colibri_c.is_dir():
         openai_server = colibri_c / "openai_server.py"
@@ -33,7 +33,7 @@ def find_server() -> Path:
             return openai_server
     
     # Fallback to shutil.which for backward compatibility
-    command = shutil.which("kolibri-server") or shutil.which("kolibri-server.exe")
+    command = shutil.which("colibri-server") or shutil.which("colibri-server.exe")
     if command:
         return Path(command)
 
@@ -80,7 +80,7 @@ def main() -> None:
     if not model_dir.is_dir():
         raise SystemExit(
             f"Model directory not found: {model_dir}\n"
-            "Download GLM-5.2 in Colibri format first using download_kolibri.py"
+            "Download GLM-5.2 in Colibri format first using download_colibri.py"
         )
     
     # Verify key files exist
@@ -88,13 +88,13 @@ def main() -> None:
     if not config_file.is_file():
         raise SystemExit(
             f"Model directory {model_dir} is missing config.json\n"
-            "The download may have failed. Try running download_kolibri.py again."
+            "The download may have failed. Try running download_colibri.py again."
         )
 
     server = find_server()
     
     # Find the glm engine binary - prefer local repository
-    workspace = Path(__file__).parent.parent  # local-models/kolibri/
+    workspace = Path(__file__).parent.parent  # local-models/colibri/
     colibri_c = workspace / "c"
     engine_path = None
     
@@ -117,7 +117,7 @@ def main() -> None:
             "Install it by:\n"
             "1. Downloading pre-built binary from https://github.com/JustVugg/colibri/releases\n"
             "2. Or building from source: git clone https://github.com/JustVugg/colibri.git && cd colibri/c && make\n"
-            "3. Place glm.exe in local-models/kolibri/c/"
+            "3. Place glm.exe in local-models/colibri/c/"
         )
     
     command = [
