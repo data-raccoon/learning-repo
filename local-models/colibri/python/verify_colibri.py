@@ -1,4 +1,4 @@
-"""Verify the local Kolibri process, API authentication, and chat response."""
+"""Verify the local Colibri process, API authentication, and chat response."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ API_KEY_FILE = Path(r"C:\LLMs\config\kolibri_api_key.txt")
 
 
 def request(headers: dict[str, str]) -> dict:
-    """Send a test request to the Kolibri server."""
+    """Send a test request to the Colibri server."""
     payload = {
         "model": "GLM-5.2-744B-MoE",
         "messages": [{"role": "user", "content": "Antworte aussschlie\u00dflich mit: Bereit."}],
@@ -33,10 +33,10 @@ def request(headers: dict[str, str]) -> dict:
 
 
 def main() -> None:
-    """Verify Kolibri server health and authentication."""
+    """Verify Colibri server health and authentication."""
     pid = PID_FILE.read_text(encoding="ascii").strip()
     
-    # Check for GPU processes (Kolibri may use CPU or GPU)
+    # Check for GPU processes (Colibri may use CPU or GPU)
     gpu_processes = []
     try:
         result = subprocess.run(

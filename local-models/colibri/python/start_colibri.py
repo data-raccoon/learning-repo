@@ -1,4 +1,4 @@
-"""Start the local OpenAI-compatible Kolibri server for GLM-5.2 MoE model."""
+"""Start the local OpenAI-compatible Colibri server for GLM-5.2 MoE model."""
 
 from __future__ import annotations
 
@@ -11,13 +11,13 @@ import sys
 from pathlib import Path
 
 
-# Kolibri uses a different port than Ministral to avoid conflicts
+# Colibri uses a different port than Ministral to avoid conflicts
 DEFAULT_PORT = 8082
 PID_FILE = Path(r"C:\LLMs\logs\kolibri.pid")
 LOG_FILE = Path(r"C:\LLMs\logs\kolibri.log")
 API_KEY_FILE = Path(r"C:\LLMs\config\kolibri_api_key.txt")
-# Default model directory for GLM-5.2 in Kolibri's custom format (NOT GGUF)
-# Kolibri uses its own container format with multiple .safetensors shards
+# Default model directory for GLM-5.2 in Colibri's custom format (NOT GGUF)
+# Colibri uses its own container format with multiple .safetensors shards
 # Model is a directory, not a single file
 DEFAULT_MODEL_DIR = Path(r"C:\LLMs\models\kolibri")
 
@@ -38,7 +38,7 @@ def find_server() -> Path:
         return Path(command)
 
     raise FileNotFoundError(
-        "Kolibri server not found. Install it by:\n"
+        "Colibri server not found. Install it by:\n"
         "1. Downloading from https://github.com/JustVugg/colibri/releases\n"
         "2. Or building from source: git clone https://github.com/JustVugg/colibri.git && cd colibri/c && make\n"
         "3. The server is 'openai_server.py' and requires 'glm.exe' (the C engine)"
@@ -46,7 +46,7 @@ def find_server() -> Path:
 
 
 def api_key() -> str:
-    """Get or create the API key for Kolibri server."""
+    """Get or create the API key for Colibri server."""
     API_KEY_FILE.parent.mkdir(parents=True, exist_ok=True)
     if not API_KEY_FILE.exists():
         API_KEY_FILE.write_text(secrets.token_urlsafe(32), encoding="ascii")
@@ -64,13 +64,13 @@ def main() -> None:
 
     if args.stop:
         if not PID_FILE.exists():
-            print("No Kolibri PID file found.")
+            print("No Colibri PID file found.")
             return
         pid = int(PID_FILE.read_text(encoding="ascii").strip())
         result = subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], check=False)
         if result.returncode == 0:
             PID_FILE.unlink(missing_ok=True)
-            print(f"Stopped Kolibri server (PID {pid}).")
+            print(f"Stopped Colibri server (PID {pid}).")
         else:
             raise SystemExit(f"Could not stop PID {pid}; inspect {PID_FILE}.")
         return
@@ -80,7 +80,7 @@ def main() -> None:
     if not model_dir.is_dir():
         raise SystemExit(
             f"Model directory not found: {model_dir}\n"
-            "Download GLM-5.2 in Kolibri format first using download_kolibri.py"
+            "Download GLM-5.2 in Colibri format first using download_kolibri.py"
         )
     
     # Verify key files exist
@@ -113,7 +113,7 @@ def main() -> None:
     
     if not engine_path:
         raise FileNotFoundError(
-            f"glm.exe (Kolibri C engine) not found in {colibri_c}.\n"
+            f"glm.exe (Colibri C engine) not found in {colibri_c}.\n"
             "Install it by:\n"
             "1. Downloading pre-built binary from https://github.com/JustVugg/colibri/releases\n"
             "2. Or building from source: git clone https://github.com/JustVugg/colibri.git && cd colibri/c && make\n"
@@ -145,7 +145,7 @@ def main() -> None:
     # Reduce RAM budget for experts to fit in available memory
     os.environ["RAM_GB"] = "20"
     
-    print(f"Starting Kolibri (GLM-5.2) at http://127.0.0.1:{args.port}")
+    print(f"Starting Colibri (GLM-5.2) at http://127.0.0.1:{args.port}")
     if args.background:
         PID_FILE.parent.mkdir(parents=True, exist_ok=True)
         creationflags = 0

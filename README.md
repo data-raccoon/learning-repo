@@ -11,7 +11,7 @@ AI-Learn/
 |-- local-models/                  Local model runtimes and model-specific assets
 |   |-- ministral/                 Ministral download, server, and Vibe integration
 |   |-- soofi/                     Deferred Soofi local-model family scaffold
-|   `-- kolibri/                   Deferred Kolibri local-model family scaffold
+|   `-- colibri/                   Deferred Kolibri local-model family scaffold
 |-- orchestration-experiments/     Agent-controller experiments and generated artifacts
 |   |-- compliance-check/          EU AI compliance orchestration
 |   `-- game-building/             Four game-building orchestration experiments

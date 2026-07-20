@@ -1,10 +1,10 @@
-# Kolibri
+# Colibri
 
-Local Kolibri inference engine for running large MoE models (GLM-5.2 744B parameters) on consumer hardware with disk-streaming.
+Local Colibri inference engine for running large MoE models (GLM-5.2 744B parameters) on consumer hardware with disk-streaming.
 
 ## Architecture
 
-Kolibri is a pure C, zero-dependency inference engine that exploits MoE sparsity to run massive models with limited RAM. It streams only active experts from disk, using Multi-head Latent Attention (MLA) with compressed KV-cache.
+Colibri is a pure C, zero-dependency inference engine that exploits MoE sparsity to run massive models with limited RAM. It streams only active experts from disk, using Multi-head Latent Attention (MLA) with compressed KV-cache.
 
 **Key Characteristics:**
 - Pure C implementation (~1,300-2,400 lines)
@@ -15,16 +15,16 @@ Kolibri is a pure C, zero-dependency inference engine that exploits MoE sparsity
 
 ## Registry Status
 
-The Kolibri provider, model, harness, and profile are registered in `agent-orchestrator/config/` with `candidate` status:
+The Colibri provider, model, harness, and profile are registered in `agent-orchestrator/config/` with `candidate` status:
 
-- **Provider**: `local-kolibri` - OpenAI-compatible local server at `http://127.0.0.1:8082/v1`
+- **Provider**: `local-colibri` - OpenAI-compatible local server at `http://127.0.0.1:8082/v1`
 - **Model**: `glm-5.2-744b-moe-local` - GLM-5.2 with 131K context tokens
-- **Harness**: `kolibri-openai-chat` - OpenAI-compatible chat API
-- **Profile**: `kolibri-glm-5.2-inference` - Inference-capable with high success probability
+- **Harness**: `colibri-openai-chat` - OpenAI-compatible chat API
+- **Profile**: `colibri-glm-5.2-inference` - Inference-capable with high success probability
 
 ## Setup
 
-### 1. Install Kolibri Engine
+### 1. Install Colibri Engine
 
 Build from source or install via package manager:
 ```powershell
@@ -41,9 +41,9 @@ The executable should be named `kolibri-server` or `kolibri-server.exe`.
 
 ### 2. Download Model
 
-**IMPORTANT**: Kolibri uses its **own custom container format**, NOT GGUF.
+**IMPORTANT**: Colibri uses its **own custom container format**, NOT GGUF.
 
-Download GLM-5.2 in Kolibri format to:
+Download GLM-5.2 in Colibri format to:
 ```
 C:\LLMs\models\kolibri\  (directory containing multiple .safetensors files)
 ```
@@ -51,7 +51,7 @@ C:\LLMs\models\kolibri\  (directory containing multiple .safetensors files)
 **Recommended source**: [jlnsrk/GLM-5.2-colibri-int4](https://huggingface.co/jlnsrk/GLM-5.2-colibri-int4)
 - This is a pre-converted GLM-5.2 (744B MoE) in int4 quantization
 - **Size: ~370-380 GB** (not 90-100 GB - the model is split across many .safetensors files)
-- Format: Kolibri's native container format with:
+- Format: Colibri's native container format with:
   - Multiple `out-*.safetensors` shards (2.69 GB each)
   - `config.json`, `generation_config.json`
   - `tokenizer.json`, `tokenizer_config.json`
@@ -60,7 +60,7 @@ C:\LLMs\models\kolibri\  (directory containing multiple .safetensors files)
 **Requirements**:
 - `huggingface_hub` package: `pip install huggingface_hub`
 - ~380 GB free disk space on C:\
-- Fast NVMe SSD **strongly recommended** (Kolibri streams from disk)
+- Fast NVMe SSD **strongly recommended** (Colibri streams from disk)
 
 **Download script**: Run the provided Python script:
 ```powershell

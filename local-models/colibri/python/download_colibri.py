@@ -1,11 +1,11 @@
-"""Download GLM-5.2 in Kolibri format into C:\\LLMs.
+"""Download GLM-5.2 in Colibri format into C:\\LLMs.
 
-IMPORTANT: Kolibri uses its OWN custom container format, NOT GGUF.
+IMPORTANT: Colibri uses its OWN custom container format, NOT GGUF.
 The model consists of multiple .safetensors shards (out-00000.safetensors, etc.)
 plus config files, totaling ~370-380 GB.
 
 Source: https://huggingface.co/jlnsrk/GLM-5.2-colibri-int4
-This is a pre-converted GLM-5.2 (744B MoE) in int4 quantization for Kolibri.
+This is a pre-converted GLM-5.2 (744B MoE) in int4 quantization for Colibri.
 
 Requirements:
 - huggingface_hub package: pip install huggingface_hub
@@ -153,7 +153,7 @@ def main() -> None:
         
         print(f"\nModel downloaded to: {target_dir}")
         print(f"\nNext steps:")
-        print(f"1. Install Kolibri engine: git clone https://github.com/JustVugg/colibri.git && cd colibri/c && ./setup.sh")
+        print(f"1. Install Colibri engine: git clone https://github.com/JustVugg/colibri.git && cd colibri/c && ./setup.sh")
         print(f"2. Set COLIBRI_MODEL={target_dir}")
         print(f"3. Run: ./coli chat")
         
