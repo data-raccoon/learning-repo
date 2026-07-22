@@ -202,6 +202,14 @@ class JobRunner:
                 verifiers = self._verify(job, target, evidence)
                 changes = snapshot.changes() if snapshot else {"added": [], "removed": [], "changed": []}
                 ownership_gate = self._ownership_gate(changes, job.allowed_write_paths)
+                parent_siblings = snapshot.new_parent_siblings() if snapshot else []
+                if parent_siblings:
+                    ownership_gate = {
+                        "ok": False,
+                        "allowed_paths": list(job.allowed_write_paths),
+                        "violations": ownership_gate.get("violations", []),
+                        "parent_boundary_violations": parent_siblings,
+                    }
                 harness_gate = acceptance_gate(target) if acceptance_gate else {"ok": True, "skipped": True}
                 gates_ok = (
                     artifact_gate and schema_gate["ok"] and materialization_gate["ok"] and ownership_gate["ok"]
@@ -241,6 +249,12 @@ class JobRunner:
                 try:
                     quarantine = snapshot.quarantine()
                     snapshot.restore()
+                    for name in snapshot.new_parent_siblings():
+                        sibling = snapshot.target.parent / name
+                        try:
+                            sibling.unlink(missing_ok=True)
+                        except OSError:
+                            pass
                     snapshot.discard()
                     try:
                         summary["quarantine"] = str(quarantine.relative_to(self.orchestrator_root))

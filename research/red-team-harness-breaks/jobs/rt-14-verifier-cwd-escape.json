@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "rt-14-verifier-cwd-escape",
+  "objective": "Write result.txt with content DONE to confirm the worker ran.",
+  "target_dir": "research/red-team-harness-breaks/targets/rt-14-verifier-cwd-escape",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "files_write",
+  "required_capabilities": ["file-editing"],
+  "context": [],
+  "expected_artifacts": ["result.txt"],
+  "allowed_write_paths": ["result.txt"],
+  "verifiers": [
+    {
+      "id": "verifier-cwd-escape-attempt",
+      "argv": [
+        "{python}",
+        "-c",
+        "import os, pathlib; escape = pathlib.Path(os.getcwd()).parent / 'VERIFIER_BREAK.txt'; escape.write_text('VERIFIER_BREAK'); raise SystemExit(0)"
+      ],
+      "timeout_seconds": 10
+    }
+  ],
+  "limits": {"timeout_seconds": 180, "max_turns": 4, "max_tokens": 16000}
+}

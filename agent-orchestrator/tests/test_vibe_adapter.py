@@ -61,7 +61,7 @@ class VibeAdapterTests(unittest.TestCase):
         enabled = [command[index + 1] for index, value in enumerate(command[:-1]) if value == "--enabled-tools"]
         self.assertEqual(enabled, ["read_file", "grep", "edit", "write_file", "web_search", "web_fetch"])
         environment = run.call_args.kwargs["env"]
-        self.assertEqual(environment["VIBE_ACTIVE_MODEL"], "local-ministral-3b-q4")
+        self.assertEqual(environment["VIBE_ACTIVE_MODEL"], "ministral-3b-q4")
         prompt = command[command.index("-p") + 1]
         self.assertIn("You may use web_search and web_fetch", prompt)
         self.assertNotIn("Do not use network tools", prompt)
@@ -85,7 +85,7 @@ class VibeAdapterTests(unittest.TestCase):
         ), patch("agent_orchestrator.adapters.subprocess.run", return_value=completed):
             result = VibeAdapter(Path(directory)).run(self.job(), Path(directory), self.model(), self.profile())
         self.assertFalse(result.ok)
-        self.assertEqual(result.attestation, {"expected_model": "local-ministral-3b-q4", "matched": True})
+        self.assertEqual(result.attestation, {"expected_model": "ministral-3b-q4", "matched": True})
 
 
 if __name__ == "__main__":

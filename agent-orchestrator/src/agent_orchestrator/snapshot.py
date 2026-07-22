@@ -39,9 +39,25 @@ class TargetSnapshot:
         self.target = target
         self.snapshot_dir = run_dir / "snapshot"
         self.quarantine_dir = run_dir / "quarantine"
+        self._parent_siblings_before: frozenset[str] = frozenset()
 
     def capture(self) -> None:
         shutil.copytree(self.target, self.snapshot_dir, symlinks=True)
+        parent = self.target.parent
+        if parent.exists():
+            self._parent_siblings_before = frozenset(
+                p.name for p in parent.iterdir() if p.is_file() and p != self.target
+            )
+
+    def new_parent_siblings(self) -> list[str]:
+        """Return names of files that appeared in target.parent after capture()."""
+        parent = self.target.parent
+        if not parent.exists():
+            return []
+        after = frozenset(
+            p.name for p in parent.iterdir() if p.is_file() and p != self.target
+        )
+        return sorted(after - self._parent_siblings_before)
 
     def manifest(self, root: Path) -> dict[str, dict[str, Any]]:
         return {name: _record(path) for name, path in _files(root).items()}

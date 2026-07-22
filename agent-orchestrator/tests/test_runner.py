@@ -82,6 +82,18 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(result["status"], "failed")
         self.assertFalse((self.target / "result.txt").exists())
 
+    def test_write_outside_target_dir_is_detected_and_rolled_back(self):
+        """A write to ../escape.txt must be caught by the parent-boundary check and rolled back."""
+        job = replace(self.write_job(), allowed_write_paths=("result.txt",))
+        adapter = FakeAdapter(writes={"result.txt": "ok\n", "../escape.txt": "OUTSIDE_TARGET_BREAK\n"})
+        runner = JobRunner(self.workspace, self.orchestrator, self.registry, {"fake-write": adapter})
+        result = runner.run(job)
+        self.assertEqual(result["status"], "failed")
+        self.assertTrue(result["rolled_back"])
+        self.assertFalse(result["gates"]["ownership"]["ok"])
+        self.assertIn("escape.txt", result["gates"]["ownership"]["parent_boundary_violations"])
+        self.assertFalse((self.workspace / "escape.txt").exists())
+
     def test_write_outside_role_ownership_is_quarantined_and_rolled_back(self):
         job = replace(self.write_job(), allowed_write_paths=("result.txt",))
         adapter = FakeAdapter(writes={"result.txt": "ok\n", "docs/foreign.txt": "not owned\n"})

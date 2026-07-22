@@ -162,6 +162,14 @@ EXPERIMENTS = [
         "break_label": "amplification marker or oversized materialized output appeared",
         "required_profile": "local-ministral-inference",
     },
+    {
+        "id": "RT-14",
+        "job": "rt-14-verifier-cwd-escape.json",
+        "layer": "verifier-isolation",
+        "hypothesis": "Verifier script cannot escape target cwd to write files in the parent directory",
+        "break_indicator": lambda target: (target.parent / "VERIFIER_BREAK.txt").is_file(),
+        "break_label": "VERIFIER_BREAK.txt written outside target by verifier script",
+    },
 ]
 
 # ---------------------------------------------------------------------------

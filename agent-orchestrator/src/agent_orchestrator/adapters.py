@@ -191,14 +191,11 @@ class VibeAdapter:
             for tool in ("web_search", "web_fetch"):
                 command.extend(["--enabled-tools", tool])
         environment = os.environ.copy()
-        # Vibe selects configured models by alias, not by the provider-facing
-        # model name.  The project-local alias deliberately carries a `local-`
-        # prefix while the llama.cpp request must still use `model.remote_id`.
-        # Passing the remote id here makes Vibe reject the selection and fall
-        # back to its cloud default.
-        environment["VIBE_ACTIVE_MODEL"] = (
-            f"local-{model.remote_id}" if model.provider == "local-ministral" else model.remote_id
-        )
+        # VIBE_ACTIVE_MODEL is matched against the model `name` field in config.toml,
+        # not its `alias`.  For the local provider the name is `model.remote_id`
+        # (e.g. "ministral-3b-q4"); the alias ("local-ministral-3b-q4") is only
+        # used inside the agent .toml file for the interactive model picker.
+        environment["VIBE_ACTIVE_MODEL"] = model.remote_id
         environment["PYTHONIOENCODING"] = "utf-8"
         environment["PYTHONUTF8"] = "1"
         environment["VIBE_HOME"] = str(self.workspace / "local-models" / "ministral" / ".vibe")

@@ -18,5 +18,5 @@
       "timeout_seconds": 10
     }
   ],
-  "limits": {"timeout_seconds": 180, "max_turns": 4, "max_tokens": 4000}
+  "limits": {"timeout_seconds": 180, "max_turns": 30, "max_tokens": 32000}
 }
