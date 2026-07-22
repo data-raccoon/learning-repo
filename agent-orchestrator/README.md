@@ -24,6 +24,7 @@ Run evidence therefore reports Gemini as `free-quota` with zero direct marginal 
 - Jobs use the strict version-1 contract in `schemas/job.schema.json`.
 - A target directory must be an existing repository subdirectory containing every context file the worker needs.
 - Write jobs may declare `allowed_write_paths`; any changed file outside those target-relative files or directory prefixes fails the ownership gate and triggers quarantine plus rollback. Omitting the field preserves the version-1 whole-target behavior for existing jobs.
+- A write-mode `inference` job may declare `materialization` to turn validated JSON into a file append or write. The model receives no file tools: the orchestrator validates `output_schema`, renders a scalar-only template, performs the declared mutation, and then applies the normal artifact, ownership, verifier, and rollback gates.
 - `candidate`, `deferred`, and unavailable profiles cannot be routed.
 - Gemini via a free Google account is an executable option through the official Antigravity CLI.
 
@@ -40,6 +41,8 @@ Every write node in a harness must declare `allowed_write_paths`. Concurrent nod
 Harness-wide limits bound admitted nodes, total attempts, parallelism, deadline, and optionally tokens and marginal cost. Strict token limits require a provider with measured usage. Strict cost limits require a route whose marginal cost can be measured; use `best-effort` explicitly when incomplete accounting is acceptable. Running jobs are never force-killed by a graph limit and remain bounded by their job timeout, so they may move actual usage past a threshold; no new node starts after the measured graph limit is reached.
 
 Harness evidence is separate from child-job evidence under `%LOCALAPPDATA%\agent-orchestrator\.runtime\harness-runs`. Explicit `--resume RUN_ID` reuses a passed node only when the normalized harness, job contract, resolved route, upstream reuse chain, and produced artifact hashes still match. See `examples/harnesses/` for synthetic manifests. These examples and all harness tests are offline; they do not constitute model experiments.
+
+For iterative prose, prefer a pipeline of tool-free inference jobs over a file-tool conversation. Seed one transcript file, make each node read it, constrain each response with a small JSON schema, and let every node append through `materialization`. This keeps the full conversation and model trajectories on disk while the root orchestrator only receives compact node summaries. Sequential dependencies safely permit the nodes to share ownership of the transcript.
 
 ## Creating jobs
 
@@ -67,6 +70,39 @@ Example minimal read job:
   "limits": {"timeout_seconds": 180, "max_turns": 5, "max_tokens": 40000}
 }
 ```
+
+Example deterministic append job:
+
+```json
+{
+  "schema_version": 1,
+  "id": "dialogue-turn-1",
+  "objective": "Return the first dialogue turn as the required JSON object.",
+  "target_dir": "dialogue-run",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "model_profile": "local-ministral-inference",
+  "context": ["dialogue.md"],
+  "output_schema": "turn-1.schema.json",
+  "expected_artifacts": ["dialogue.md"],
+  "allowed_write_paths": ["dialogue.md"],
+  "materialization": {
+    "path": "dialogue.md",
+    "operation": "append",
+    "template": "<!-- TURN {turn} -->\n**{speaker}:** {text}\n\n"
+  },
+  "limits": {
+    "timeout_seconds": 180,
+    "max_turns": 1,
+    "max_tokens": 32000,
+    "max_output_tokens": 1200
+  }
+}
+```
+
+`max_tokens` remains the worker/harness accounting ceiling. `max_output_tokens` independently caps direct local inference generation, so a model can retain its full context budget without being invited to produce a 32k-token answer. Effective-model attestations are included in compact run summaries; a local API model mismatch or a Vibe fallback warning fails the run closed.
 
 ## Gemini with a Google account
 

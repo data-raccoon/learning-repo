@@ -75,6 +75,30 @@ class ContractPathTests(unittest.TestCase):
         with self.assertRaises(ContractError):
             validate_job_paths(self.root, job)
 
+    def test_materialization_requires_transactional_declarations(self):
+        (self.root / "target" / "schema.json").write_text('{"type":"object"}', encoding="utf-8")
+        (self.root / "target" / "dialogue.md").write_text("# Dialogue\n", encoding="utf-8")
+        values = {
+            "mode": "write", "tool_class": "inference", "output_schema": "schema.json",
+            "expected_artifacts": ["dialogue.md"], "allowed_write_paths": ["dialogue.md"],
+            "materialization": {"path": "dialogue.md", "operation": "append", "template": "{text}\n"},
+        }
+        job = load_job(self.job_file(**values))
+        self.assertEqual(job.materialization.path, "dialogue.md")
+        validate_job_paths(self.root, job)
+        with self.assertRaises(ContractError):
+            load_job(self.job_file(**{**values, "expected_artifacts": []}))
+
+    def test_append_materialization_requires_existing_target(self):
+        (self.root / "target" / "schema.json").write_text('{"type":"object"}', encoding="utf-8")
+        job = load_job(self.job_file(
+            mode="write", tool_class="inference", output_schema="schema.json",
+            expected_artifacts=["missing.md"], allowed_write_paths=["missing.md"],
+            materialization={"path": "missing.md", "operation": "append", "template": "{text}"},
+        ))
+        with self.assertRaises(ContractError):
+            validate_job_paths(self.root, job)
+
 
 if __name__ == "__main__":
     unittest.main()

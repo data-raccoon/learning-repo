@@ -18,11 +18,13 @@ from .adapters import GoogleAccountCliAdapter, LocalChatAdapter, VibeAdapter
 from .contracts import ContractError, Job
 from .evidence import RunEvidence, artifact_records, utc_now
 from .locking import TargetLock
+from .materialization import materialize
 from .paths import validate_job_paths
 from .registry import Registry
 from .routing import RoutingError, route_job
 from .runtime import RuntimeManager
 from .snapshot import TargetSnapshot
+from .schema_validation import strict_json_loads, validate_json_schema
 
 
 SAFE_VERIFIER_EXECUTABLES = {"python", "python.exe", "py", "py.exe", "node", "node.exe", "npm", "npm.cmd", "git", "git.exe"}
@@ -113,27 +115,14 @@ class JobRunner:
         if fenced:
             candidate = fenced.group(1).strip()
         try:
-            value = json.loads(candidate)
-            schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError) as error:
+            value = strict_json_loads(candidate)
+            schema = strict_json_loads(schema_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError, ValueError) as error:
             return {"ok": False, "error": f"invalid JSON output or schema: {error}"}
-        if schema.get("type") == "object":
-            if not isinstance(value, dict):
-                return {"ok": False, "error": "output is not an object"}
-            missing = [name for name in schema.get("required", []) if name not in value]
-            if missing:
-                return {"ok": False, "error": "missing required properties: " + ", ".join(missing)}
-            properties = schema.get("properties", {})
-            if schema.get("additionalProperties") is False:
-                extra = sorted(set(value) - set(properties))
-                if extra:
-                    return {"ok": False, "error": "unexpected properties: " + ", ".join(extra)}
-            python_types = {"string": str, "integer": int, "number": (int, float), "boolean": bool, "array": list, "object": dict}
-            for name, definition in properties.items():
-                expected = python_types.get(definition.get("type"))
-                if name in value and expected and (not isinstance(value[name], expected) or definition.get("type") == "integer" and isinstance(value[name], bool)):
-                    return {"ok": False, "error": f"property {name} has the wrong type"}
-        return {"ok": True}
+        if not isinstance(schema, dict):
+            return {"ok": False, "error": "output schema is not an object"}
+        error = validate_json_schema(value, schema)
+        return {"ok": not error, **({"error": error} if error else {}), "value": value}
 
     @staticmethod
     def _ownership_gate(changes: dict[str, list[str]], allowed_paths: tuple[str, ...]) -> dict[str, Any]:
@@ -198,17 +187,24 @@ class JobRunner:
                     result = adapter.run(job, target, model, profile)
                 evidence.write_text("trajectory.txt", result.trajectory)
                 evidence.write_text("final-message.txt", result.final_text)
+                summary["attestation"] = result.attestation
                 if not result.ok:
                     raise RuntimeError(result.error or "worker failed")
+                schema_gate = self._validate_output_schema(result.final_text, target / job.output_schema) if job.output_schema else {"ok": True, "skipped": True}
+                materialization_gate: dict[str, Any] = {"ok": True, "skipped": True}
+                if schema_gate["ok"] and job.materialization:
+                    materialization_gate = materialize(
+                        target / job.materialization.path, schema_gate["value"], job.materialization,
+                    )
+                schema_gate.pop("value", None)
                 artifacts = artifact_records(target, job.expected_artifacts)
                 artifact_gate = all(not item.get("missing") for item in artifacts)
                 verifiers = self._verify(job, target, evidence)
-                schema_gate = self._validate_output_schema(result.final_text, target / job.output_schema) if job.output_schema else {"ok": True, "skipped": True}
                 changes = snapshot.changes() if snapshot else {"added": [], "removed": [], "changed": []}
                 ownership_gate = self._ownership_gate(changes, job.allowed_write_paths)
                 harness_gate = acceptance_gate(target) if acceptance_gate else {"ok": True, "skipped": True}
                 gates_ok = (
-                    artifact_gate and schema_gate["ok"] and ownership_gate["ok"]
+                    artifact_gate and schema_gate["ok"] and materialization_gate["ok"] and ownership_gate["ok"]
                     and all(item["ok"] for item in verifiers) and harness_gate.get("ok") is True
                 )
                 summary.update({
@@ -216,6 +212,7 @@ class JobRunner:
                     "gates": {
                         "artifacts": artifact_gate,
                         "output_schema": schema_gate,
+                        "materialization": materialization_gate,
                         "ownership": ownership_gate,
                         "verifiers": verifiers,
                         "harness": harness_gate,

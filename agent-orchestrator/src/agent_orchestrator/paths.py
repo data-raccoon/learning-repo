@@ -49,4 +49,9 @@ def validate_job_paths(workspace: Path, job: Job) -> Path:
     if job.output_schema:
         reject_symlink_components(target, job.output_schema)
         contained_path(target, job.output_schema, must_exist=True)
+    if job.materialization:
+        reject_symlink_components(target, job.materialization.path)
+        materialization_path = contained_path(target, job.materialization.path)
+        if job.materialization.operation == "append" and not materialization_path.is_file():
+            raise ContractError(f"append target does not exist: {job.materialization.path}")
     return target

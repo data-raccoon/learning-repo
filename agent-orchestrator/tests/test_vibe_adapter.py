@@ -69,6 +69,24 @@ class VibeAdapterTests(unittest.TestCase):
     def test_web_is_denied_by_default(self):
         self.assertIn("Do not use network tools", build_prompt(self.job()))
 
+    def test_model_fallback_warning_fails_closed(self):
+        completed = subprocess.CompletedProcess([], 0, stdout='{"role":"assistant","content":"done"}', stderr="Model not configured; falling back")
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "agent_orchestrator.adapters.shutil.which", return_value="vibe"
+        ), patch("agent_orchestrator.adapters.subprocess.run", return_value=completed):
+            result = VibeAdapter(Path(directory)).run(self.job(), Path(directory), self.model(), self.profile())
+        self.assertFalse(result.ok)
+        self.assertFalse(result.attestation["matched"])
+
+    def test_non_fallback_worker_failure_preserves_model_attestation(self):
+        completed = subprocess.CompletedProcess([], 1, stdout="", stderr="token limit exceeded")
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "agent_orchestrator.adapters.shutil.which", return_value="vibe"
+        ), patch("agent_orchestrator.adapters.subprocess.run", return_value=completed):
+            result = VibeAdapter(Path(directory)).run(self.job(), Path(directory), self.model(), self.profile())
+        self.assertFalse(result.ok)
+        self.assertEqual(result.attestation, {"expected_model": "local-ministral-3b-q4", "matched": True})
+
 
 if __name__ == "__main__":
     unittest.main()

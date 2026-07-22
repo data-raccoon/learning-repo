@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 from agent_orchestrator.adapters import FakeAdapter
-from agent_orchestrator.contracts import Job, Verifier
+from agent_orchestrator.contracts import Job, Materialization, Verifier
 from agent_orchestrator.registry import Registry
 from agent_orchestrator.runner import JobRunner
 from agent_orchestrator.snapshot import TargetSnapshot
@@ -146,6 +146,46 @@ class RunnerTests(unittest.TestCase):
         adapter = FakeAdapter(final_text='```json\n{"answer": "ok"}\n```')
         result = JobRunner(self.workspace, self.orchestrator, self.registry, {"fake": adapter}).run(job)
         self.assertEqual(result["status"], "passed")
+
+    def test_schema_enforces_nested_constraints(self):
+        schema = self.target / "schema.json"
+        schema.write_text('{"type":"object","properties":{"turn":{"const":2},"text":{"type":"string","minLength":3}},"required":["turn","text"],"additionalProperties":false}', encoding="utf-8")
+        job = Job(1, "schema-constraints", "Return JSON", "target", "read", "normal", "low", "inference",
+                  ("summarization",), (), (), (), (), "weak-read", "schema.json")
+        result = JobRunner(self.workspace, self.orchestrator, self.registry, {"fake": FakeAdapter(final_text='{"turn": 1, "text": "x"}')}).run(job)
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("const", result["gates"]["output_schema"]["error"])
+
+    def test_validated_output_is_appended_transactionally(self):
+        (self.target / "dialogue.md").write_text("# Dialogue\n\n", encoding="utf-8")
+        (self.target / "schema.json").write_text(
+            '{"type":"object","properties":{"turn":{"const":1},"speaker":{"enum":["Mara"]},"text":{"type":"string","minLength":1}},"required":["turn","speaker","text"],"additionalProperties":false}',
+            encoding="utf-8",
+        )
+        job = Job(
+            1, "append-turn", "Write one turn", "target", "write", "normal", "low", "inference",
+            ("summarization",), ("dialogue.md",), ("dialogue.md",), (), (), "weak-read", "schema.json",
+            allowed_write_paths=("dialogue.md",),
+            materialization=Materialization("dialogue.md", "append", "<!-- TURN {turn} -->\n**{speaker}:** {text}\n\n"),
+        )
+        adapter = FakeAdapter(final_text='{"turn":1,"speaker":"Mara","text":"Ein Argument."}')
+        result = JobRunner(self.workspace, self.orchestrator, self.registry, {"fake": adapter}).run(job)
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["gates"]["materialization"]["operation"], "append")
+        self.assertIn("**Mara:** Ein Argument.", (self.target / "dialogue.md").read_text(encoding="utf-8"))
+
+    def test_invalid_output_never_mutates_materialization_target(self):
+        original = "# Dialogue\n"
+        (self.target / "dialogue.md").write_text(original, encoding="utf-8")
+        (self.target / "schema.json").write_text('{"type":"object","properties":{"text":{"type":"string"}},"required":["text"],"additionalProperties":false}', encoding="utf-8")
+        job = Job(
+            1, "reject-turn", "Write one turn", "target", "write", "normal", "low", "inference",
+            ("summarization",), (), ("dialogue.md",), (), (), "weak-read", "schema.json",
+            allowed_write_paths=("dialogue.md",), materialization=Materialization("dialogue.md", "append", "{text}\n"),
+        )
+        result = JobRunner(self.workspace, self.orchestrator, self.registry, {"fake": FakeAdapter(final_text='{"wrong":true}')}).run(job)
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual((self.target / "dialogue.md").read_text(encoding="utf-8"), original)
 
 
 if __name__ == "__main__":

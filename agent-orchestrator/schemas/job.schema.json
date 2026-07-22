@@ -33,7 +33,11 @@
           "npm run typecheck",
           "npm run build",
           "git diff --",
-          "git status --short"
+          "git status --short",
+          "git add",
+          "git add .",
+          "git commit -m",
+          "git status"
         ]
       }
     },
@@ -61,7 +65,18 @@
       "properties": {
         "timeout_seconds": {"type": "integer", "minimum": 1},
         "max_turns": {"type": "integer", "minimum": 1},
-        "max_tokens": {"type": "integer", "minimum": 1}
+        "max_tokens": {"type": "integer", "minimum": 1},
+        "max_output_tokens": {"type": "integer", "minimum": 1}
+      }
+    },
+    "materialization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "operation", "template"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "operation": {"enum": ["append", "write"]},
+        "template": {"type": "string", "minLength": 1}
       }
     }
   }

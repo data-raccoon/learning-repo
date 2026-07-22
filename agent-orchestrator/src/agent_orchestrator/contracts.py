@@ -107,6 +107,14 @@ class Limits:
     timeout_seconds: int = 900
     max_turns: int = 12
     max_tokens: int = 30_000
+    max_output_tokens: int | None = None
+
+
+@dataclass(frozen=True)
+class Materialization:
+    path: str
+    operation: str
+    template: str
 
 
 @dataclass(frozen=True)
@@ -129,6 +137,7 @@ class Job:
     limits: Limits = field(default_factory=Limits)
     allowed_commands: tuple[str, ...] = ()
     allowed_write_paths: tuple[str, ...] = ()
+    materialization: Materialization | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -138,7 +147,7 @@ JOB_KEYS = {
     "schema_version", "id", "objective", "target_dir", "mode", "importance",
     "risk", "tool_class", "required_capabilities", "context",
     "expected_artifacts", "verifiers", "dependencies", "model_profile",
-    "output_schema", "limits", "allowed_commands", "allowed_write_paths",
+    "output_schema", "limits", "allowed_commands", "allowed_write_paths", "materialization",
 }
 
 
@@ -203,11 +212,28 @@ def load_job(path: Path) -> Job:
             raise ContractError("verifier timeout_seconds must be 1..3600")
         verifiers.append(Verifier(str(item["id"]), argv, timeout))
     limit_values = raw.get("limits", {})
-    if not isinstance(limit_values, dict) or set(limit_values) - {"timeout_seconds", "max_turns", "max_tokens"}:
+    if not isinstance(limit_values, dict) or set(limit_values) - {"timeout_seconds", "max_turns", "max_tokens", "max_output_tokens"}:
         raise ContractError("limits contains unknown fields")
     limits = Limits(**limit_values)
-    if limits.timeout_seconds < 1 or limits.max_turns < 1 or limits.max_tokens < 1:
+    if limits.timeout_seconds < 1 or limits.max_turns < 1 or limits.max_tokens < 1 or (limits.max_output_tokens is not None and limits.max_output_tokens < 1):
         raise ContractError("all limits must be positive")
+    materialization = None
+    materialization_value = raw.get("materialization")
+    if materialization_value is not None:
+        if not isinstance(materialization_value, dict) or set(materialization_value) != {"path", "operation", "template"}:
+            raise ContractError("materialization must contain exactly path, operation, and template")
+        if any(not isinstance(materialization_value[key], str) or not materialization_value[key] for key in materialization_value):
+            raise ContractError("materialization values must be non-empty strings")
+        if materialization_value["operation"] not in {"append", "write"}:
+            raise ContractError("materialization operation must be append or write")
+        if raw["mode"] != "write" or raw["tool_class"] != "inference":
+            raise ContractError("materialization requires a write-mode inference job")
+        if not raw.get("output_schema"):
+            raise ContractError("materialization requires output_schema")
+        path_value = materialization_value["path"]
+        if path_value not in allowed_write_paths or path_value not in _strings(raw.get("expected_artifacts"), "expected_artifacts"):
+            raise ContractError("materialization path must be declared in allowed_write_paths and expected_artifacts")
+        materialization = Materialization(path_value, materialization_value["operation"], materialization_value["template"])
     return Job(
         schema_version=1,
         id=raw["id"], objective=raw["objective"], target_dir=raw["target_dir"],
@@ -223,4 +249,5 @@ def load_job(path: Path) -> Job:
         limits=limits,
         allowed_commands=allowed_commands,
         allowed_write_paths=allowed_write_paths,
+        materialization=materialization,
     )

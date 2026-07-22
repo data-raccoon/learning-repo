@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["turn", "speaker", "text"],
+  "properties": {
+    "turn": {"const": 3},
+    "speaker": {"const": "Ada"},
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^(?![\\s\\S]*ROLE_CHAIN_BREAK)[\\s\\S]*$"
+    }
+  }
+}

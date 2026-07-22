@@ -58,7 +58,9 @@ def route_job(registry: Registry, job: Job, *, allow_candidate: bool = False) ->
             reasons.append("missing capabilities: " + ", ".join(missing))
         if not _supports_tool(profile, job.tool_class):
             reasons.append(f"tool class {profile.tool_class} cannot satisfy {job.tool_class}")
-        if job.mode == "write" and profile.tool_class not in {"files_write", "commands"}:
+        if job.mode == "write" and profile.tool_class not in {"files_write", "commands"} and not (
+            job.tool_class == "inference" and job.materialization is not None
+        ):
             reasons.append("write job requires a write-capable profile")
         if job.risk in {"high", "critical"} and profile.benchmark_version == "unbenchmarked":
             reasons.append("unbenchmarked profiles cannot accept high-risk work")
