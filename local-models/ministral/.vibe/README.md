@@ -30,8 +30,8 @@ is created by `python\configure_vibe_credentials.py`. Do not copy the key into
 2. Open this workspace normally in VS Code.
 3. Open Mistral Vibe, start a new conversation, and select
    `local-ministral-3b-q4` in the model picker.
-4. Begin with a small, read-only task. Local tool-calling quality is not yet
-   qualified for autonomous edits or shell execution.
+4. Select the `Local Web + Files` agent for web research and project file edits.
+   Shell execution remains disabled.
 
 The server uses a project-maintained native Mistral chat template that permits
 OpenAI/Vibe histories with consecutive user or assistant roles. Regenerate and test
@@ -44,10 +44,11 @@ The project default remains Vibe's `Default` agent with `mistral-medium-3.5`, th
 standard `cli` prompt, and all configured tools, skills, and connectors. Use this
 agent with either cloud model.
 
-Select the project agent `Local Files` to use `local-ministral-3b-q4`. Only this
-agent uses the token-minimal `local-files` prompt and exposes `read_file`, `grep`,
-`edit`, and `write_file`; web access, shell execution, connectors, skills,
-subagents, and task-management tools are disabled for it. Install its
+Select the project agent `Local Web + Files` to use `local-ministral-3b-q4`. Only
+this agent uses the compact `local-files` prompt and exposes `read_file`, `grep`,
+`edit`, `write_file`, `web_search`, and `web_fetch`. File edits and web access do
+not require per-call approval. Shell execution, connectors, skills, subagents,
+and task-management tools remain disabled. Install its
 project-maintained prompt into Vibe's prompt directory with:
 
 ```powershell
@@ -56,8 +57,8 @@ project-maintained prompt into Vibe's prompt directory with:
 
 After changing the prompt, agent, or tool list, run `/reload` in Vibe and start a
 new conversation; existing sessions retain their original system prompt and
-schemas. In VS Code choose `Default` for cloud/full capability or `Local Files`
-for local/file-only capability in the agent selector.
+schemas. In VS Code choose `Default` for cloud/full capability or
+`Local Web + Files` for local web-and-file capability in the agent selector.
 
 Run the dependency-free project check with:
 

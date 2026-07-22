@@ -8,7 +8,7 @@ input_cost_per_million = 0.0
 output_cost_per_million = 0.0
 price_effective_at = "2026-07-19"
 modalities = ["text"]
-capabilities = ["extraction", "classification", "summarization", "formatting", "file-editing"]
+capabilities = ["extraction", "classification", "summarization", "formatting", "file-editing", "web-research"]
 notes = "Exact Q4_K_M configuration on the local workstation."
 
 [[models]]

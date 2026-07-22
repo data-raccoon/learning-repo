@@ -11,11 +11,13 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / ".vibe" / "config.toml"
+AGENT_PATH = PROJECT_ROOT / ".vibe" / "agents" / "local-files.toml"
 API_KEY_PATH = Path(r"C:\LLMs\config\api_key.txt")
 
 
 def main() -> None:
     config = tomllib.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    agent = tomllib.loads(AGENT_PATH.read_text(encoding="utf-8"))
     providers = {item["name"]: item for item in config.get("providers", [])}
     models = {item["alias"]: item for item in config.get("models", [])}
 
@@ -34,6 +36,13 @@ def main() -> None:
     if active_model not in configured_aliases:
         raise SystemExit(f"The active model is not configured: {active_model}")
 
+    required_tools = {"read_file", "grep", "edit", "write_file", "web_search", "web_fetch"}
+    enabled_tools = set(agent.get("enabled_tools", []))
+    if not required_tools.issubset(enabled_tools):
+        raise SystemExit(f"Local agent is missing tools: {sorted(required_tools - enabled_tools)}")
+    for tool in ("edit", "write_file", "web_search", "web_fetch"):
+        if agent.get("tools", {}).get(tool, {}).get("permission") != "always":
+            raise SystemExit(f"Local agent tool must be always available: {tool}")
     key = API_KEY_PATH.read_text(encoding="ascii").strip()
     request = urllib.request.Request(
         provider["api_base"] + "/models",

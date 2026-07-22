@@ -1,6 +1,6 @@
 agent_type = "agent"
-display_name = "Local Files"
-description = "Token-minimal local Ministral agent with file tools only."
+display_name = "Local Web + Files"
+description = "Local Ministral agent with web research and workspace file editing."
 safety = "safe"
 active_model = "local-ministral-3b-q4"
 system_prompt_id = "local-files"
@@ -9,6 +9,8 @@ enabled_tools = [
     "grep",
     "edit",
     "write_file",
+    "web_search",
+    "web_fetch",
 ]
 disabled_skills = ["*"]
 enable_connectors = false
@@ -21,7 +23,13 @@ permission = "always"
 permission = "always"
 
 [tools.edit]
-permission = "ask"
+permission = "always"
 
 [tools.write_file]
-permission = "ask"
+permission = "always"
+
+[tools.web_search]
+permission = "always"
+
+[tools.web_fetch]
+permission = "always"

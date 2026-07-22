@@ -16,7 +16,7 @@ model = "ministral-3b-q4-local"
 harness = "local-vibe-files"
 status = "eligible"
 success_probability = 0.78
-capabilities = ["file-editing", "formatting"]
+capabilities = ["file-editing", "formatting", "web-research"]
 tool_class = "files_write"
 max_parallel = 1
 benchmark_version = "game-building-canaries"
@@ -103,5 +103,4 @@ tool_class = "commands"
 max_parallel = 1
 benchmark_version = "antigravity-command-canary-v1"
 evaluated_at = "2026-07-19"
-
 
