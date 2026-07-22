@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "leihmutterschaft-dialog-turn-08-jonas",
+  "objective": "Read the current dialogue and generate ONLY turn 8 in German. Return valid JSON matching turn-output.schema.json: all keys and all string values, including the entire text value, MUST be enclosed in JSON double quotes and properly escaped. Use turn=8 and speaker=Jonas. The text is one line of 125-160 words with no internal quotation mark, Markdown, foreign word, third-person self-reference, invented term, or question. Jonas speaks in first person to Mara. State common ground: no unregulated market; secure child status and origin rights; independent protection and sole medical autonomy for the pregnant woman; action against coercion; protection for children already born. State that I consider an eng begrenzte, regulierte altruistische Möglichkeit potentially legitimate while Mara considers legalization in Germany not yet justified. End that disagreement does not remove the shared duty to protect people affected now. No laws, countries, sources, label, or generic balance language.",
+  "target_dir": "leihmutterschaft-dialog",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["formatting"],
+  "context": ["brief.md", "research.md", "dialogue.md", "turn-output.schema.json"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": ["leihmutterschaft-dialog-turn-07-mara"],
+  "model_profile": "local-ministral-inference",
+  "output_schema": "turn-output.schema.json",
+  "limits": {"timeout_seconds": 180, "max_turns": 1, "max_tokens": 350}
+}

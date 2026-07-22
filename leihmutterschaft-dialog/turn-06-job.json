@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "leihmutterschaft-dialog-turn-06-jonas",
+  "objective": "Read the current dialogue and generate ONLY turn 6 in German. Return exactly one JSON object matching turn-output.schema.json with turn=6, speaker=Jonas, and a single-line text of 125-165 words with no literal newline, tab, quotation mark, control character, English word, or malformed expression. Jonas answers Mara with these concrete safeguards for a hypothetical altruistic model: independent counseling and legal advice; the pregnant woman's sole control over medical decisions; transparent expense reimbursement and insurance; no broker profit; durable origin records; follow-up support for lasting physical or psychological harm. Explicitly say in natural German that these rules can reduce but never eliminate pressure or coercion. Do not mention risk areas, paternalism, studies, existing legalization, sources, a Markdown label, or meta-commentary.",
+  "target_dir": "leihmutterschaft-dialog",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["formatting"],
+  "context": ["brief.md", "research.md", "dialogue.md", "turn-output.schema.json"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": ["leihmutterschaft-dialog-turn-05-mara"],
+  "model_profile": "local-ministral-inference",
+  "output_schema": "turn-output.schema.json",
+  "limits": {"timeout_seconds": 180, "max_turns": 1, "max_tokens": 420}
+}

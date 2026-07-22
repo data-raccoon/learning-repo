@@ -60,6 +60,8 @@ class VibeAdapterTests(unittest.TestCase):
         command = run.call_args.args[0]
         enabled = [command[index + 1] for index, value in enumerate(command[:-1]) if value == "--enabled-tools"]
         self.assertEqual(enabled, ["read_file", "grep", "edit", "write_file", "web_search", "web_fetch"])
+        environment = run.call_args.kwargs["env"]
+        self.assertEqual(environment["VIBE_ACTIVE_MODEL"], "local-ministral-3b-q4")
         prompt = command[command.index("-p") + 1]
         self.assertIn("You may use web_search and web_fetch", prompt)
         self.assertNotIn("Do not use network tools", prompt)

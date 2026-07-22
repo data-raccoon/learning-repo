@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["retrieval_date", "language", "dossier_markdown", "sources"],
+  "properties": {
+    "retrieval_date": {"const": "2026-07-22"},
+    "language": {"const": "de"},
+    "dossier_markdown": {"type": "string", "minLength": 1800},
+    "sources": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "url"],
+        "properties": {
+          "title": {"type": "string", "minLength": 3},
+          "url": {"type": "string", "pattern": "^https?://"}
+        }
+      }
+    }
+  }
+}

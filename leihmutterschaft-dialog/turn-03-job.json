@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "leihmutterschaft-dialog-turn-03-mara",
+  "objective": "Read the current dialogue and generate ONLY turn 3 in German. Return exactly one JSON object matching turn-output.schema.json with turn=3, speaker=Mara, and a single-line text with HARD MAXIMUM 160 words and no literal newline, tab, quotation mark, or control character. Mara responds directly to Jonas. Use ALL and ONLY these legal facts: §1 ESchG prohibits specified medical assistance for surrogacy; the AdVermiG prohibits surrogate mediation; §1591 BGB makes the woman who gives birth the legal mother; foreign arrangements can create case-specific recognition and child-status uncertainty; the 2024 commission examined possible reform but did not legalize it. Add no country example, entry-ban claim, treaty, EU measure, party, penalty, date, trend, or additional legal assertion. Mara argues briefly that sending arrangements abroad can relocate rather than solve structural risk. No sources, Markdown label, or meta-commentary.",
+  "target_dir": "leihmutterschaft-dialog",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["formatting"],
+  "context": ["brief.md", "research.md", "dialogue.md", "turn-output.schema.json"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": ["leihmutterschaft-dialog-turn-02-jonas"],
+  "model_profile": "local-ministral-inference",
+  "output_schema": "turn-output.schema.json",
+  "limits": {"timeout_seconds": 180, "max_turns": 1, "max_tokens": 380}
+}

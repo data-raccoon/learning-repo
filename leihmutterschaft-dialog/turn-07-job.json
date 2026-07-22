@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "leihmutterschaft-dialog-turn-07-mara",
+  "objective": "Read the current dialogue and generate ONLY turn 7 in German. Return exactly one JSON object matching turn-output.schema.json with turn=7, speaker=Mara, and a single-line text with HARD MAXIMUM 165 words, no literal newline, tab, quotation mark, Markdown, slogan, or invented term. Use exactly this argument structure: first ask how rules can be enforced without intrusive surveillance; next ask how unequal access, evasion abroad, and state refusal despite consent are handled; finally state that Mara supports secure child status, origin records, independent advice, and protection against coercion for everyone including children already born through foreign arrangements, but that these protections do not yet justify legalizing surrogacy in Germany. Do not claim German leadership, experimentation, inevitable harm, or any new fact. No sources, label, or meta-commentary.",
+  "target_dir": "leihmutterschaft-dialog",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["formatting"],
+  "context": ["brief.md", "research.md", "dialogue.md", "turn-output.schema.json"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": ["leihmutterschaft-dialog-turn-06-jonas"],
+  "model_profile": "local-ministral-inference",
+  "output_schema": "turn-output.schema.json",
+  "limits": {"timeout_seconds": 180, "max_turns": 1, "max_tokens": 370}
+}

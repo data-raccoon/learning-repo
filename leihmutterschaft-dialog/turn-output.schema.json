@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["turn", "speaker", "text"],
+  "properties": {
+    "turn": {"type": "integer", "minimum": 1, "maximum": 8},
+    "speaker": {"enum": ["Mara", "Jonas"]},
+    "text": {"type": "string", "minLength": 500, "maxLength": 1400}
+  }
+}

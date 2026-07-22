@@ -138,6 +138,15 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(result["status"], "failed")
         self.assertIn("missing required", result["gates"]["output_schema"]["error"])
 
+    def test_structured_output_gate_accepts_single_json_fence(self):
+        schema = self.target / "schema.json"
+        schema.write_text('{"type":"object","properties":{"answer":{"type":"string"}},"required":["answer"],"additionalProperties":false}', encoding="utf-8")
+        job = Job(1, "schema-fence", "Return JSON", "target", "read", "normal", "low", "inference",
+                  ("summarization",), (), (), (), (), "weak-read", "schema.json")
+        adapter = FakeAdapter(final_text='```json\n{"answer": "ok"}\n```')
+        result = JobRunner(self.workspace, self.orchestrator, self.registry, {"fake": adapter}).run(job)
+        self.assertEqual(result["status"], "passed")
+
 
 if __name__ == "__main__":
     unittest.main()

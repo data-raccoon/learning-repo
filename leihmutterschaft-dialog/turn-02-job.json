@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "leihmutterschaft-dialog-turn-02-jonas",
+  "objective": "Read the current dialogue and generate ONLY turn 2 in German. Return exactly one JSON object matching turn-output.schema.json with turn=2, speaker=Jonas, and a single-line text of about 120-160 words with no literal newline, tab, quotation mark, or control character. Jonas is a liberal medical ethicist. He responds concretely to Mara's concern about structural pressure: concede that formal consent alone is insufficient, but argue that adult autonomy and harm-reducing regulation should not be dismissed. Mention independent counseling or legal representation as a safeguard without pretending it removes every power imbalance. Do not repeat definitions, add sources, use a Markdown speaker label, or include meta-commentary.",
+  "target_dir": "leihmutterschaft-dialog",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["formatting"],
+  "context": ["brief.md", "research.md", "dialogue.md", "turn-output.schema.json"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": ["leihmutterschaft-dialog-turn-01-mara"],
+  "model_profile": "local-ministral-inference",
+  "output_schema": "turn-output.schema.json",
+  "limits": {"timeout_seconds": 180, "max_turns": 1, "max_tokens": 700}
+}

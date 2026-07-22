@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "leihmutterschaft-dialog-turn-01-mara",
+  "objective": "Generate ONLY turn 1 of the German dialogue. Return exactly one JSON object matching turn-output.schema.json with turn=1, speaker=Mara, and text containing HARD MINIMUM 120 AND HARD MAXIMUM 145 German words; count the words before returning and never exceed 145. The text value MUST be one single-line paragraph with no literal newline, tab, quotation mark, or control character. Mara is an empathetic but structurally skeptical bioethical jurist. She opens the conflict and correctly explains that traditional surrogacy uses the carrying woman's own egg while gestational surrogacy may use an embryo genetically unrelated to her. She recognizes legitimate wishes for children but foregrounds pregnancy risks, exploitation pressure, and the child's legal security. No Markdown speaker label, sources, or meta-commentary inside text.",
+  "target_dir": "leihmutterschaft-dialog",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["formatting"],
+  "context": ["brief.md", "research.md", "dialogue.md", "turn-output.schema.json"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "dependencies": [],
+  "model_profile": "local-ministral-inference",
+  "output_schema": "turn-output.schema.json",
+  "limits": {"timeout_seconds": 180, "max_turns": 1, "max_tokens": 700}
+}

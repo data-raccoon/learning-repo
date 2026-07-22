@@ -108,8 +108,12 @@ class JobRunner:
 
     @staticmethod
     def _validate_output_schema(text: str, schema_path: Path) -> dict[str, Any]:
+        candidate = text.strip()
+        fenced = re.fullmatch(r"```(?:json)?\s*\r?\n([\s\S]*?)\r?\n```", candidate, flags=re.IGNORECASE)
+        if fenced:
+            candidate = fenced.group(1).strip()
         try:
-            value = json.loads(text)
+            value = json.loads(candidate)
             schema = json.loads(schema_path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError) as error:
             return {"ok": False, "error": f"invalid JSON output or schema: {error}"}

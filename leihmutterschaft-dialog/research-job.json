@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "leihmutterschaft-current-web-research",
+  "objective": "Perform exactly two compact web_search calls about the CURRENT context of surrogacy (Leihmutterschaft) as of 2026-07-22: one query focused on current German law and reform debate, and one focused on European cross-border parentage and ethics. NEVER call web_fetch and never call any file tool. Using only search-result titles, snippets, and direct URLs, return ONLY one JSON object matching research-output.schema.json. The dossier_markdown value must be entirely in German, contain the literal word Deutschland, state the retrieval date, distinguish gestational from traditional surrogacy, cover current German law and debate, cross-border parentage, and ethical arguments on both sides. Clearly label snippet-only claims as uncertain; do not conflate exploitation through surrogacy with surrogacy categorically and do not invent events or legal changes. Include at least six sources found in the searches. Do not draft the dialogue.",
+  "target_dir": "leihmutterschaft-dialog",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "files_write",
+  "required_capabilities": ["web-research", "file-editing"],
+  "context": ["brief.md", "research-output.schema.json"],
+  "expected_artifacts": [],
+  "allowed_write_paths": ["worker-must-not-write"],
+  "verifiers": [],
+  "dependencies": [],
+  "model_profile": "local-ministral-files",
+  "output_schema": "research-output.schema.json",
+  "limits": {"timeout_seconds": 240, "max_turns": 5, "max_tokens": 32000}
+}

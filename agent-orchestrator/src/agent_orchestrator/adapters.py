@@ -161,7 +161,14 @@ class VibeAdapter:
             for tool in ("web_search", "web_fetch"):
                 command.extend(["--enabled-tools", tool])
         environment = os.environ.copy()
-        environment["VIBE_ACTIVE_MODEL"] = model.remote_id
+        # Vibe selects configured models by alias, not by the provider-facing
+        # model name.  The project-local alias deliberately carries a `local-`
+        # prefix while the llama.cpp request must still use `model.remote_id`.
+        # Passing the remote id here makes Vibe reject the selection and fall
+        # back to its cloud default.
+        environment["VIBE_ACTIVE_MODEL"] = (
+            f"local-{model.remote_id}" if model.provider == "local-ministral" else model.remote_id
+        )
         environment["PYTHONIOENCODING"] = "utf-8"
         environment["PYTHONUTF8"] = "1"
         environment["VIBE_HOME"] = str(self.workspace / "local-models" / "ministral" / ".vibe")
@@ -177,7 +184,9 @@ class VibeAdapter:
             return AdapterResult(False, trajectory=(error.stdout or "") + (error.stderr or ""), error="worker timeout")
         trajectory = process.stdout
         if process.returncode:
-            compact = re.sub(r"\s+", " ", process.stderr or process.stdout).strip()[:500]
+            stderr = re.sub(r"\s+", " ", process.stderr).strip()[:300]
+            stdout_tail = re.sub(r"\s+", " ", process.stdout).strip()[-500:]
+            compact = " | ".join(part for part in (stderr, f"stdout_tail={stdout_tail}" if stdout_tail else "") if part)
             return AdapterResult(False, trajectory=trajectory, error=f"vibe exited {process.returncode}: {compact}")
         try:
             result = json.loads(process.stdout)
