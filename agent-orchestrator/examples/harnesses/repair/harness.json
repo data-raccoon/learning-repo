@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-repair",
+  "topology": "repair",
+  "limits": {"max_parallel": 1, "deadline_seconds": 900, "max_jobs": 3, "max_attempts": 4},
+  "nodes": [
+    {"job": "work.json", "role": "worker"},
+    {"job": "verify.json", "role": "verifier", "max_attempts": 2},
+    {"job": "repair.json", "role": "repairer", "max_attempts": 1}
+  ],
+  "handoffs": [
+    {"from": "repair-work", "to": "repair-verify", "artifacts": [{"path": "repair/output.txt", "media_type": "text/plain"}]},
+    {"from": "repair-work", "to": "repair-fix", "artifacts": [{"path": "repair/output.txt", "media_type": "text/plain"}]},
+    {"from": "repair-fix", "to": "repair-verify", "artifacts": [{"path": "repair/repaired-output.txt", "media_type": "text/plain"}]}
+  ],
+  "repair_loop": {
+    "work_node": "repair-work",
+    "verify_node": "repair-verify",
+    "repair_node": "repair-fix",
+    "max_cycles": 1
+  }
+}

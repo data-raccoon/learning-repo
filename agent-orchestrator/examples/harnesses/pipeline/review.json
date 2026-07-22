@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pipeline-review",
+  "objective": "Review the immutable synthetic draft.",
+  "target_dir": "agent-orchestrator/examples/harness-target",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "model_profile": "local-ministral-inference",
+  "context": ["pipeline/draft.txt"],
+  "dependencies": ["pipeline-produce"],
+  "limits": {"timeout_seconds": 120, "max_turns": 3, "max_tokens": 2000}
+}

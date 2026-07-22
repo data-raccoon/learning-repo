@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "repair-fix",
+  "objective": "Repair the synthetic output after failed verification.",
+  "target_dir": "agent-orchestrator/examples/harness-target",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "files_write",
+  "model_profile": "local-ministral-files",
+  "context": ["repair/output.txt"],
+  "expected_artifacts": ["repair/repaired-output.txt"],
+  "allowed_write_paths": ["repair/repaired-output.txt"],
+  "dependencies": ["repair-verify"],
+  "limits": {"timeout_seconds": 120, "max_turns": 3, "max_tokens": 2000}
+}

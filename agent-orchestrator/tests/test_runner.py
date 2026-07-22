@@ -25,8 +25,14 @@ class RunnerTests(unittest.TestCase):
         self.registry = Registry(self.config)
         self.orchestrator = self.workspace / "agent-orchestrator"
         self.orchestrator.mkdir()
+        self.previous_runtime = os.environ.get("AGENT_ORCHESTRATOR_RUNTIME")
+        os.environ["AGENT_ORCHESTRATOR_RUNTIME"] = str(self.root / "runtime")
 
     def tearDown(self):
+        if self.previous_runtime is None:
+            os.environ.pop("AGENT_ORCHESTRATOR_RUNTIME", None)
+        else:
+            os.environ["AGENT_ORCHESTRATOR_RUNTIME"] = self.previous_runtime
         self.temp.cleanup()
 
     def write_job(self, verifiers=()):
@@ -67,7 +73,7 @@ class RunnerTests(unittest.TestCase):
             snapshot.discard()
             self.assertFalse(snapshot.snapshot_dir.exists())
         finally:
-            os.environ.pop("AGENT_ORCHESTRATOR_RUNTIME", None)
+            os.environ["AGENT_ORCHESTRATOR_RUNTIME"] = str(self.root / "runtime")
 
     def test_failed_verifier_rolls_back(self):
         verifier = Verifier("fails", (sys.executable, "-c", "raise SystemExit(3)"), 10)

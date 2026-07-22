@@ -13,6 +13,7 @@ status = "active"
 auth_kind = "none"
 billing = "metered-api"
 plan = "test"
+usage_reporting = "measured"
 ''', encoding="utf-8")
     (config / "models.toml").write_text('''
 [[models]]

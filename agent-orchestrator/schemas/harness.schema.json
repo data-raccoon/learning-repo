@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-learn.local/schemas/orchestrator-harness-v1.json",
+  "title": "AI-Learn bounded multi-agent harness",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "topology", "nodes"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "topology": {"enum": ["pipeline", "fanout-fanin", "repair"]},
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_parallel": {"type": "integer", "minimum": 1, "maximum": 32},
+        "deadline_seconds": {"type": "integer", "minimum": 1},
+        "max_jobs": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "max_attempts": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "max_tokens": {"type": "integer", "minimum": 1},
+        "max_cost_usd": {"type": "number", "minimum": 0},
+        "cost_enforcement": {"enum": ["strict", "best-effort"]}
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["job", "role"],
+        "properties": {
+          "job": {"type": "string", "minLength": 1},
+          "role": {"type": "string", "minLength": 1},
+          "max_attempts": {"type": "integer", "minimum": 1, "maximum": 100},
+          "fan_in": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "strategy": {"enum": ["all", "first-passing", "verifier"]},
+              "verifier": {"$ref": "#/$defs/verifier"}
+            }
+          }
+        }
+      }
+    },
+    "handoffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "artifacts"],
+        "properties": {
+          "from": {"type": "string", "minLength": 1},
+          "to": {"type": "string", "minLength": 1},
+          "artifacts": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "media_type"],
+              "properties": {
+                "path": {"type": "string", "minLength": 1},
+                "media_type": {"enum": ["application/json", "text/plain", "application/octet-stream"]},
+                "schema": {"type": "string", "minLength": 1},
+                "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "repair_loop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_node", "verify_node", "repair_node", "max_cycles"],
+      "properties": {
+        "work_node": {"type": "string", "minLength": 1},
+        "verify_node": {"type": "string", "minLength": 1},
+        "repair_node": {"type": "string", "minLength": 1},
+        "max_cycles": {"type": "integer", "minimum": 1, "maximum": 100}
+      }
+    }
+  },
+  "$defs": {
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "argv"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "argv": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 3600}
+      }
+    }
+  }
+}

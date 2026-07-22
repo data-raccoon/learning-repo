@@ -27,6 +27,20 @@ Run evidence therefore reports Gemini as `free-quota` with zero direct marginal 
 - `candidate`, `deferred`, and unavailable profiles cannot be routed.
 - Gemini via a free Google account is an executable option through the official Antigravity CLI.
 
+## Bounded harnesses
+
+`schemas/harness.schema.json` composes existing version-1 jobs without changing their public contract. A harness is deliberately not a free-form agent chat: it is a deterministic controller for one of three bounded topologies:
+
+- `pipeline` — one connected sequence;
+- `fanout-fanin` — independent branches followed by an `all`, manifest-ordered `first-passing`, or allowlisted `verifier` join;
+- `repair` — work, independent verification, and a bounded number of repair/reverify cycles.
+
+Every write node in a harness must declare `allowed_write_paths`. Concurrent nodes targeting the same directory must own disjoint paths; the existing target lock may still serialize them. Handoffs are producer artifacts that the consumer also declares as context. Harness v1 permits only same-target handoffs, validates their media type and optional JSON schema/pinned hash before the producer transaction commits, and checks their recorded SHA-256 again before consumption.
+
+Harness-wide limits bound admitted nodes, total attempts, parallelism, deadline, and optionally tokens and marginal cost. Strict token limits require a provider with measured usage. Strict cost limits require a route whose marginal cost can be measured; use `best-effort` explicitly when incomplete accounting is acceptable. Running jobs are never force-killed by a graph limit and remain bounded by their job timeout, so they may move actual usage past a threshold; no new node starts after the measured graph limit is reached.
+
+Harness evidence is separate from child-job evidence under `%LOCALAPPDATA%\agent-orchestrator\.runtime\harness-runs`. Explicit `--resume RUN_ID` reuses a passed node only when the normalized harness, job contract, resolved route, upstream reuse chain, and produced artifact hashes still match. See `examples/harnesses/` for synthetic manifests. These examples and all harness tests are offline; they do not constitute model experiments.
+
 ## Creating jobs
 
 **Target directory rules:** Use relative paths only; absolute paths raise `absolute paths are forbidden`. Target must be a subdirectory (not the workspace root); targeting `.` raises `path escapes its allowed root`. Do not use parent traversal (`..`). All context files must live inside the target.
@@ -95,6 +109,9 @@ A command job declares only the checks it needs, for example:
 | `route JOB` | Explain the capability-first route without execution. |
 | `run JOB` | Execute one locked, transactional job. |
 | `run-graph GRAPH` | Run a dependency graph with bounded parallelism. |
+| `harness validate MANIFEST` | Validate paths, topology, routes, ownership, handoffs, and budgets without execution. |
+| `harness run MANIFEST [--dry-run] [--resume RUN_ID]` | Preview or execute a bounded harness. |
+| `harness status [RUN_ID]` | Return one compact harness summary from the separate evidence namespace. |
 | `status [RUN_ID]` | Return one compact run summary. |
 | `runtime start\|status\|stop` | Manage the registered local Ministral runtime. |
 | `eval run [--job JOB]` | Audit profiles or retain one live profile-candidate result. |

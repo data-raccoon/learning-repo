@@ -43,6 +43,9 @@ class Registry:
         return result
 
     def _validate_links(self) -> None:
+        for provider in self.providers.values():
+            if provider.usage_reporting not in {"measured", "unavailable"}:
+                raise RegistryError(f"provider {provider.id} has invalid usage_reporting")
         for model in self.models.values():
             if model.provider not in self.providers:
                 raise RegistryError(f"model {model.id} references unknown provider {model.provider}")

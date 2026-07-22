@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-fanout-fanin",
+  "topology": "fanout-fanin",
+  "limits": {"max_parallel": 2, "deadline_seconds": 600, "max_jobs": 3, "max_attempts": 3},
+  "nodes": [
+    {"job": "left.json", "role": "candidate-a"},
+    {"job": "right.json", "role": "candidate-b"},
+    {"job": "join.json", "role": "join", "fan_in": {"strategy": "all"}}
+  ],
+  "handoffs": [
+    {"from": "fanout-left", "to": "fanout-join", "artifacts": [{"path": "fanout/a.txt", "media_type": "text/plain"}]},
+    {"from": "fanout-right", "to": "fanout-join", "artifacts": [{"path": "fanout/b.txt", "media_type": "text/plain"}]}
+  ]
+}

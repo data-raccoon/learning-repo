@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "fanout-right",
+  "objective": "Produce synthetic candidate B.",
+  "target_dir": "agent-orchestrator/examples/harness-target",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "files_write",
+  "model_profile": "local-ministral-files",
+  "expected_artifacts": ["fanout/b.txt"],
+  "allowed_write_paths": ["fanout/b.txt"],
+  "limits": {"timeout_seconds": 120, "max_turns": 3, "max_tokens": 2000}
+}

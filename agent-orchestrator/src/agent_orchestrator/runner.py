@@ -12,7 +12,7 @@ import sys
 import threading
 import time
 import uuid
-from typing import Any
+from typing import Any, Callable
 
 from .adapters import GoogleAccountCliAdapter, LocalChatAdapter, VibeAdapter
 from .contracts import ContractError, Job
@@ -160,7 +160,8 @@ class JobRunner:
             results.append({"id": verifier.id, "ok": process.returncode == 0, "exit_code": process.returncode})
         return results
 
-    def run(self, job: Job, *, allow_candidate: bool = False) -> dict[str, Any]:
+    def run(self, job: Job, *, allow_candidate: bool = False,
+            acceptance_gate: Callable[[Path], dict[str, Any]] | None = None) -> dict[str, Any]:
         run_id = _run_id(job.id)
         evidence = RunEvidence(self.runtime_root, run_id)
         started = time.monotonic()
@@ -201,7 +202,11 @@ class JobRunner:
                 schema_gate = self._validate_output_schema(result.final_text, target / job.output_schema) if job.output_schema else {"ok": True, "skipped": True}
                 changes = snapshot.changes() if snapshot else {"added": [], "removed": [], "changed": []}
                 ownership_gate = self._ownership_gate(changes, job.allowed_write_paths)
-                gates_ok = artifact_gate and schema_gate["ok"] and ownership_gate["ok"] and all(item["ok"] for item in verifiers)
+                harness_gate = acceptance_gate(target) if acceptance_gate else {"ok": True, "skipped": True}
+                gates_ok = (
+                    artifact_gate and schema_gate["ok"] and ownership_gate["ok"]
+                    and all(item["ok"] for item in verifiers) and harness_gate.get("ok") is True
+                )
                 summary.update({
                     "artifacts": artifacts,
                     "gates": {
@@ -209,6 +214,7 @@ class JobRunner:
                         "output_schema": schema_gate,
                         "ownership": ownership_gate,
                         "verifiers": verifiers,
+                        "harness": harness_gate,
                     },
                     "usage": result.usage,
                     "cost": self._cost(model, provider, result.usage),
@@ -235,7 +241,10 @@ class JobRunner:
                     quarantine = snapshot.quarantine()
                     snapshot.restore()
                     snapshot.discard()
-                    summary["quarantine"] = str(quarantine.relative_to(self.orchestrator_root))
+                    try:
+                        summary["quarantine"] = str(quarantine.relative_to(self.orchestrator_root))
+                    except ValueError:
+                        summary["quarantine"] = str(quarantine)
                     summary["rolled_back"] = True
                     evidence.event("job.rolled_back", quarantine=summary["quarantine"])
                 except Exception as rollback_error:

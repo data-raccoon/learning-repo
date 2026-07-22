@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-pipeline",
+  "topology": "pipeline",
+  "limits": {"max_parallel": 1, "deadline_seconds": 600, "max_jobs": 2, "max_attempts": 2},
+  "nodes": [
+    {"job": "produce.json", "role": "producer"},
+    {"job": "review.json", "role": "reviewer"}
+  ],
+  "handoffs": [{
+    "from": "pipeline-produce",
+    "to": "pipeline-review",
+    "artifacts": [{"path": "pipeline/draft.txt", "media_type": "text/plain"}]
+  }]
+}

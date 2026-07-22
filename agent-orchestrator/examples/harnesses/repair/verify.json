@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "repair-verify",
+  "objective": "Verify the current synthetic output.",
+  "target_dir": "agent-orchestrator/examples/harness-target",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "model_profile": "local-ministral-inference",
+  "context": ["repair/output.txt", "repair/repaired-output.txt"],
+  "dependencies": ["repair-work"],
+  "limits": {"timeout_seconds": 120, "max_turns": 3, "max_tokens": 2000}
+}

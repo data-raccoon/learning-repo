@@ -15,6 +15,8 @@ from typing import Any
 from . import __version__
 from .contracts import ContractError, load_job
 from .evaluation import audit_profiles, run_candidate
+from .harness_contracts import load_harness
+from .harness_runner import HarnessRunner, read_harness_status, resolve_harness
 from .paths import validate_job_paths
 from .registry import Registry, RegistryError
 from .routing import RoutingError, route_job
@@ -70,6 +72,16 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("job", type=Path)
     graph = commands.add_parser("run-graph", help="Execute a dependency graph")
     graph.add_argument("graph", type=Path)
+    harness = commands.add_parser("harness", help="Validate, run, or inspect a bounded harness")
+    harness_commands = harness.add_subparsers(dest="harness_command", required=True)
+    harness_validate = harness_commands.add_parser("validate", help="Validate and resolve a harness without execution")
+    harness_validate.add_argument("manifest", type=Path)
+    harness_run = harness_commands.add_parser("run", help="Execute a bounded harness")
+    harness_run.add_argument("manifest", type=Path)
+    harness_run.add_argument("--dry-run", action="store_true")
+    harness_run.add_argument("--resume", default="")
+    harness_status = harness_commands.add_parser("status", help="Read a compact harness summary")
+    harness_status.add_argument("run_id", nargs="?", default="latest")
     status = commands.add_parser("status", help="Read a compact run summary")
     status.add_argument("run_id", nargs="?", default="latest")
     runtime = commands.add_parser("runtime", help="Manage a registered local runtime")
@@ -130,6 +142,16 @@ def main(argv: list[str] | None = None) -> None:
         elif args.command == "run-graph":
             jobs, maximum = load_graph(_scoped_spec(args.graph))
             result = run_graph(_runner(registry), jobs, maximum)
+        elif args.command == "harness":
+            if args.harness_command == "status":
+                result = read_harness_status(get_runtime_root(), args.run_id)
+            else:
+                spec = load_harness(_scoped_spec(args.manifest))
+                runner = _runner(registry)
+                if args.harness_command == "validate":
+                    result = resolve_harness(spec, WORKSPACE, runner)
+                else:
+                    result = HarnessRunner(WORKSPACE, runner).run(spec, dry_run=args.dry_run, resume=args.resume)
         elif args.command == "status":
             result = read_status(args.run_id)
         elif args.command == "runtime":

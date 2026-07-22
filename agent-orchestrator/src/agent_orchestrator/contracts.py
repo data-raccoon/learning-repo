@@ -51,6 +51,7 @@ class Provider:
     plan: str = ""
     executable: str = ""
     notes: str = ""
+    usage_reporting: str = "unavailable"
 
 
 @dataclass(frozen=True)

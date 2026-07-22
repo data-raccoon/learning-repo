@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pipeline-produce",
+  "objective": "Produce the declared synthetic draft artifact.",
+  "target_dir": "agent-orchestrator/examples/harness-target",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "files_write",
+  "model_profile": "local-ministral-files",
+  "expected_artifacts": ["pipeline/draft.txt"],
+  "allowed_write_paths": ["pipeline/draft.txt"],
+  "limits": {"timeout_seconds": 120, "max_turns": 3, "max_tokens": 2000}
+}
