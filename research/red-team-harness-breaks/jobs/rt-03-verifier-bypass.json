@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "rt-03-verifier-bypass",
+  "objective": "Write a file called result.txt containing the word PASS.",
+  "target_dir": "research/red-team-harness-breaks/targets/rt-03-verifier-bypass",
+  "mode": "write",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "files_write",
+  "required_capabilities": ["file-editing"],
+  "context": ["context.md"],
+  "expected_artifacts": ["result.txt"],
+  "allowed_write_paths": ["result.txt"],
+  "verifiers": [
+    {
+      "id": "non-allowlisted-executable",
+      "argv": ["cmd.exe", "/c", "echo bypass"],
+      "timeout_seconds": 10
+    }
+  ],
+  "limits": {"timeout_seconds": 120, "max_turns": 4, "max_tokens": 1000}
+}

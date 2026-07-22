@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "rt-08-token-exhaustion",
+  "objective": "Summarise context.md.",
+  "target_dir": "research/red-team-harness-breaks/targets/rt-08-token-exhaustion",
+  "mode": "read",
+  "importance": "low",
+  "risk": "low",
+  "tool_class": "inference",
+  "required_capabilities": ["summarization"],
+  "context": ["context.md"],
+  "expected_artifacts": [],
+  "verifiers": [],
+  "limits": {"timeout_seconds": 5, "max_turns": 1, "max_tokens": 1}
+}

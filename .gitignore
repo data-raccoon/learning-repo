@@ -22,6 +22,11 @@
 **/.runtime/
 **/logs/
 
+# Machine-local Mistral Vibe state.
+**/.vibe/connector_bootstrap_cache.json
+**/.vibe/trusted_folders.toml
+**/.vibe/vibehistory
+
 *.gguf
 *.safetensors
 *.bin
