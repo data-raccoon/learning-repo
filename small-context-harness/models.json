@@ -1,0 +1,90 @@
+{
+  "v": 1,
+  "default": "auto",
+  "profiles": [
+    {
+      "id": "ollama-ministral-3-8b",
+      "provider": "ollama",
+      "model": "ministral-3:8b",
+      "digest": "1922accd5827ebe6829e536369195db25eaf664528dc66206d646ea3bb386b71",
+      "status": "eligible",
+      "quality": 0.76,
+      "context_tokens": 8192,
+      "output_tokens": 2048,
+      "billing": "local-compute",
+      "capabilities": [
+        "classification",
+        "extraction",
+        "formatting",
+        "summarization"
+      ],
+      "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-25."
+    },
+    {
+      "id": "ollama-qwen3.5-9b",
+      "provider": "ollama",
+      "model": "qwen3.5:9b",
+      "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "status": "eligible",
+      "quality": 0.80,
+      "context_tokens": 8192,
+      "output_tokens": 2048,
+      "billing": "local-compute",
+      "capabilities": [
+        "classification",
+        "coding",
+        "extraction",
+        "formatting",
+        "reasoning",
+        "review",
+        "summarization"
+      ],
+      "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-25; tool capability is intentionally not exposed."
+    },
+    {
+      "id": "ollama-ministral-3-14b",
+      "provider": "ollama",
+      "model": "ministral-3:14b",
+      "digest": "4760c35aeb9d9e9c6174c2492562c0b999e80a222804fd96b1915ab72bbcdcf7",
+      "status": "eligible",
+      "quality": 0.83,
+      "context_tokens": 8192,
+      "output_tokens": 2048,
+      "billing": "local-compute",
+      "capabilities": [
+        "architecture",
+        "classification",
+        "extraction",
+        "formatting",
+        "planning",
+        "reasoning",
+        "review",
+        "summarization"
+      ],
+      "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-25."
+    },
+    {
+      "id": "gemini-auto-free",
+      "provider": "gemini-antigravity",
+      "model": "gemini-3.5-flash-medium",
+      "digest": "",
+      "status": "eligible",
+      "quality": 0.90,
+      "context_tokens": 16384,
+      "output_tokens": 4096,
+      "billing": "free-account-quota",
+      "capabilities": [
+        "architecture",
+        "classification",
+        "coding",
+        "extraction",
+        "formatting",
+        "planning",
+        "reasoning",
+        "review",
+        "summarization"
+      ],
+      "notes": "Canonical ID from agy models; passed small-context-exact-response-v1 on 2026-07-25. External OS-keyring login; API and Vertex credentials are stripped."
+    }
+  ]
+}

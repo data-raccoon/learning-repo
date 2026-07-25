@@ -1,0 +1,14 @@
+{
+  "v": 1,
+  "task_id": "example-readme-edit",
+  "packet_sha256": "replace-with-pack-output",
+  "status": "done",
+  "summary": "Added the requested Usage section.",
+  "changed": [
+    {
+      "path": "README.md",
+      "sha256": "replace-with-current-file-sha256"
+    }
+  ],
+  "risks": []
+}

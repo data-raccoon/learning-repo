@@ -6,7 +6,8 @@ This workspace is organized by concern. Each top-level project should be opened 
 
 ```text
 AI-Learn/
-|-- agent-orchestrator/            Vendor-neutral model registry, routing, execution, and evidence
+|-- small-context-harness/         Default compact model registry, routing, packets, and gates
+|-- agent_orchestrator/            Legacy/advanced graphs, command workers, and durable evidence
 |-- gaming-agents/                 Engine-neutral game MVP roles, job scaffolding, approvals, and QA gates
 |-- local-models/                  Local model runtimes and model-specific assets
 |   |-- ministral/                 Ministral download, server, and Vibe integration
@@ -24,7 +25,10 @@ AI-Learn/
 
 ## Boundary Rules
 
-- Put reusable model inventory, routing, job contracts, worker adapters, runtime control, and compact run evidence in `agent-orchestrator/`.
+- Put default model inventory, local-first routing, bounded context packets, and
+  deterministic acceptance gates in `small-context-harness/`.
+- Extend `agent_orchestrator/` only for advanced graphs, command-capable workers,
+  or durable evidence not supported by the default harness.
 - Put reusable game-production roles, game job scaffolding, approval contracts, and engine-neutral QA policy in `gaming-agents/`.
 - Put model binaries, serving code, chat templates, and model checks in `local-models/`.
 - Put controllers, prompts, run evidence, and generated test products in `orchestration-experiments/`.

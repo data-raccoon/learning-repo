@@ -3,11 +3,17 @@
 ## Repository boundaries
 
 - `local-models/` — model binaries, serving code, templates, endpoint checks.
-- `agent-orchestrator/` — reusable multi-model control plane.
+- `small-context-harness/` — default model registry, routing, bounded packets, and gates.
+- `agent_orchestrator/` — legacy/advanced multi-model control plane; use only when explicitly required.
 
 ## Model delegation
 
-- Use the repo-local `orchestrate-models` skill when work benefits from a worker model.
+- Use `small-context-harness/harness.py` through the repo-local
+  `orchestrate-models` skill when work benefits from a worker model.
+- Default to `pack -> route -> invoke`; models return bounded proposals and
+  never receive repository write authority.
+- Use `agent_orchestrator` only for a requirement the small-context harness does
+  not support, such as admitted command workers, graphs, or durable run evidence.
 - Delegation is one level deep. Only the root agent creates jobs or graphs.
 - Give every worker exactly one target directory with all required context.
 - Never widen a worker's read scope to compensate for an incomplete task packet.
@@ -20,7 +26,10 @@
 - Keep credentials, model weights, runtime logs, and PID files outside the repository.
 - Do not stop a local runtime unless the orchestrator proves it started that exact process.
 - OpenAI/ChatGPT is inventory-only until explicitly admitted.
-- Gemini workers use the official `agy` executable and its OS-keyring session. Do not place OAuth data in the repository or substitute API/Vertex credentials for the consumer-account profile.
+- Ollama workers use the loopback API and exact registered model digests.
+- Gemini proposal workers use the official `agy` executable and its OS-keyring
+  session. Do not place OAuth data in the repository or substitute API/Vertex
+  credentials for the consumer-account profile.
 - Antigravity may use its external project/worktree storage. Gemini file tools write only inside the job target. The admitted Gemini QA profile runs only the fixed commands listed in the job's `allowed_commands`; each run gets a temporary absolute-target policy and an independent verifier. Network, MCP, package installation, downloads, and non-workspace access are forbidden.
 
 ## Shell
@@ -32,7 +41,11 @@ Windows 11, Git Bash. Avoid && || ; in commands.
 Python interpreter for all scripts: `& "$env:USERPROFILE\.venvs\all\Scripts\python.exe"`. Never use bare `python`.
 
 ```powershell
-# agent-orchestrator/ — after changing the orchestrator or its skill
+# small-context-harness/ — after changing the default harness or its skill
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" -m unittest discover -s small-context-harness\tests -v
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py inventory
+
+# agent_orchestrator/ — after changing the legacy orchestrator
 $env:PYTHONPATH = "src"
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" -m unittest discover -s tests -v
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" orchestrate.py doctor

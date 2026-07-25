@@ -1,0 +1,49 @@
+{
+  "v": 1,
+  "id": "example-readme-edit",
+  "goal": "Add one concise usage note to the target README without changing other files.",
+  "target": "small-context-harness/examples/target",
+  "model": {
+    "profile": "auto",
+    "capability": "coding",
+    "importance": "normal"
+  },
+  "context": [
+    {
+      "path": "README.md",
+      "start": 1,
+      "end": 80
+    }
+  ],
+  "write_roots": [
+    "README.md"
+  ],
+  "done": [
+    "README.md contains a Usage section.",
+    "The existing title remains unchanged."
+  ],
+  "forbidden": [
+    "Do not create files.",
+    "Do not use network access."
+  ],
+  "limits": {
+    "packet_chars": 8000,
+    "output_chars": 4000,
+    "model_context_tokens": 4096,
+    "model_output_tokens": 512,
+    "model_timeout_seconds": 120,
+    "max_tool_calls": 8,
+    "max_verifiers": 1,
+    "verifier_timeout_seconds": 30
+  },
+  "verifiers": [
+    {
+      "id": "readme-contract",
+      "argv": [
+        "{python}",
+        "-c",
+        "from pathlib import Path; text=Path('README.md').read_text(encoding='utf-8'); raise SystemExit(0 if text.startswith('# Example target') and '\\n## Usage\\n' in text else 1)"
+      ]
+    }
+  ]
+}

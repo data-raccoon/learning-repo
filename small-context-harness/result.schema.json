@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-learn.local/small-context-result-v1.json",
+  "title": "Small-context worker result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["v", "task_id", "packet_sha256", "status", "summary", "changed", "risks"],
+  "properties": {
+    "v": {"const": 1},
+    "task_id": {"type": "string"},
+    "packet_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "status": {"enum": ["done", "blocked", "failed"]},
+    "summary": {"type": "string", "minLength": 1},
+    "changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "risks": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}
