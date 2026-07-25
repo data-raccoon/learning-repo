@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deterministic-checks:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@<pin-to-full-commit-sha>
+
+      - name: Set up development environment
+        run: make setup
+
+      - name: Run required checks
+        run: make check
+
+  agent-evaluations:
+    name: Agent evaluations
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Do not expose production environments or credentials to PR workflows.
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@<pin-to-full-commit-sha>
+
+      - name: Set up evaluation environment
+        run: make setup
+
+      - name: Run evaluations
+        run: make eval
+        env:
+          MODEL_API_KEY: ${{ secrets.EVAL_MODEL_API_KEY }}
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@<pin-to-full-commit-sha>
+        with:
+          name: evaluation-report
+          path: evals/results/
+          retention-days: 14
