@@ -1,0 +1,313 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-learn.dev/schemas/handover-ack/v1.0.json",
+  "title": "Handover Acknowledgement",
+  "description": "Machine-readable acknowledgement from a receiver agent before starting work",
+  "type": "object",
+  "required": [
+    "handover_id",
+    "receiver",
+    "decision",
+    "understanding",
+    "accepted_scopes",
+    "rejected_scopes",
+    "accepted_at"
+  ],
+  "properties": {
+    "handover_id": {
+      "type": "string",
+      "description": "ID of the handover being acknowledged",
+      "pattern": "^ho_[a-zA-Z0-9]{8,}$",
+      "examples": ["ho_01K123ABC"]
+    },
+    "parent_handover_id": {
+      "type": "string",
+      "description": "ID of the parent handover if this is a nested handover",
+      "pattern": "^ho_[a-zA-Z0-9]{8,}$"
+    },
+    "receiver": {
+      "type": "string",
+      "description": "Name of the receiving agent",
+      "minLength": 1,
+      "examples": ["implementer"]
+    },
+    "decision": {
+      "type": "string",
+      "description": "Acceptance decision",
+      "enum": [
+        "accepted",
+        "rejected",
+        "clarification-required",
+        "approval-required",
+        "temporarily-unavailable"
+      ],
+      "examples": ["accepted"]
+    },
+    "understanding": {
+      "type": "object",
+      "required": ["goal", "deliverables"],
+      "properties": {
+        "goal": {
+          "type": "string",
+          "description": "Receiver's understanding of the goal",
+          "minLength": 1,
+          "examples": ["Add bounded retries to the payment-status client."]
+        },
+        "deliverables": {
+          "type": "array",
+          "description": "What the receiver will produce",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "examples": [
+            ["implementation", "regression tests", "verification report"]
+          ]
+        },
+        "definition_of_done": {
+          "type": "array",
+          "description": "Receiver's understanding of completion criteria",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "accepted_scopes": {
+      "type": "array",
+      "description": "Scopes the receiver accepts",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "examples": [
+          "repository:read",
+          "repository:write:src/infrastructure/payments/**",
+          "repository:write:tests/unit/payments/**",
+          "tests:execute"
+        ]
+      }
+    },
+    "rejected_scopes": {
+      "type": "array",
+      "description": "Scopes the receiver rejects (if any)",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "clarifications_required": {
+      "type": "array",
+      "description": "Questions or clarifications needed before acceptance",
+      "items": {
+        "type": "object",
+        "required": ["field", "question"],
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Field or aspect requiring clarification",
+            "minLength": 1
+          },
+          "question": {
+            "type": "string",
+            "description": "The specific question",
+            "minLength": 1
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "Suggested resolution"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "planned_first_action": {
+      "type": "object",
+      "description": "What the receiver plans to do first",
+      "properties": {
+        "tool": {
+          "type": "string",
+          "description": "Tool to be used",
+          "minLength": 1,
+          "examples": ["repository.read"]
+        },
+        "target": {
+          "type": "string",
+          "description": "Target of the action",
+          "minLength": 1,
+          "examples": ["src/infrastructure/payments/client.py"]
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Parameters for the action",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when acknowledgement was made",
+      "examples": ["2026-07-23T08:31:00Z"]
+    },
+    "rejection_reason": {
+      "type": "object",
+      "description": "Reason for rejection (if decision is rejected)",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Machine-readable rejection code",
+          "enum": [
+            "CAPABILITY_MISMATCH",
+            "INSUFFICIENT_PERMISSIONS",
+            "EXCESSIVE_PERMISSIONS",
+            "MISSING_CONTEXT",
+            "UNTESTABLE_DEFINITION",
+            "POLICY_CONFLICT",
+            "TASK_COMPLETE",
+            "TASK_STALE",
+            "OWNERSHIP_CONFLICT",
+            "LOOP_DETECTED",
+            "DEPTH_EXCEEDED",
+            "APPROVAL_MISSING"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable reason",
+          "minLength": 1
+        },
+        "details": {
+          "type": "string",
+          "description": "Additional details"
+        }
+      },
+      "additionalProperties": false
+    },
+    "capability_verification": {
+      "type": "object",
+      "description": "Verification that receiver has required capabilities",
+      "properties": {
+        "required_capability": {
+          "type": "string",
+          "description": "Capability requested in the handover",
+          "minLength": 1
+        },
+        "has_capability": {
+          "type": "boolean",
+          "description": "Whether receiver has the capability"
+        },
+        "capability_version": {
+          "type": "string",
+          "description": "Version of the capability",
+          "examples": ["1.0"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "authorization_check": {
+      "type": "object",
+      "description": "Authorization verification results",
+      "properties": {
+        "scopes_sufficient": {
+          "type": "boolean",
+          "description": "Whether delegated scopes are sufficient"
+        },
+        "scopes_excessive": {
+          "type": "boolean",
+          "description": "Whether delegated scopes are excessive"
+        },
+        "forbidden_actions_acceptable": {
+          "type": "boolean",
+          "description": "Whether forbidden actions are acceptable"
+        },
+        "expires_at_valid": {
+          "type": "boolean",
+          "description": "Whether expiration is acceptable"
+        },
+        "delegation_depth_ok": {
+          "type": "boolean",
+          "description": "Whether delegation depth is within limits"
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence_accessibility": {
+      "type": "object",
+      "description": "Verification that evidence is accessible",
+      "properties": {
+        "all_accessible": {
+          "type": "boolean",
+          "description": "Whether all evidence references are accessible"
+        },
+        "inaccessible_count": {
+          "type": "integer",
+          "description": "Number of inaccessible evidence references",
+          "minimum": 0,
+          "default": 0
+        },
+        "inaccessible": {
+          "type": "array",
+          "description": "List of inaccessible evidence references",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ownership_check": {
+      "type": "object",
+      "description": "Verification of ownership state",
+      "properties": {
+        "current_owner": {
+          "type": "string",
+          "description": "Current owner of the task"
+        },
+        "ownership_version": {
+          "type": "integer",
+          "description": "Current ownership version",
+          "minimum": 0
+        },
+        "stale": {
+          "type": "boolean",
+          "description": "Whether the handover is stale (ownership changed)"
+        },
+        "conflict": {
+          "type": "boolean",
+          "description": "Whether there is an ownership conflict"
+        }
+      },
+      "additionalProperties": false
+    },
+    "loop_detection": {
+      "type": "object",
+      "description": "Loop detection results",
+      "properties": {
+        "is_loop": {
+          "type": "boolean",
+          "description": "Whether a loop was detected"
+        },
+        "loop_path": {
+          "type": "array",
+          "description": "Path of the loop if detected",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "depth": {
+          "type": "integer",
+          "description": "Current delegation depth",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

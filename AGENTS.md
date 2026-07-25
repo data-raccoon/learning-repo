@@ -23,6 +23,10 @@
 - Gemini workers use the official `agy` executable and its OS-keyring session. Do not place OAuth data in the repository or substitute API/Vertex credentials for the consumer-account profile.
 - Antigravity may use its external project/worktree storage. Gemini file tools write only inside the job target. The admitted Gemini QA profile runs only the fixed commands listed in the job's `allowed_commands`; each run gets a temporary absolute-target policy and an independent verifier. Network, MCP, package installation, downloads, and non-workspace access are forbidden.
 
+## Shell
+
+Windows 11, Git Bash. Avoid && || ; in commands.
+
 ## Verification
 
 Python interpreter for all scripts: `& "$env:USERPROFILE\.venvs\all\Scripts\python.exe"`. Never use bare `python`.

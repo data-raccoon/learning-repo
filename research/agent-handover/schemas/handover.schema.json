@@ -1,0 +1,785 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-learn.dev/schemas/handover/v1.0.json",
+  "title": "Agent Handover Envelope",
+  "description": "Structured handover packet for agent-to-agent responsibility transfer",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "handover",
+    "task",
+    "state",
+    "authorization",
+    "next_action",
+    "return_contract"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version for compatibility checking",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "examples": ["1.0"]
+    },
+    "handover": {
+      "type": "object",
+      "required": ["id", "created_at", "source", "destination", "reason"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique handover identifier",
+          "pattern": "^ho_[a-zA-Z0-9]{8,}$",
+          "examples": ["ho_01K123ABC"]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when handover was created",
+          "examples": ["2026-07-23T08:30:00Z"]
+        },
+        "source": {
+          "type": "object",
+          "required": ["agent", "run_id", "task_id"],
+          "properties": {
+            "agent": {
+              "type": "string",
+              "description": "Name of the source agent",
+              "minLength": 1,
+              "examples": ["planner"]
+            },
+            "run_id": {
+              "type": "string",
+              "description": "Run identifier for the source agent",
+              "minLength": 1,
+              "examples": ["run_123"]
+            },
+            "task_id": {
+              "type": "string",
+              "description": "Task identifier being handed over",
+              "minLength": 1,
+              "examples": ["task_456"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "destination": {
+          "type": "object",
+          "required": ["agent", "capability"],
+          "properties": {
+            "agent": {
+              "type": "string",
+              "description": "Name of the destination agent",
+              "minLength": 1,
+              "examples": ["implementer"]
+            },
+            "capability": {
+              "type": "string",
+              "description": "Required capability the destination must have",
+              "minLength": 1,
+              "examples": ["repository.change"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "reason": {
+          "type": "object",
+          "required": ["code", "summary"],
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Machine-readable reason code",
+              "enum": [
+                "SPECIALIST_REQUIRED",
+                "STAGE_COMPLETE",
+                "REWORK_REQUIRED",
+                "REVIEW_REQUIRED",
+                "APPROVAL_REQUIRED",
+                "ESCALATION_REQUIRED",
+                "ERROR_RECOVERY"
+              ],
+              "examples": ["SPECIALIST_REQUIRED"]
+            },
+            "summary": {
+              "type": "string",
+              "description": "Human-readable explanation",
+              "minLength": 1,
+              "examples": ["The implementation plan is complete; code changes are required."]
+            }
+          },
+          "additionalProperties": false
+        },
+        "parent_handover_id": {
+          "type": "string",
+          "description": "ID of the parent handover if this is a return handover",
+          "pattern": "^ho_[a-zA-Z0-9]{8,}$",
+          "examples": ["ho_01K123ABC"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "required": ["goal", "requested_outcome", "definition_of_done"],
+      "properties": {
+        "goal": {
+          "type": "string",
+          "description": "Clear statement of what needs to be accomplished",
+          "minLength": 1,
+          "examples": ["Add retry handling to the payment-status client."]
+        },
+        "requested_outcome": {
+          "type": "string",
+          "description": "What the receiver is expected to produce",
+          "minLength": 1,
+          "examples": ["Implementation and deterministic regression tests."]
+        },
+        "definition_of_done": {
+          "type": "array",
+          "description": "List of testable criteria for completion",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "examples": [
+            [
+              "Retries only transient failures.",
+              "Retry count is configurable.",
+              "Existing public interfaces remain compatible.",
+              "make check passes."
+            ]
+          ]
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the task",
+          "enum": [
+            "not_started",
+            "in_progress",
+            "ready_for_implementation",
+            "ready_for_review",
+            "ready_for_testing",
+            "implementation_complete",
+            "review_complete",
+            "testing_complete",
+            "blocked",
+            "failed"
+          ],
+          "examples": ["ready_for_implementation"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "required": ["status", "completed", "current", "remaining"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Overall status of the handover",
+          "enum": ["ready_for_implementation", "ready_for_review", "ready_for_testing", "in_progress", "blocked", "failed"],
+          "examples": ["ready_for_implementation"]
+        },
+        "completed": {
+          "type": "array",
+          "description": "List of completed work items",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "examples": [
+            [
+              "Located the client in src/infrastructure/payments/client.py.",
+              "Confirmed callers expect PaymentGatewayError."
+            ]
+          ]
+        },
+        "current": {
+          "type": "array",
+          "description": "Current state observations",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "examples": [["No files have been modified."]]
+        },
+        "remaining": {
+          "type": "array",
+          "description": "List of remaining work items",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "examples": [
+            [
+              "Implement bounded retries.",
+              "Add unit tests.",
+              "Run required checks."
+            ]
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "decisions": {
+      "type": "array",
+      "description": "Decisions made during the current task stage",
+      "items": {
+        "type": "object",
+        "required": ["id", "statement", "rationale", "made_by"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique decision identifier",
+            "minLength": 1,
+            "examples": ["decision-1"]
+          },
+          "statement": {
+            "type": "string",
+            "description": "The decision that was made",
+            "minLength": 1,
+            "examples": ["Use the repository's existing retry utility."]
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Reasoning behind the decision",
+            "minLength": 1,
+            "examples": ["Avoids introducing another dependency."]
+          },
+          "made_by": {
+            "type": "string",
+            "description": "Agent or user who made the decision",
+            "minLength": 1,
+            "examples": ["planner"]
+          },
+          "made_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the decision was made"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        [
+          {
+            "id": "decision-1",
+            "statement": "Use the repository's existing retry utility.",
+            "rationale": "Avoids introducing another dependency.",
+            "made_by": "planner"
+          }
+        ]
+      ]
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "Assumptions that need to be verified",
+      "items": {
+        "type": "object",
+        "required": ["statement", "confidence"],
+        "properties": {
+          "statement": {
+            "type": "string",
+            "description": "The assumption being made",
+            "minLength": 1,
+            "examples": ["HTTP 429 and 5xx responses are transient."]
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence level (0.0 to 1.0)",
+            "minimum": 0,
+            "maximum": 1,
+            "examples": [0.85]
+          },
+          "needs_verification": {
+            "type": "boolean",
+            "description": "Whether this assumption needs verification",
+            "default": false,
+            "examples": [true]
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether this assumption has been verified"
+          },
+          "verified_by": {
+            "type": "string",
+            "description": "Who verified the assumption"
+          },
+          "verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the assumption was verified"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        [
+          {
+            "statement": "HTTP 429 and 5xx responses are transient.",
+            "confidence": 0.85,
+            "needs_verification": true
+          }
+        ]
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Evidence references supporting the handover",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "reference", "relevance"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of evidence",
+            "enum": ["file", "test", "document", "artifact", "log", "metric"],
+            "examples": ["file"]
+          },
+          "reference": {
+            "type": "string",
+            "description": "Reference to the evidence (URI or path)",
+            "minLength": 1,
+            "examples": ["src/infrastructure/payments/client.py"]
+          },
+          "relevance": {
+            "type": "string",
+            "description": "Why this evidence is relevant",
+            "minLength": 1,
+            "examples": ["Primary implementation target."]
+          },
+          "accessed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the evidence was accessed"
+          },
+          "digest": {
+            "type": "string",
+            "description": "Content digest for integrity verification",
+            "examples": ["sha256:abc123..."]
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        [
+          {
+            "type": "file",
+            "reference": "src/infrastructure/payments/client.py",
+            "relevance": "Primary implementation target."
+          },
+          {
+            "type": "file",
+            "reference": "src/shared/retry.py",
+            "relevance": "Existing retry abstraction."
+          }
+        ]
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Durable artifacts produced during the task",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "uri"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique artifact identifier",
+            "minLength": 1,
+            "examples": ["artifact-plan"]
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of artifact",
+            "minLength": 1,
+            "examples": ["implementation_plan"]
+          },
+          "uri": {
+            "type": "string",
+            "description": "URI where the artifact is stored",
+            "minLength": 1,
+            "examples": ["repo://.agent-artifacts/run_123/plan.md"]
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for the artifact",
+            "examples": ["Implementation Plan"]
+          },
+          "media_type": {
+            "type": "string",
+            "description": "MIME type of the artifact",
+            "examples": ["text/markdown"]
+          },
+          "digest": {
+            "type": "string",
+            "description": "Content digest for integrity verification",
+            "examples": ["sha256:abc123..."]
+          },
+          "version": {
+            "type": "integer",
+            "description": "Artifact version",
+            "minimum": 1,
+            "default": 1
+          },
+          "produced_by": {
+            "type": "string",
+            "description": "Agent that produced the artifact",
+            "examples": ["planner"]
+          },
+          "produced_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the artifact was produced"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        [
+          {
+            "id": "artifact-plan",
+            "type": "implementation_plan",
+            "uri": "repo://.agent-artifacts/run_123/plan.md",
+            "digest": "sha256:abc123..."
+          }
+        ]
+      ]
+    },
+    "authorization": {
+      "type": "object",
+      "required": ["principal", "delegated_scopes", "forbidden_actions"],
+      "properties": {
+        "principal": {
+          "type": "string",
+          "description": "User or service principal",
+          "minLength": 1,
+          "examples": ["user_789"]
+        },
+        "delegated_scopes": {
+          "type": "array",
+          "description": "Scopes delegated to the receiver",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["repository:read", "repository:write:src/infrastructure/payments/**"]
+          }
+        },
+        "forbidden_actions": {
+          "type": "array",
+          "description": "Actions explicitly forbidden for the receiver",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["deploy", "publish", "access_production", "modify_dependencies"]
+          }
+        },
+        "approval_required": {
+          "type": "array",
+          "description": "Actions requiring human approval",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["change_public_api", "modify_authentication"]
+          }
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the authorization expires",
+          "examples": ["2026-07-23T10:30:00Z"]
+        },
+        "delegation_depth": {
+          "type": "integer",
+          "description": "Current delegation depth",
+          "minimum": 0,
+          "default": 0
+        },
+        "max_delegation_depth": {
+          "type": "integer",
+          "description": "Maximum allowed delegation depth",
+          "minimum": 0,
+          "default": 3
+        },
+        "may_redelegate": {
+          "type": "boolean",
+          "description": "Whether the receiver may further delegate",
+          "default": false
+        },
+        "resource": {
+          "type": "string",
+          "description": "Resource the authorization applies to",
+          "examples": ["repo://payments-service"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "description": "Execution constraints and budgets",
+      "properties": {
+        "priority": {
+          "type": "string",
+          "description": "Execution priority",
+          "enum": ["low", "normal", "high", "urgent"],
+          "default": "normal"
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Deadline for completion"
+        },
+        "max_turns": {
+          "type": "integer",
+          "description": "Maximum number of interaction turns",
+          "minimum": 1,
+          "default": 20
+        },
+        "max_tool_calls": {
+          "type": "integer",
+          "description": "Maximum number of tool calls",
+          "minimum": 1,
+          "default": 50
+        },
+        "retry_budget": {
+          "type": "integer",
+          "description": "Number of retries allowed",
+          "minimum": 0,
+          "default": 2
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "description": "Timeout for the handover in seconds",
+          "minimum": 1,
+          "default": 30
+        }
+      },
+      "additionalProperties": false
+    },
+    "next_action": {
+      "type": "object",
+      "required": ["instruction", "expected_first_tool"],
+      "properties": {
+        "instruction": {
+          "type": "string",
+          "description": "Actionable instruction for the receiver",
+          "minLength": 1,
+          "examples": ["Inspect the referenced files, verify the retry assumptions and implement the smallest compatible change."]
+        },
+        "expected_first_tool": {
+          "type": "string",
+          "description": "Expected first tool the receiver should use",
+          "minLength": 1,
+          "examples": ["repository.read"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "return_contract": {
+      "type": "object",
+      "required": ["return_to", "required_outputs", "success_status"],
+      "properties": {
+        "return_to": {
+          "type": "string",
+          "description": "Agent to return results to",
+          "minLength": 1,
+          "examples": ["reviewer"]
+        },
+        "required_outputs": {
+          "type": "array",
+          "description": "Outputs the receiver must produce",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "examples": ["changed_files", "verification_results", "remaining_risks"]
+          }
+        },
+        "success_status": {
+          "type": "string",
+          "description": "Status indicating successful completion",
+          "minLength": 1,
+          "examples": ["implementation_complete"]
+        },
+        "failure_status": {
+          "type": "string",
+          "description": "Status indicating failure"
+        }
+      },
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "description": "Results from a return handover (completion)",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "Summary of work completed",
+          "minLength": 1
+        },
+        "changed_files": {
+          "type": "array",
+          "description": "Files that were changed",
+          "items": {
+            "type": "object",
+            "required": ["path", "change"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path",
+                "minLength": 1
+              },
+              "change": {
+                "type": "string",
+                "description": "Description of the change",
+                "minLength": 1
+              },
+              "diff": {
+                "type": "string",
+                "description": "Actual diff/patch"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "verification": {
+          "type": "array",
+          "description": "Verification results",
+          "items": {
+            "type": "object",
+            "required": ["command", "status"],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Command that was run",
+                "minLength": 1
+              },
+              "status": {
+                "type": "string",
+                "description": "Result status",
+                "enum": ["passed", "failed", "skipped", "error"]
+              },
+              "evidence": {
+                "type": "string",
+                "description": "Reference to evidence artifact",
+                "minLength": 1
+              },
+              "output": {
+                "type": "string",
+                "description": "Command output"
+              },
+              "exit_code": {
+                "type": "integer",
+                "description": "Exit code"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When verification was run"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "decisions": {
+          "type": "array",
+          "description": "Decisions made during execution",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unresolved": {
+          "type": "array",
+          "description": "Issues that remain unresolved",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "risks": {
+          "type": "array",
+          "description": "Risks identified during execution",
+          "items": {
+            "type": "object",
+            "required": ["severity", "description"],
+            "properties": {
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "mitigation": {
+                "type": "string",
+                "description": "How the risk can be mitigated"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "claims": {
+          "type": "array",
+          "description": "Claims made about the work",
+          "items": {
+            "type": "object",
+            "required": ["statement", "evidence"],
+            "properties": {
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "description": "Security classification",
+      "properties": {
+        "data_classification": {
+          "type": "string",
+          "description": "Data classification level",
+          "enum": ["public", "internal", "confidential", "secret"],
+          "default": "internal"
+        },
+        "contains_secrets": {
+          "type": "boolean",
+          "description": "Whether the handover contains secrets",
+          "default": false
+        },
+        "untrusted_inputs": {
+          "type": "array",
+          "description": "Sources of untrusted input",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sensitive_fields": {
+          "type": "array",
+          "description": "Fields that contain sensitive data",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

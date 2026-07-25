@@ -1,0 +1,254 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-learn.dev/schemas/artifact/v1.0.json",
+  "title": "Agent Artifact",
+  "description": "Durable work product produced during agent execution",
+  "type": "object",
+  "required": ["id", "type", "uri", "produced_by", "produced_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique artifact identifier",
+      "pattern": "^artifact_[a-zA-Z0-9\\-_]{1,64}$",
+      "examples": ["artifact_patch_001", "artifact-plan"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the artifact",
+      "minLength": 1,
+      "examples": ["retry-implementation.patch", "Implementation Plan"]
+    },
+    "type": {
+      "type": "string",
+      "description": "Type of artifact",
+      "minLength": 1,
+      "examples": [
+        "implementation_plan",
+        "patch",
+        "report",
+        "test_output",
+        "log",
+        "metric",
+        "documentation",
+        "configuration"
+      ]
+    },
+    "media_type": {
+      "type": "string",
+      "description": "MIME type of the artifact",
+      "minLength": 1,
+      "examples": [
+        "text/x-diff",
+        "text/markdown",
+        "text/plain",
+        "application/json",
+        "text/x-python",
+        "application/x-yaml"
+      ]
+    },
+    "uri": {
+      "type": "string",
+      "description": "URI where the artifact is stored",
+      "format": "uri",
+      "minLength": 1,
+      "examples": [
+        "repo://.agent-artifacts/run_123/retry.patch",
+        "file:///artifacts/plan.md",
+        "https://storage.ai-learn.dev/artifacts/abc123"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Artifact version (starts at 1)",
+      "minimum": 1,
+      "default": 1
+    },
+    "digest": {
+      "type": "string",
+      "description": "Content digest for integrity verification",
+      "pattern": "^(sha256|sha512|md5|sha1):[a-fA-F0-9]{40,128}$",
+      "examples": ["sha256:8a4b1c2d3e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0"]
+    },
+    "size_bytes": {
+      "type": "integer",
+      "description": "Size of the artifact in bytes",
+      "minimum": 0
+    },
+    "produced_by": {
+      "type": "string",
+      "description": "Agent that produced the artifact",
+      "minLength": 1,
+      "examples": ["implementer", "planner", "tester"]
+    },
+    "produced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when artifact was produced",
+      "examples": ["2026-07-23T08:45:00Z"]
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the artifact expires (if temporary)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the artifact",
+      "minLength": 1
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata about the artifact",
+      "additionalProperties": true,
+      "properties": {
+        "parent_handover_id": {
+          "type": "string",
+          "description": "Handover ID that produced this artifact",
+          "pattern": "^ho_[a-zA-Z0-9]{8,}$"
+        },
+        "task_id": {
+          "type": "string",
+          "description": "Task ID associated with the artifact",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": "string",
+          "description": "Run ID that produced the artifact",
+          "minLength": 1
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags for categorization",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "related_artifacts": {
+      "type": "array",
+      "description": "Artifacts this artifact depends on or relates to",
+      "items": {
+        "type": "object",
+        "required": ["id", "relationship"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the related artifact",
+            "minLength": 1
+          },
+          "relationship": {
+            "type": "string",
+            "description": "Relationship type",
+            "enum": [
+              "depends_on",
+              "supersedes",
+              "derived_from",
+              "part_of",
+              "alternative_to"
+            ]
+          },
+          "uri": {
+            "type": "string",
+            "description": "URI of the related artifact",
+            "format": "uri"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "storage": {
+      "type": "object",
+      "description": "Storage information",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "Storage location",
+          "enum": ["repository", "artifact_store", "external", "inline"]
+        },
+        "path": {
+          "type": "string",
+          "description": "Storage path"
+        },
+        "access_method": {
+          "type": "string",
+          "description": "How to access the artifact",
+          "enum": ["read", "write", "append", "stream"]
+        },
+        "compression": {
+          "type": "string",
+          "description": "Compression algorithm",
+          "enum": ["none", "gzip", "bzip2", "xz", "zstd"]
+        },
+        "encryption": {
+          "type": "string",
+          "description": "Encryption method"
+        }
+      },
+      "additionalProperties": false
+    },
+    "access_control": {
+      "type": "object",
+      "description": "Access control information",
+      "properties": {
+        "readers": {
+          "type": "array",
+          "description": "Agents/users who can read the artifact",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "writers": {
+          "type": "array",
+          "description": "Agents/users who can write the artifact",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "public": {
+          "type": "boolean",
+          "description": "Whether the artifact is publicly accessible",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation information",
+      "properties": {
+        "validated": {
+          "type": "boolean",
+          "description": "Whether the artifact has been validated"
+        },
+        "validated_by": {
+          "type": "string",
+          "description": "Who validated the artifact"
+        },
+        "validated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When validation occurred"
+        },
+        "validation_method": {
+          "type": "string",
+          "description": "Method used for validation",
+          "examples": ["schema", "signature", "hash", "manual"]
+        },
+        "validation_errors": {
+          "type": "array",
+          "description": "Validation errors if any",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

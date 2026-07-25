@@ -1,0 +1,3 @@
+The core design principle is: an agent should not have to guess how to understand, change, verify, or safely operate the system. Encode those expectations through explicit instructions, stable commands, typed boundaries, automated tests, behavioral evaluations, and approval gates.
+
+Keep repository instructions short, operational, and testable. Put universal rules in AGENTS.md, path-specific rules near the relevant code, and specialist workflows in custom-agent profiles.
