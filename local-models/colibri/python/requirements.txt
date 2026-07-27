@@ -1,3 +1,0 @@
-# No external dependencies required for Colibri runtime
-# Colibri is pure C with zero dependencies
-# Python is only used for model conversion, not runtime

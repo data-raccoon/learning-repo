@@ -2,18 +2,12 @@
 
 ## Repository boundaries
 
-- `local-models/` — model binaries, serving code, templates, endpoint checks.
 - `small-context-harness/` — default model registry, routing, bounded packets, and gates.
-- `agent_orchestrator/` — legacy/advanced multi-model control plane; use only when explicitly required.
 
 ## Model delegation
 
 - Use `small-context-harness/harness.py` through the repo-local
   `orchestrate-models` skill when work benefits from a worker model.
-- Default to `pack -> route -> invoke`; models return bounded proposals and
-  never receive repository write authority.
-- Use `agent_orchestrator` only for a requirement the small-context harness does
-  not support, such as admitted command workers, graphs, or durable run evidence.
 - Delegation is one level deep. Only the root agent creates jobs or graphs.
 - Give every worker exactly one target directory with all required context.
 - Never widen a worker's read scope to compensate for an incomplete task packet.
@@ -45,15 +39,4 @@ Python interpreter for all scripts: `& "$env:USERPROFILE\.venvs\all\Scripts\pyth
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" -m unittest discover -s small-context-harness\tests -v
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py inventory
 
-# agent_orchestrator/ — after changing the legacy orchestrator
-$env:PYTHONPATH = "src"
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" -m unittest discover -s tests -v
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" orchestrate.py doctor
-
-# repo root — after changing gaming-agents/
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" -m unittest discover -s gaming-agents\tests -v
-
-# local-models/<model>/ — after changing model scripts
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" verify_server.py   # ministral
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" verify_colibri.py  # colibri (deferred)
 ```
