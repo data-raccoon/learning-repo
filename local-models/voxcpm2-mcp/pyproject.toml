@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voxcpm2-mcp"
+version = "0.1.0"
+description = "A localhost MCP server for consented VoxCPM2 voice cloning."
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "huggingface-hub>=0.30,<2",
+    "mcp>=1.12,<2",
+    "soundfile>=0.13,<1",
+]
+
+[project.scripts]
+voxcpm2-mcp = "voxcpm2_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"

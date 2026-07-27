@@ -1,0 +1,6 @@
+# Private reference audio, transcripts, and generated speech.
+/data/*
+!/data/.gitkeep
+!/data/outputs/
+/data/outputs/*
+!/data/outputs/.gitkeep

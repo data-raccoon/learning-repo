@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/voxcpm2_mcp/__init__.py
+src/voxcpm2_mcp/server.py
+src/voxcpm2_mcp/service.py
+src/voxcpm2_mcp.egg-info/PKG-INFO
+src/voxcpm2_mcp.egg-info/SOURCES.txt
+src/voxcpm2_mcp.egg-info/dependency_links.txt
+src/voxcpm2_mcp.egg-info/entry_points.txt
+src/voxcpm2_mcp.egg-info/requires.txt
+src/voxcpm2_mcp.egg-info/top_level.txt
+tests/test_service.py

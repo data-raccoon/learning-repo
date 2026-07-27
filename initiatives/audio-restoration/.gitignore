@@ -1,0 +1,10 @@
+# Local/private recordings and generated restoration artifacts.
+/inputs/
+/outputs/
+
+!/inputs/
+!/outputs/
+/inputs/*
+/outputs/*
+!/inputs/.gitkeep
+!/outputs/.gitkeep
