@@ -27,7 +27,7 @@ repository.
 
 ## Configure
 
-The configured sample is `data/latin-american-sample.wav`. Optionally add its
+The configured sample is `data/reference-sample.wav`. Optionally add its
 verbatim transcript at
 `data/reference.txt` to enable transcript-assisted cloning. The `data/`
 directory is gitignored.
@@ -37,7 +37,7 @@ Defaults can be overridden with:
 | Variable | Default |
 | --- | --- |
 | `VOXCPM2_DATA_DIR` | `./data` |
-| `VOXCPM2_REFERENCE_WAV` | `./data/latin-american-sample.wav` |
+| `VOXCPM2_REFERENCE_WAV` | `./data/reference-sample.wav` |
 | `VOXCPM2_REFERENCE_TEXT` | `./data/reference.txt` |
 | `VOXCPM2_OUTPUT_DIR` | `./data/outputs` |
 | `VOXCPM2_MODEL` | `openbmb/VoxCPM2` |

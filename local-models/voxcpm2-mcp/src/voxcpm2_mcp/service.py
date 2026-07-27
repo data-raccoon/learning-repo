@@ -48,7 +48,7 @@ class Settings:
             reference_path=Path(
                 os.environ.get(
                     "VOXCPM2_REFERENCE_WAV",
-                    data_dir / "latin-american-sample.wav",
+                    data_dir / "reference-sample.wav",
                 )
             ).expanduser().resolve(),
             transcript_path=Path(
@@ -249,7 +249,7 @@ class VoxCPM2Service:
         if not self.settings.reference_path.is_file():
             raise FileNotFoundError(
                 "Configured reference audio is missing; add "
-                "data/latin-american-sample.wav or set VOXCPM2_REFERENCE_WAV"
+                "data/reference-sample.wav or set VOXCPM2_REFERENCE_WAV"
             )
 
         async with self._job_lock:

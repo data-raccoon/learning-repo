@@ -41,7 +41,9 @@ removes residual stationary noise, the useful voice band is limited to
 
 Output: `outputs/latin-american-sample_cleaned_v2_aggressive.wav`
 
-Both outputs are 48 kHz mono, 24-bit PCM WAV files.
+Both outputs are 48 kHz mono, 16-bit PCM WAV files. Standard PCM is used
+instead of WAVE_FORMAT_EXTENSIBLE so local speech and audio tools can consume
+the restored recordings reliably.
 
 ## Run
 
@@ -62,6 +64,7 @@ Each run checks that:
 
 - the copied input remains unchanged during processing;
 - both WAV files decode successfully;
+- both WAV files use standard 16-bit PCM encoding;
 - both outputs have peak headroom and no samples at 0 dB;
 - long-pause processing reduces the duration;
 - repeated runs produce deterministic WAV files.

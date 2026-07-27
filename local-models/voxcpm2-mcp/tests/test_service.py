@@ -66,7 +66,7 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
-        self.reference = self.root / "latin-american-sample.wav"
+        self.reference = self.root / "reference-sample.wav"
         self.reference.write_bytes(b"RIFF-test")
         self.settings = Settings(
             data_dir=self.root,

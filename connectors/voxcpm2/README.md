@@ -55,7 +55,7 @@ repository.
 Place the consented sample at:
 
 ```text
-local-models/voxcpm2-mcp/data/latin-american-sample.wav
+local-models/voxcpm2-mcp/data/reference-sample.wav
 ```
 
 The entire `data/` directory is gitignored. Initially use isolated-reference

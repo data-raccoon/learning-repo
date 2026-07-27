@@ -18,6 +18,7 @@ OUTPUTS = HERE / "outputs"
 MASTER_V1 = OUTPUTS / "latin-american-sample_cleaned_v1.wav"
 MASTER_V2 = OUTPUTS / "latin-american-sample_cleaned_v2_aggressive.wav"
 REPORT = OUTPUTS / "analysis.json"
+OUTPUT_CODEC = "pcm_s16le"
 
 FILTERS_V1 = ",".join(
     [
@@ -110,9 +111,10 @@ def probe(path: Path) -> dict[str, object]:
     stream = re.search(
         r"Audio: ([^,\n]+), ([0-9]+) Hz, ([^,\n]+)", log
     )
+    codec = stream.group(1).strip().split(" ", 1)[0] if stream else None
     return {
         "duration_seconds": duration,
-        "codec": stream.group(1).strip() if stream else None,
+        "codec": codec,
         "sample_rate_hz": int(stream.group(2)) if stream else None,
         "channels": stream.group(3).strip() if stream else None,
         "mean_volume_db": mean,
@@ -146,7 +148,7 @@ def main() -> None:
             "-ac",
             "1",
             "-c:a",
-            "pcm_s24le",
+            OUTPUT_CODEC,
             str(output),
         )
         versions[version] = {
@@ -170,6 +172,9 @@ def main() -> None:
         analysis = details["analysis"]
         report["checks"][f"{version}_decodes"] = (
             analysis["duration_seconds"] is not None
+        )
+        report["checks"][f"{version}_is_pcm_s16le"] = (
+            analysis["codec"] == OUTPUT_CODEC
         )
         report["checks"][f"{version}_has_headroom"] = (
             analysis["peak_volume_db"] is not None
