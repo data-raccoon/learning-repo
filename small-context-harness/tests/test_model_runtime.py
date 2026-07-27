@@ -104,7 +104,7 @@ class ModelRuntimeTests(unittest.TestCase):
 
     @patch("model_runtime._json_request")
     def test_ollama_invocation_attests_model_and_caps_tokens(self, request) -> None:
-        profile = self.profiles["ollama-qwen3.5-9b"]
+        profile = self.profiles["ollama-ornith-9b"]
         request.return_value = {
             "model": profile.model,
             "message": {"content": "Bounded review."},

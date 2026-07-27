@@ -53,8 +53,10 @@ code safe to execute; run untrusted code in an appropriate external sandbox.
 
 | Profile | Provider | Default use |
 |---|---|---|
+| `ollama-ministral-3-3b` | Local Ollama | low-cost extraction, classification, formatting, summarization |
 | `ollama-ministral-3-8b` | Local Ollama | extraction, classification, formatting, summarization |
-| `ollama-qwen3.5-9b` | Local Ollama | coding proposals, reasoning, and review |
+| `ollama-ornith-9b` | Local Ollama | coding proposals, reasoning, and review |
+| `ollama-gemma4-e4b` | Local Ollama | reasoning, review, and summarization |
 | `ollama-ministral-3-14b` | Local Ollama | planning, architecture, and stronger review |
 | `gemini-auto-free` | Official Antigravity `agy` CLI | critical work that clears the higher routing threshold |
 

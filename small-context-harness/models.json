@@ -3,6 +3,24 @@
   "default": "auto",
   "profiles": [
     {
+      "id": "ollama-ministral-3-3b",
+      "provider": "ollama",
+      "model": "ministral-3:3b",
+      "digest": "f04aa1c738f64e13c625b82ae92504fc0260fa6723b509ed1ece0fa188179b1d",
+      "status": "eligible",
+      "quality": 0.70,
+      "context_tokens": 8192,
+      "output_tokens": 2048,
+      "billing": "local-compute",
+      "capabilities": [
+        "classification",
+        "extraction",
+        "formatting",
+        "summarization"
+      ],
+      "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-27."
+    },
+    {
       "id": "ollama-ministral-3-8b",
       "provider": "ollama",
       "model": "ministral-3:8b",
@@ -21,10 +39,10 @@
       "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-25."
     },
     {
-      "id": "ollama-qwen3.5-9b",
+      "id": "ollama-ornith-9b",
       "provider": "ollama",
-      "model": "qwen3.5:9b",
-      "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "model": "ornith:9b",
+      "digest": "a75697c145891910e312c95e4a9fc1ccb8653e5ef543b23b0403a4665b82fd91",
       "status": "eligible",
       "quality": 0.80,
       "context_tokens": 8192,
@@ -39,7 +57,27 @@
         "review",
         "summarization"
       ],
-      "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-25; tool capability is intentionally not exposed."
+      "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-27; tool capability is intentionally not exposed."
+    },
+    {
+      "id": "ollama-gemma4-e4b",
+      "provider": "ollama",
+      "model": "gemma4:e4b",
+      "digest": "c6eb396dbd5992bbe3f5cdb947e8bbc0ee413d7c17e2beaae69f5d569cf982eb",
+      "status": "eligible",
+      "quality": 0.81,
+      "context_tokens": 8192,
+      "output_tokens": 2048,
+      "billing": "local-compute",
+      "capabilities": [
+        "classification",
+        "extraction",
+        "formatting",
+        "reasoning",
+        "review",
+        "summarization"
+      ],
+      "notes": "Local Ollama Q4_K_M model. Passed small-context-exact-response-v1 on 2026-07-27; tool capability is intentionally not exposed."
     },
     {
       "id": "ollama-ministral-3-14b",
