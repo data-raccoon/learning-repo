@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/spg/v1/entity.schema.json",
+  "title": "Production graph entity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "type", "name", "aliases", "attributes"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+    "type": {
+      "enum": ["production", "person", "credited_role", "department", "team",
+        "company", "location", "asset", "process", "production_phase", "tool"]
+    },
+    "name": {"type": "string", "minLength": 1},
+    "aliases": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "attributes": {"type": "object"},
+    "scope_production_id": {"type": ["string", "null"]}
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/spg/v1/edge.schema.json",
+  "title": "Production graph edge",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "type", "from_id", "to_id", "attributes"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "id": {"type": "string", "pattern": "^edge-[a-z0-9-]+$"},
+    "type": {
+      "enum": ["PERSON_CREDITED_AS_ROLE", "ROLE_MEMBER_OF_TEAM",
+        "TEAM_PART_OF_DEPARTMENT", "PERSON_AFFILIATED_WITH_COMPANY",
+        "COMPANY_PROVIDED_SERVICE", "PROCESS_PRECEDES_PROCESS",
+        "TEAM_PERFORMS_PROCESS", "PROCESS_PRODUCES_ASSET",
+        "PROCESS_HANDS_OFF_TO_TEAM", "PROCESS_IN_PHASE",
+        "ROLE_ON_PRODUCTION", "ASSET_FOR_PRODUCTION"]
+    },
+    "from_id": {"type": "string"},
+    "to_id": {"type": "string"},
+    "attributes": {"type": "object"}
+  }
+}

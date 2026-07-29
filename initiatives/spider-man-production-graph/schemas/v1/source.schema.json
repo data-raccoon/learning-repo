@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/spg/v1/source.schema.json",
+  "title": "Public source registry record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "title", "url", "publisher",
+    "publication_date", "accessed_at", "source_type", "authority_tier",
+    "access_status"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "id": {"type": "string", "pattern": "^source-[a-z0-9-]+$"},
+    "title": {"type": "string", "minLength": 1},
+    "url": {"type": "string", "pattern": "^https?://"},
+    "publisher": {"type": "string", "minLength": 1},
+    "publication_date": {"type": ["string", "null"], "format": "date"},
+    "accessed_at": {"type": "string", "format": "date"},
+    "source_type": {
+      "enum": ["official_page", "guild_record", "professional_profile",
+        "vendor_page", "interview", "trade_article", "credit_database",
+        "secondary_reporting", "methodology"]
+    },
+    "authority_tier": {
+      "enum": ["official", "professional", "trade", "credit_database", "secondary"]
+    },
+    "access_status": {"enum": ["accessible", "partial", "inaccessible"]},
+    "notes": {"type": "string"}
+  }
+}

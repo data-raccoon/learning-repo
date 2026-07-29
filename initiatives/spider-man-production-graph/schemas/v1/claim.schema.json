@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/spg/v1/claim.schema.json",
+  "title": "Evidence-aware claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "subject_id", "predicate", "object",
+    "status", "confidence", "evidence", "method", "rationale", "review_state"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "id": {"type": "string", "pattern": "^claim-[a-z0-9-]+$"},
+    "subject_id": {"type": "string"},
+    "predicate": {"type": "string", "minLength": 1},
+    "object": {},
+    "status": {"enum": ["verified", "inferred", "industry-pattern", "disputed"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_id", "locator", "supporting_excerpt"],
+        "properties": {
+          "source_id": {"type": "string"},
+          "locator": {"type": "string"},
+          "supporting_excerpt": {"type": "string", "maxLength": 500}
+        }
+      }
+    },
+    "method": {"type": "string"},
+    "rationale": {"type": "string"},
+    "review_state": {"enum": ["accepted", "provisional", "rejected"]},
+    "preferred_interpretation": {"type": ["boolean", "null"]},
+    "contradicts_claim_ids": {
+      "type": "array", "items": {"type": "string"}, "uniqueItems": true
+    }
+  }
+}

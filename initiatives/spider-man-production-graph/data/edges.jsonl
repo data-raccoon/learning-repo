@@ -1,0 +1,53 @@
+{"schema_version":"1.0.0","id":"edge-sony-presents-production","type":"COMPANY_PROVIDED_SERVICE","from_id":"company-sony-pictures","to_id":"production-sm-bnd-2026","attributes":{"service":"official presentation/distribution"}}
+{"schema_version":"1.0.0","id":"edge-marvel-associated-production","type":"COMPANY_PROVIDED_SERVICE","from_id":"company-marvel","to_id":"production-sm-bnd-2026","attributes":{"service":"official film association"}}
+{"schema_version":"1.0.0","id":"edge-design-team-department","type":"TEAM_PART_OF_DEPARTMENT","from_id":"team-design-leadership","to_id":"department-production-design","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-drawing-team-department","type":"TEAM_PART_OF_DEPARTMENT","from_id":"team-drawing-office","to_id":"department-production-design","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-construction-team-department","type":"TEAM_PART_OF_DEPARTMENT","from_id":"team-construction","to_id":"department-production-design","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-setdec-team-department","type":"TEAM_PART_OF_DEPARTMENT","from_id":"team-set-decoration","to_id":"department-production-design","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-charles-role","type":"PERSON_CREDITED_AS_ROLE","from_id":"person-charles-wood","to_id":"role-production-designer-sm-bnd","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-justin-role","type":"PERSON_CREDITED_AS_ROLE","from_id":"person-justin-ackroyd","to_id":"role-set-dresser-justin-ackroyd","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-nigel-role","type":"PERSON_CREDITED_AS_ROLE","from_id":"person-nigel-archer","to_id":"role-supervising-carpenter-nigel-archer","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-viki-role","type":"PERSON_CREDITED_AS_ROLE","from_id":"person-viki-atkinson","to_id":"role-draughtsperson-viki-atkinson","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-emily-role","type":"PERSON_CREDITED_AS_ROLE","from_id":"person-emily-bates","to_id":"role-set-dec-draughtsperson-emily-bates","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-peter-role","type":"PERSON_CREDITED_AS_ROLE","from_id":"person-peter-buckley","to_id":"role-hod-metal-worker-peter-buckley","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-pd-role-team","type":"ROLE_MEMBER_OF_TEAM","from_id":"role-production-designer-sm-bnd","to_id":"team-design-leadership","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-setdresser-role-team","type":"ROLE_MEMBER_OF_TEAM","from_id":"role-set-dresser-justin-ackroyd","to_id":"team-set-decoration","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-carpenter-role-team","type":"ROLE_MEMBER_OF_TEAM","from_id":"role-supervising-carpenter-nigel-archer","to_id":"team-construction","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-draught-role-team","type":"ROLE_MEMBER_OF_TEAM","from_id":"role-draughtsperson-viki-atkinson","to_id":"team-drawing-office","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-setdec-draught-role-team","type":"ROLE_MEMBER_OF_TEAM","from_id":"role-set-dec-draughtsperson-emily-bates","to_id":"team-set-decoration","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-metal-role-team","type":"ROLE_MEMBER_OF_TEAM","from_id":"role-hod-metal-worker-peter-buckley","to_id":"team-construction","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-pd-role-production","type":"ROLE_ON_PRODUCTION","from_id":"role-production-designer-sm-bnd","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-setdresser-role-production","type":"ROLE_ON_PRODUCTION","from_id":"role-set-dresser-justin-ackroyd","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-carpenter-role-production","type":"ROLE_ON_PRODUCTION","from_id":"role-supervising-carpenter-nigel-archer","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-draught-role-production","type":"ROLE_ON_PRODUCTION","from_id":"role-draughtsperson-viki-atkinson","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-setdec-draught-role-production","type":"ROLE_ON_PRODUCTION","from_id":"role-set-dec-draughtsperson-emily-bates","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-metal-role-production","type":"ROLE_ON_PRODUCTION","from_id":"role-hod-metal-worker-peter-buckley","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-breakdown-phase","type":"PROCESS_IN_PHASE","from_id":"process-script-breakdown","to_id":"phase-development","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-concept-phase","type":"PROCESS_IN_PHASE","from_id":"process-visual-concept","to_id":"phase-pre-production","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-technical-phase","type":"PROCESS_IN_PHASE","from_id":"process-technical-design","to_id":"phase-pre-production","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-build-phase","type":"PROCESS_IN_PHASE","from_id":"process-set-build","to_id":"phase-pre-production","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-dress-phase","type":"PROCESS_IN_PHASE","from_id":"process-set-dress","to_id":"phase-production","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-support-phase","type":"PROCESS_IN_PHASE","from_id":"process-shoot-support","to_id":"phase-production","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-handover-phase","type":"PROCESS_IN_PHASE","from_id":"process-asset-handover","to_id":"phase-post-production","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-design-performs-breakdown","type":"TEAM_PERFORMS_PROCESS","from_id":"team-design-leadership","to_id":"process-script-breakdown","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-design-performs-concept","type":"TEAM_PERFORMS_PROCESS","from_id":"team-design-leadership","to_id":"process-visual-concept","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-drawing-performs-technical","type":"TEAM_PERFORMS_PROCESS","from_id":"team-drawing-office","to_id":"process-technical-design","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-construction-performs-build","type":"TEAM_PERFORMS_PROCESS","from_id":"team-construction","to_id":"process-set-build","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-setdec-performs-dress","type":"TEAM_PERFORMS_PROCESS","from_id":"team-set-decoration","to_id":"process-set-dress","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-design-performs-support","type":"TEAM_PERFORMS_PROCESS","from_id":"team-design-leadership","to_id":"process-shoot-support","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-breakdown-before-concept","type":"PROCESS_PRECEDES_PROCESS","from_id":"process-script-breakdown","to_id":"process-visual-concept","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-concept-before-technical","type":"PROCESS_PRECEDES_PROCESS","from_id":"process-visual-concept","to_id":"process-technical-design","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-technical-before-build","type":"PROCESS_PRECEDES_PROCESS","from_id":"process-technical-design","to_id":"process-set-build","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-build-before-dress","type":"PROCESS_PRECEDES_PROCESS","from_id":"process-set-build","to_id":"process-set-dress","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-dress-before-support","type":"PROCESS_PRECEDES_PROCESS","from_id":"process-set-dress","to_id":"process-shoot-support","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-support-before-handover","type":"PROCESS_PRECEDES_PROCESS","from_id":"process-shoot-support","to_id":"process-asset-handover","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-concept-produces-language","type":"PROCESS_PRODUCES_ASSET","from_id":"process-visual-concept","to_id":"asset-visual-language","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-technical-produces-drawings","type":"PROCESS_PRODUCES_ASSET","from_id":"process-technical-design","to_id":"asset-set-drawings","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-dress-produces-ready-set","type":"PROCESS_PRODUCES_ASSET","from_id":"process-set-dress","to_id":"asset-shoot-ready-set","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-handover-produces-reference","type":"PROCESS_PRODUCES_ASSET","from_id":"process-asset-handover","to_id":"asset-post-reference","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-technical-handoff-construction","type":"PROCESS_HANDS_OFF_TO_TEAM","from_id":"process-technical-design","to_id":"team-construction","attributes":{"deliverable":"set drawings and specifications"}}
+{"schema_version":"1.0.0","id":"edge-build-handoff-setdec","type":"PROCESS_HANDS_OFF_TO_TEAM","from_id":"process-set-build","to_id":"team-set-decoration","attributes":{"deliverable":"constructed set"}}
+{"schema_version":"1.0.0","id":"edge-language-production","type":"ASSET_FOR_PRODUCTION","from_id":"asset-visual-language","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-drawings-production","type":"ASSET_FOR_PRODUCTION","from_id":"asset-set-drawings","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-ready-set-production","type":"ASSET_FOR_PRODUCTION","from_id":"asset-shoot-ready-set","to_id":"production-sm-bnd-2026","attributes":{}}
+{"schema_version":"1.0.0","id":"edge-reference-production","type":"ASSET_FOR_PRODUCTION","from_id":"asset-post-reference","to_id":"production-sm-bnd-2026","attributes":{}}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/spg/v1/extraction-manifest.schema.json",
+  "title": "Extraction manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "run_at", "source_ids", "method",
+    "tool", "tool_version", "operator", "record_counts", "notes"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "id": {"type": "string", "pattern": "^extract-[a-z0-9-]+$"},
+    "run_at": {"type": "string", "format": "date-time"},
+    "source_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "method": {"enum": ["manual", "automated", "hybrid"]},
+    "tool": {"type": "string"},
+    "tool_version": {"type": "string"},
+    "operator": {"type": "string"},
+    "record_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "notes": {"type": "string"}
+  }
+}

@@ -6,8 +6,12 @@
 
 ## Model delegation
 
-- Use `small-context-harness/harness.py` through the repo-local
-  `orchestrate-models` skill when work benefits from a worker model.
+- Handle tasks directly by default. Do not create sub-workers, jobs, or graphs
+  unless the user explicitly asks for delegation, sub-agents, worker models, or
+  parallel agent work.
+- When the user explicitly requests delegation, use
+  `small-context-harness/harness.py` through the repo-local
+  `orchestrate-models` skill.
 - Delegation is one level deep. Only the root agent creates jobs or graphs.
 - Give every worker exactly one target directory with all required context.
 - Never widen a worker's read scope to compensate for an incomplete task packet.

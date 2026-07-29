@@ -1,0 +1,26 @@
+[
+  {
+    "kind": "official",
+    "publisher": "Example Studio",
+    "native_credit": "A. Designer — Production Designer",
+    "expected_role": "Production Designer"
+  },
+  {
+    "kind": "vendor",
+    "publisher": "Example Scenic Ltd",
+    "native_credit": "Scenic fabrication vendor",
+    "expected_service": "scenic fabrication"
+  },
+  {
+    "kind": "interview",
+    "publisher": "Example Trade",
+    "native_credit": "We handed approved drawings to construction.",
+    "expected_edge": "PROCESS_HANDS_OFF_TO_TEAM"
+  },
+  {
+    "kind": "credit_database",
+    "publisher": "Example Credits",
+    "native_credit": "Alex Smith — draughtsperson",
+    "expected_role": "Draughtsperson"
+  }
+]
