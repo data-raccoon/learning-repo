@@ -9,6 +9,8 @@
       "digest": "f04aa1c738f64e13c625b82ae92504fc0260fa6723b509ed1ece0fa188179b1d",
       "status": "eligible",
       "context_tokens": 8192,
+      "compaction_tokens": 0,
+      "session_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
       "capabilities": [
@@ -26,6 +28,8 @@
       "digest": "1922accd5827ebe6829e536369195db25eaf664528dc66206d646ea3bb386b71",
       "status": "eligible",
       "context_tokens": 8192,
+      "compaction_tokens": 0,
+      "session_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
       "capabilities": [
@@ -43,6 +47,8 @@
       "digest": "a75697c145891910e312c95e4a9fc1ccb8653e5ef543b23b0403a4665b82fd91",
       "status": "eligible",
       "context_tokens": 8192,
+      "compaction_tokens": 0,
+      "session_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
       "capabilities": [
@@ -63,6 +69,8 @@
       "digest": "c6eb396dbd5992bbe3f5cdb947e8bbc0ee413d7c17e2beaae69f5d569cf982eb",
       "status": "eligible",
       "context_tokens": 8192,
+      "compaction_tokens": 0,
+      "session_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
       "capabilities": [
@@ -82,6 +90,8 @@
       "digest": "4760c35aeb9d9e9c6174c2492562c0b999e80a222804fd96b1915ab72bbcdcf7",
       "status": "eligible",
       "context_tokens": 8192,
+      "compaction_tokens": 0,
+      "session_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
       "capabilities": [
@@ -103,6 +113,8 @@
       "digest": "",
       "status": "eligible",
       "context_tokens": 16384,
+      "compaction_tokens": 0,
+      "session_tokens": 16384,
       "output_tokens": 4096,
       "billing": "free-account-quota",
       "capabilities": [
@@ -124,7 +136,9 @@
       "model": "devstral-small",
       "digest": "",
       "status": "eligible",
-      "context_tokens": 200000,
+      "context_tokens": 256000,
+      "compaction_tokens": 200000,
+      "session_tokens": 1000000,
       "output_tokens": 200000,
       "billing": "cloud-subscription",
       "capabilities": [
@@ -138,7 +152,7 @@
         "review",
         "summarization"
       ],
-      "notes": "Mistral Vibe CLI alias for devstral-small-latest (Devstral Small 2). Published provider metadata lists a 256k context window and 256k maximum output."
+      "notes": "Mistral Vibe CLI alias for devstral-small-latest (Devstral Small 2). Registered with its 256k physical window, a 200k auto-compaction threshold, and an opt-in 1M cumulative compacting-session budget."
     },
     {
       "id": "mistral-medium-3.5",
@@ -146,7 +160,9 @@
       "model": "mistral-medium-3.5",
       "digest": "",
       "status": "eligible",
-      "context_tokens": 65536,
+      "context_tokens": 128000,
+      "compaction_tokens": 100000,
+      "session_tokens": 500000,
       "output_tokens": 8192,
       "billing": "cloud-subscription",
       "capabilities": [
@@ -155,7 +171,7 @@
         "reasoning",
         "review"
       ],
-      "notes": "Mistral Vibe CLI alias for mistral-vibe-cli-latest. Use for bounded task definition, planning, architecture, and review proposals."
+      "notes": "Mistral Vibe CLI alias for mistral-vibe-cli-latest. Registered with its 128k physical window, a 100k auto-compaction threshold, and an opt-in 500k cumulative compacting-session budget. Use for bounded task definition, planning, architecture, and review artifacts."
     }
   ]
 }

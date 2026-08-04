@@ -70,8 +70,14 @@ Accept work only when the gate returns `"status": "passed"`.
 - The worker runner enforces file-tool `write_roots`; the baseline audit detects
   the complete target diff, including unreported writes.
 - Use a fresh isolated Vibe session per bounded task. Split whole-project
-  bootstraps into independently gated slices; Vibe's token limit is cumulative
-  across tool turns.
+  bootstraps into independently gated slices. `model_context_tokens` is the
+  live working window; `model_session_tokens` is the cumulative prompt-plus-
+  completion budget across tool turns and compactions.
+- Extended sessions are opt-in. Medium is registered at 128k physical, 100k
+  compact, and 500k cumulative tokens; Devstral is registered at 256k physical,
+  200k compact, and 1M cumulative. The isolated Vibe session uses the lower of
+  the profile threshold and task-admitted context. Treat the summary as lossy
+  and keep authoritative task state in files.
 - Give coding tasks exact public APIs and exact-file write roots. Use a
   root-authored executable contract; worker-authored tests are supporting
   evidence only.

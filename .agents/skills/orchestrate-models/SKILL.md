@@ -58,6 +58,15 @@ architecture, and review, and `devstral-small` for coding. The harness sets
 `VIBE_ACTIVE_MODEL` for each execution, so both aliases may remain configured
 and no project-local registry or selector is needed.
 
+Medium is registered at 128k physical context, a 100k compaction threshold, and
+a 500k cumulative session; Devstral is registered at 256k physical, 200k
+compact, and 1M cumulative. Tasks admit context and cumulative budget through
+`model_context_tokens` and `model_session_tokens`. The isolated Vibe
+configuration uses the lower of the profile compaction threshold and the
+task-admitted context. This is a lossy multi-epoch work budget, not a larger
+physical model window, so workers must keep plans, decisions, and implementation
+state in durable files.
+
 ## Durable evidence
 
 Store acknowledgements, baselines, results, and trajectories outside the

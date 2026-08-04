@@ -49,6 +49,26 @@ class ModelRuntimeTests(unittest.TestCase):
             ]
         }
 
+    def test_mistral_profiles_register_extended_compacting_sessions(self) -> None:
+        medium = self.profiles["mistral-medium-3.5"]
+        devstral = self.profiles["devstral-small"]
+        self.assertEqual(
+            (128_000, 100_000, 500_000),
+            (
+                medium.context_tokens,
+                medium.compaction_tokens,
+                medium.session_tokens,
+            ),
+        )
+        self.assertEqual(
+            (256_000, 200_000, 1_000_000),
+            (
+                devstral.context_tokens,
+                devstral.compaction_tokens,
+                devstral.session_tokens,
+            ),
+        )
+
     def test_auto_route_is_rejected(self) -> None:
         with self.assertRaisesRegex(model_runtime.ModelRejected, "disabled"):
             model_runtime.route(
@@ -193,13 +213,24 @@ class ModelRuntimeTests(unittest.TestCase):
             target = root / "target"
             target.mkdir()
             config = root / "config.toml"
-            config.write_text('active_model = "devstral-small"\n', encoding="utf-8")
+            config.write_text(
+                'active_model = "devstral-small"\n'
+                '[[models]]\n'
+                'name = "devstral-small-latest"\n'
+                'alias = "devstral-small"\n'
+                'provider = "mistral"\n'
+                'auto_compact_threshold = 200000\n',
+                encoding="utf-8",
+            )
             trajectory = root / "trajectory.json"
             observed = {}
 
             def execute(*args, **kwargs):
                 agent = Path(kwargs["env"]["VIBE_HOME"]) / "agents" / "small-context-worker.toml"
                 observed["agent"] = agent.read_text(encoding="utf-8")
+                observed["config"] = (
+                    Path(kwargs["env"]["VIBE_HOME"]) / "config.toml"
+                ).read_text(encoding="utf-8")
                 observed["command"] = args[0]
                 observed["environment"] = kwargs["env"]
                 observed["prompt"] = kwargs["input"]
@@ -216,7 +247,8 @@ class ModelRuntimeTests(unittest.TestCase):
                     write_roots=["out/result.txt"],
                     allowed_commands=[["git", "status", "--short"]],
                     trajectory_path=trajectory,
-                    context_tokens=4096,
+                    context_tokens=256000,
+                    session_tokens=2000000,
                     output_tokens=128,
                     max_turns=4,
                     command_timeout=10,
@@ -225,12 +257,19 @@ class ModelRuntimeTests(unittest.TestCase):
             observed["trajectory"] = trajectory.read_text(encoding="utf-8")
         self.assertIn("write_file", observed["command"])
         self.assertIn("limited_bash", observed["command"])
+        self.assertEqual(
+            "1000000", observed["command"][observed["command"].index("--max-tokens") + 1]
+        )
         self.assertNotIn("--auto-approve", observed["command"])
         self.assertIn('permission = "never"', observed["agent"])
         self.assertIn("out\\\\result.txt", observed["agent"])
         self.assertEqual("devstral-small", observed["environment"]["VIBE_ACTIVE_MODEL"])
+        self.assertIn("auto_compact_threshold = 200000", observed["config"])
         self.assertIn("Work directly in the current directory", observed["prompt"])
         self.assertTrue(result["success"])
+        self.assertEqual(256000, result["context_window_tokens"])
+        self.assertEqual(1000000, result["session_token_budget"])
+        self.assertEqual(200000, result["compaction_threshold_tokens"])
         self.assertEqual("[]", observed["trajectory"])
 
 

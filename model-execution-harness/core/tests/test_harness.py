@@ -47,6 +47,7 @@ class HarnessTests(unittest.TestCase):
                 "packet_chars": 4000,
                 "output_chars": 4000,
                 "model_context_tokens": 4096,
+                "model_session_tokens": 16384,
                 "model_output_tokens": 256,
                 "model_timeout_seconds": 30,
                 "max_tool_calls": 5,
@@ -109,6 +110,12 @@ class HarnessTests(unittest.TestCase):
         self.task["allowed_commands"] = [["powershell", "-Command", "whoami"]]
         write_json(self.task_path, self.task)
         with self.assertRaisesRegex(harness.Rejected, "not globally admitted"):
+            harness.command_pack(self.task_path, self.packet_path, self.repo)
+
+    def test_task_rejects_session_budget_below_context(self) -> None:
+        self.task["limits"]["model_session_tokens"] = 2048
+        write_json(self.task_path, self.task)
+        with self.assertRaisesRegex(harness.Rejected, "must cover"):
             harness.command_pack(self.task_path, self.packet_path, self.repo)
 
     def test_pack_caps_the_complete_packet(self) -> None:
@@ -268,6 +275,9 @@ class HarnessTests(unittest.TestCase):
                     kwargs["trajectory_path"].read_bytes()
                 ).hexdigest(),
                 "stderr": "",
+                "context_window_tokens": 4096,
+                "session_token_budget": 16384,
+                "compaction_threshold_tokens": 4096,
                 "attestation": {"expected_model": "devstral-small", "matched": True},
             }
 
@@ -337,6 +347,9 @@ class HarnessTests(unittest.TestCase):
                     kwargs["trajectory_path"].read_bytes()
                 ).hexdigest(),
                 "stderr": "",
+                "context_window_tokens": 4096,
+                "session_token_budget": 16384,
+                "compaction_threshold_tokens": 4096,
                 "attestation": {"expected_model": "mistral-medium-3.5", "matched": True},
             }
 

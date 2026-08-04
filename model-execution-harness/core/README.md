@@ -53,16 +53,16 @@ code safe to execute; run untrusted code in an appropriate external sandbox.
 
 `models.json` registers:
 
-| Profile | Provider | Default use |
-|---|---|---|
-| `ollama-ministral-3-3b` | Local Ollama | low-cost extraction, classification, formatting, summarization |
-| `ollama-ministral-3-8b` | Local Ollama | extraction, classification, formatting, summarization |
-| `ollama-ornith-9b` | Local Ollama | coding proposals, reasoning, and review |
-| `ollama-gemma4-e4b` | Local Ollama | reasoning, review, and summarization |
-| `ollama-ministral-3-14b` | Local Ollama | planning, architecture, and stronger review |
-| `gemini-auto-free` | Official Antigravity `agy` CLI | broad proposal work |
-| `devstral-small` | Mistral Vibe CLI cloud provider | Devstral Small 2 implementation |
-| `mistral-medium-3.5` | Mistral Vibe CLI cloud provider | durable task definition, planning, architecture, and review artifacts |
+| Profile | Provider | Physical / compact / session | Default use |
+|---|---|---:|---|
+| `ollama-ministral-3-3b` | Local Ollama | 8k / — / 8k | low-cost extraction, classification, formatting, summarization |
+| `ollama-ministral-3-8b` | Local Ollama | 8k / — / 8k | extraction, classification, formatting, summarization |
+| `ollama-ornith-9b` | Local Ollama | 8k / — / 8k | coding proposals, reasoning, and review |
+| `ollama-gemma4-e4b` | Local Ollama | 8k / — / 8k | reasoning, review, and summarization |
+| `ollama-ministral-3-14b` | Local Ollama | 8k / — / 8k | planning, architecture, and stronger review |
+| `gemini-auto-free` | Official Antigravity `agy` CLI | 16k / — / 16k | broad proposal work |
+| `devstral-small` | Mistral Vibe CLI cloud provider | 256k / 200k / 1M | Devstral Small 2 implementation |
+| `mistral-medium-3.5` | Mistral Vibe CLI cloud provider | 128k / 100k / 500k | durable task definition, planning, architecture, and review artifacts |
 
 All profiles use deliberately smaller runtime context caps than their advertised
 maximums. Ollama model digests are pinned and checked against `/api/tags`.
@@ -78,8 +78,17 @@ repository execution uses the registered Mistral Vibe profiles.
 
 Both aliases must be present in `%USERPROFILE%\.vibe\config.toml`. For each
 execution the harness copies that model catalog into an isolated temporary
-`VIBE_HOME` and sets `VIBE_ACTIVE_MODEL` to the selected profile. No project-
-local registry or selector is needed.
+`VIBE_HOME`, sets `VIBE_ACTIVE_MODEL` to the selected profile, and overrides
+that alias's auto-compaction threshold with the lower of the registered
+threshold and the task-admitted context. No project-local registry or selector
+is needed.
+
+`model_context_tokens` limits the live working context. `model_session_tokens`
+limits cumulative prompt plus completion usage across the Vibe session and may
+be admitted up to the profile's registered extended-session cap. Compaction is
+lossy: the larger session budget permits several summarized working epochs; it
+does not enlarge a single model request. Important state must therefore remain
+in target files and may be reread after compaction.
 
 The worker gets `read_file` and `grep` inside one target. `edit` and `write_file`
 are auto-approved only for declared write roots. The custom `limited_bash` tool
@@ -131,9 +140,9 @@ Important task fields:
   policy and exposed through `limited_bash`.
 - `done`: concise, testable outcomes given to the worker.
 - `verifiers`: trusted argument arrays executed by the gate in `target`.
-- `limits`: hard packet, output, tool-call, verifier, and timeout caps. The
-  `packet_chars` cap covers the complete serialized worker packet, not just file
-  excerpts.
+- `limits`: hard packet, output, model-context, cumulative model-session,
+  tool-call, verifier, and timeout caps. The `packet_chars` cap covers the
+  complete serialized worker packet, not just file excerpts.
 
 The `max_tool_calls` limit bounds the Vibe programmatic turn budget.
 

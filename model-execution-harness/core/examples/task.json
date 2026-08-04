@@ -33,6 +33,7 @@
     "packet_chars": 8000,
     "output_chars": 4000,
     "model_context_tokens": 4096,
+    "model_session_tokens": 16384,
     "model_output_tokens": 512,
     "model_timeout_seconds": 120,
     "max_tool_calls": 8,

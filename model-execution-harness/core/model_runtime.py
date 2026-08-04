@@ -23,7 +23,8 @@ class ModelRejected(ValueError):
 
 PROFILE_FIELDS = {
     "id", "provider", "model", "digest", "status",
-    "context_tokens", "output_tokens", "billing", "capabilities", "notes",
+    "context_tokens", "compaction_tokens", "session_tokens", "output_tokens",
+    "billing", "capabilities", "notes",
 }
 @dataclass(frozen=True)
 class Profile:
@@ -33,6 +34,8 @@ class Profile:
     digest: str
     status: str
     context_tokens: int
+    compaction_tokens: int
+    session_tokens: int
     output_tokens: int
     billing: str
     capabilities: tuple[str, ...]
@@ -192,6 +195,17 @@ def load_registry(path: Path) -> dict[str, Profile]:
             or type(item["digest"]) is not str
             or type(item["context_tokens"]) is not int
             or item["context_tokens"] < 1024
+            or type(item["session_tokens"]) is not int
+            or item["session_tokens"] < item["context_tokens"]
+            or type(item["compaction_tokens"]) is not int
+            or (
+                item["provider"] == "mistral-vibe"
+                and not 1024 <= item["compaction_tokens"] < item["context_tokens"]
+            )
+            or (
+                item["provider"] != "mistral-vibe"
+                and item["compaction_tokens"] != 0
+            )
             or type(item["output_tokens"]) is not int
             or item["output_tokens"] < 32
             or type(item["billing"]) is not str
@@ -208,6 +222,8 @@ def load_registry(path: Path) -> dict[str, Profile]:
             digest=item["digest"],
             status=item["status"],
             context_tokens=item["context_tokens"],
+            compaction_tokens=item["compaction_tokens"],
+            session_tokens=item["session_tokens"],
             output_tokens=item["output_tokens"],
             billing=item["billing"],
             capabilities=tuple(item["capabilities"]),
@@ -295,6 +311,8 @@ def inventory(
                 "reason": reason,
                 "capabilities": list(profile.capabilities),
                 "context_tokens": profile.context_tokens,
+                "compaction_tokens": profile.compaction_tokens,
+                "session_tokens": profile.session_tokens,
                 "output_tokens": profile.output_tokens,
                 "billing": profile.billing,
                 "expected_digest": profile.digest,
@@ -647,6 +665,48 @@ def _toml_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
+def _compaction_threshold(profile: Profile, requested_context_tokens: int) -> int:
+    """Keep headroom for the compaction request inside the physical window."""
+    return min(profile.compaction_tokens, requested_context_tokens)
+
+
+def _copy_vibe_config_with_compaction(
+    source: Path, destination: Path, profile: Profile, requested_context_tokens: int
+) -> int:
+    """Copy the user catalog and override only the selected alias's threshold."""
+    try:
+        lines = source.read_text(encoding="utf-8").splitlines(keepends=True)
+    except (OSError, UnicodeError) as exc:
+        raise ModelRejected(f"cannot read Vibe user configuration: {exc}") from exc
+    starts = [
+        index for index, line in enumerate(lines) if line.strip() == "[[models]]"
+    ]
+    threshold = _compaction_threshold(profile, requested_context_tokens)
+    for position, start in enumerate(starts):
+        end = starts[position + 1] if position + 1 < len(starts) else len(lines)
+        alias = None
+        for line in lines[start + 1:end]:
+            match = re.match(r'^\s*alias\s*=\s*["\']([^"\']+)["\']\s*$', line)
+            if match:
+                alias = match.group(1)
+                break
+        if alias != profile.model:
+            continue
+        for index in range(start + 1, end):
+            if re.match(r"^\s*auto_compact_threshold\s*=", lines[index]):
+                newline = "\r\n" if lines[index].endswith("\r\n") else "\n"
+                lines[index] = f"auto_compact_threshold = {threshold}{newline}"
+                break
+        else:
+            lines.insert(end, f"auto_compact_threshold = {threshold}\n")
+        try:
+            destination.write_text("".join(lines), encoding="utf-8")
+        except OSError as exc:
+            raise ModelRejected(f"cannot create isolated Vibe configuration: {exc}") from exc
+        return threshold
+    raise ModelRejected(f"Vibe model alias is missing from user configuration: {profile.model}")
+
+
 def _worker_agent_toml(
     target: Path, write_roots: list[str], tool_path: Path
 ) -> str:
@@ -690,6 +750,7 @@ def run_mistral_vibe_worker(
     allowed_commands: list[list[str]],
     trajectory_path: Path,
     context_tokens: int,
+    session_tokens: int,
     output_tokens: int,
     max_turns: int,
     command_timeout: int,
@@ -730,7 +791,7 @@ def run_mistral_vibe_worker(
         "--max-turns",
         str(max_turns),
         "--max-tokens",
-        str(min(profile.context_tokens, context_tokens + output_tokens)),
+        str(min(profile.session_tokens, session_tokens)),
         "--enabled-tools",
         "read_file",
         "--enabled-tools",
@@ -751,7 +812,12 @@ def run_mistral_vibe_worker(
             vibe_home = Path(directory) / ".vibe"
             agents = vibe_home / "agents"
             agents.mkdir(parents=True)
-            shutil.copyfile(source_config, vibe_home / "config.toml")
+            compaction_threshold = _copy_vibe_config_with_compaction(
+                source_config,
+                vibe_home / "config.toml",
+                profile,
+                context_tokens,
+            )
             (agents / "small-context-worker.toml").write_text(
                 _worker_agent_toml(target, write_roots, tool_path),
                 encoding="utf-8",
@@ -786,6 +852,9 @@ def run_mistral_vibe_worker(
         "trajectory": str(trajectory_path),
         "trajectory_sha256": trajectory_sha,
         "stderr": str(stderr_path) if process.stderr else "",
+        "context_window_tokens": min(profile.context_tokens, context_tokens),
+        "session_token_budget": min(profile.session_tokens, session_tokens),
+        "compaction_threshold_tokens": compaction_threshold,
         "attestation": {
             "expected_model": profile.model,
             "active_model_override": profile.model,

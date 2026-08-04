@@ -32,8 +32,8 @@ TASK_FIELDS = {
 TASK_OPTIONAL_FIELDS = {"allowed_commands"}
 LIMIT_FIELDS = {
     "packet_chars", "output_chars", "model_context_tokens",
-    "model_output_tokens", "model_timeout_seconds", "max_tool_calls",
-    "max_verifiers", "verifier_timeout_seconds",
+    "model_session_tokens", "model_output_tokens", "model_timeout_seconds",
+    "max_tool_calls", "max_verifiers", "verifier_timeout_seconds",
 }
 RESULT_FIELDS = {
     "v", "task_id", "packet_sha256", "status", "summary", "changed", "risks",
@@ -210,6 +210,11 @@ def validate_task(raw: Any) -> dict[str, Any]:
     bounded_int(
         limits["model_context_tokens"], "model_context_tokens", 1024, 256_000
     )
+    bounded_int(
+        limits["model_session_tokens"], "model_session_tokens", 1024, 1_000_000
+    )
+    if limits["model_session_tokens"] < limits["model_context_tokens"]:
+        raise Rejected("model_session_tokens must cover model_context_tokens")
     bounded_int(
         limits["model_output_tokens"], "model_output_tokens", 32, 256_000
     )
@@ -558,6 +563,18 @@ def command_route(
             packet["task"]["limits"]["model_context_tokens"],
             selected.context_tokens,
         ),
+        "compaction_tokens": (
+            min(
+                packet["task"]["limits"]["model_context_tokens"],
+                selected.compaction_tokens,
+            )
+            if selected.compaction_tokens
+            else 0
+        ),
+        "session_tokens": min(
+            packet["task"]["limits"]["model_session_tokens"],
+            selected.session_tokens,
+        ),
         "output_tokens": min(
             packet["task"]["limits"]["model_output_tokens"],
             selected.output_tokens,
@@ -622,6 +639,7 @@ def command_execute(
         allowed_commands=allowed_commands,
         trajectory_path=trajectory_path,
         context_tokens=limits["model_context_tokens"],
+        session_tokens=limits["model_session_tokens"],
         output_tokens=limits["model_output_tokens"],
         max_turns=limits["max_tool_calls"],
         command_timeout=limits["verifier_timeout_seconds"],
@@ -679,6 +697,9 @@ def command_execute(
         "trajectory": worker["trajectory"],
         "trajectory_sha256": worker["trajectory_sha256"],
         "stderr": worker["stderr"],
+        "context_window_tokens": worker["context_window_tokens"],
+        "session_token_budget": worker["session_token_budget"],
+        "compaction_threshold_tokens": worker["compaction_threshold_tokens"],
         "attestation": worker["attestation"],
     }
 
