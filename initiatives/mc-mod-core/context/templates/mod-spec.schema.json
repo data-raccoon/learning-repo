@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-learn.local/mc-mod-spec-v2.json",
+  "title": "Fabric 26.2 mod specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "mod_id",
+    "engine",
+    "minecraft_version",
+    "fabric_loader_version",
+    "fabric_api_version",
+    "fabric_loom_version",
+    "gradle_version",
+    "java_version",
+    "entrypoints",
+    "run_argv",
+    "creative_artifacts",
+    "engineer_artifacts",
+    "verifiers"
+  ],
+  "properties": {
+    "schema_version": {"const": 2},
+    "mod_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "engine": {"const": "Fabric"},
+    "minecraft_version": {"const": "26.2"},
+    "fabric_loader_version": {"const": "0.19.3"},
+    "fabric_api_version": {"const": "0.154.2+26.2"},
+    "fabric_loom_version": {"const": "1.17-SNAPSHOT"},
+    "gradle_version": {"const": "9.5.1"},
+    "java_version": {"const": "25"},
+    "entrypoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main"],
+      "properties": {
+        "main": {"type": "string", "pattern": "^src/main/java/.+\\.java$"},
+        "client": {"type": "string", "pattern": "^src/client/java/.+\\.java$"}
+      }
+    },
+    "run_argv": {"const": ["{gradle}", "runClient"]},
+    "creative_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^src/(?:main|client)/resources/assets/[a-z0-9_-]+/.+\\.[a-z0-9]+$"
+      }
+    },
+    "engineer_artifacts": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {"type": "string", "not": {"pattern": "/assets/"}}
+    },
+    "verifiers": {
+      "const": ["compile-common", "compile-client", "unit-tests", "build"]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "v": 1,
+  "id": "mana-core-api-events-devstral",
+  "goal": "Implement Medium task mana-api-events as immutable pure-Java records. Create ManaFlowEvent(int sourceX, int sourceY, int sourceZ, int targetX, int targetY, int targetZ, double amount, int directionX, int directionY, int directionZ); ManaGatherEvent(int centerX, int centerY, int centerZ, int radius, double amount); and ManaStoreEvent(String storageId, double amount, Operation operation) with nested enum Operation { INSERT, EXTRACT }. Require finite non-negative amounts, direction components from -1 through 1, non-negative radius, nonblank storageId, and nonnull operation. Add executable ManaEventsTest.",
+  "target": "initiatives/mc-mod-core",
+  "model": {"profile": "devstral-small", "capability": "coding", "importance": "high"},
+  "context": [
+    {"path": "AGENTS.md", "start": 1, "end": 150},
+    {"path": ".mc-mod-agents/plans/10-next-three-tasks.json", "start": 85, "end": 190},
+    {"path": "src/main/java/com/manacore/core/api/types/ManaStorage.java", "start": 1, "end": 120},
+    {"path": "docs/ARCHITECTURE.md", "start": 150, "end": 260}
+  ],
+  "write_roots": [
+    "src/main/java/com/manacore/core/api/events/ManaFlowEvent.java",
+    "src/main/java/com/manacore/core/api/events/ManaGatherEvent.java",
+    "src/main/java/com/manacore/core/api/events/ManaStoreEvent.java",
+    "src/test/java/com/manacore/core/api/events/ManaEventsTest.java"
+  ],
+  "allowed_commands": [],
+  "done": [
+    "All three exact immutable records compile without Minecraft/Fabric imports.",
+    "Canonical constructors enforce every stated validation rule.",
+    "The executable worker test and independent behavior contract pass."
+  ],
+  "forbidden": [
+    "Do not write outside the four exact files or modify API types/completed slices.",
+    "Do not add an event bus, listeners, networking, persistence, file I/O, shell, subagents, MCP, downloads, or packages.",
+    "Do not depend on Minecraft or Fabric."
+  ],
+  "limits": {"packet_chars": 55000, "output_chars": 6000, "model_context_tokens": 100000, "model_session_tokens": 240000, "model_output_tokens": 50000, "model_timeout_seconds": 900, "max_tool_calls": 24, "max_verifiers": 1, "verifier_timeout_seconds": 120},
+  "verifiers": [{"id": "api-events-contract", "argv": ["{python}", ".mc-mod-agents/tools/verify_api_events_slice.py"]}]
+}

@@ -1,0 +1,116 @@
+{
+  "excerpts": [
+    {
+      "end": 142,
+      "path": "AGENTS.md",
+      "sha256": "58645d23334137e9c66fc2c2847cd3378f2c7bc2e7e52c627d5d83bf26dc5e58",
+      "start": 39,
+      "text": "## Technical Constraints\n\n**Pinned Versions (DO NOT change without explicit approval):**\n- Minecraft: 26.2\n- Loader: Fabric\n- Fabric Loader: 0.19.3\n- Fabric API: 0.154.2+26.2\n- Fabric Loom: 1.17-SNAPSHOT\n- Gradle: 9.5.1 through the checked-in wrapper\n- Java: 25\n- Gradle: controlled by ./gradlew\n\n**Architecture Rules:**\n- This is a **Fabric** project. Never use Forge, NeoForge, or Forge Legacy classes, annotations, event buses, registration patterns, or documentation.\n- Keep common/server logic separate from client-only rendering and UI code.\n- Registration code only performs registration.\n- Game rules belong in domain/service classes.\n- Rendering and screens belong in client-only packages (`client/`).\n- Network packets must validate all client-supplied input.\n- Persistent data must have explicit schema and migration strategy.\n- Pure logic should not depend on Minecraft classes where avoidable.\n- Never reference client-only classes from common/server initialization.\n\n## Required Workflow\n\n### Before Editing (for any agent)\n1. Read this `AGENTS.md`.\n2. Read `docs/PRODUCT.md` (if exists).\n3. Read `docs/ARCHITECTURE.md` (if exists).\n4. Inspect the relevant existing classes.\n5. State a short implementation plan.\n6. Identify client/server implications.\n\n### After Editing\n1. Run `./gradlew compileJava` (or specified compile task).\n2. Run automated tests: `./gradlew test`.\n3. Run formatting: `./gradlew spotlessCheck` (if configured).\n4. Review the resulting diff.\n5. Report any untested behavior.\n6. Never declare success if compilation fails.\n\n## Change Constraints\n\n- Make the **smallest** change that satisfies the task.\n- Do not add unrelated features.\n- Do not upgrade dependencies without explicit human approval.\n- Do not invent APIs.\n- Check APIs against pinned dependency sources or official Fabric docs.\n- Prefer documented Fabric API over mixins.\n- Do not add a mixin without explaining in code comments why a public API is insufficient.\n- Never execute destructive Git commands (reset --hard, clean -fd, etc.).\n- Do not commit secrets or local configuration.\n\n## Definition of Done\n\nA task is complete **only when all** of the following are true:\n- The project compiles with `./gradlew build`.\n- All relevant automated tests pass.\n- Formatting passes (`./gradlew spotlessCheck` if available).\n- Dedicated-server compatibility has been verified (no client-class loading on server).\n- User-visible behavior is documented.\n- No unrelated files were changed.\n- The Git diff has been reviewed.\n\n## Client/Server Boundary Rules\n\n**Server-Authoritative Principles:**\n- Server owns all game state.\n- Client is a dumb terminal that renders and sends input.\n- All game logic that affects state must run on the server.\n- Client may predict for smoothness but must reconcile with server authority.\n\n**Never Do:**\n- Import `net.minecraft.client.*` in common or server code.\n- Trust the client to award items, change game state, or validate actions.\n- Mutate server state only on the client.\n- Send packets from server to client without client handling.\n- Access world, player, or entity state before checking if it exists.\n\n**Always Do:**\n- Check the current 26.2 logical-side API (`Level.isClientSide()`) before client-only behavior.\n- Use the current server-player type from the pinned unobfuscated sources for server-side player logic.\n- Validate all client-supplied data in packet handlers.\n- Annotate client-only classes with `@Environment(EnvType.CLIENT)`.\n- Keep client code in `client/` package or subclasses thereof.\n\n## Ownership Boundaries\n\n| Role | Owned Paths | Read-Only | Notes |\n|------|-------------|-----------|-------|\n| Mod Architect | `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/ACCEPTANCE.md`, `mod-spec.json` | All | Planning only, no code |\n| Asset Producer | Exact declared files under `src/*/resources/assets/`, `docs/style-guide.md`, `assets/asset-manifest.json` | All | No Java or Gradle code |\n| Mod Engineer | Exact `engineer_artifacts`, `docs/IMPLEMENTATION.md` | Creative artifacts | Implementation only |\n| Mod QA | None during review; root may materialize the report under `.mc-mod-agents/evidence/` | All | Read-only audit |\n\n## Verification Gates\n\n### Automated Gates (must pass)\n```bash\n./gradlew compileJava\n./gradlew compileClientJava\n./gradlew test\n./gradlew build\n```\n"
+    },
+    {
+      "end": 45,
+      "path": "docs/PRODUCT.md",
+      "sha256": "53ae7039d8df57fc28e6cc290e0e8c68b7dd2a3dafab8084d497f30e29ecebe7",
+      "start": 1,
+      "text": "# Mana Core - Product Document\n\n## Audience and Player Promise\n\n**Target Audience:**\n- Mod developers creating magic-themed mods\n- Technical players building custom magic systems\n- Modpack creators integrating magic mechanics\n\n**Player Promise:**\nMana Core provides a foundational positional mana resource system that enables mods to implement magic mechanics with gradient-based mana flow, gathering, and storage. It handles the complex calculations on the server while providing client-side visualization for players and developers to build upon.\n\n## Core Loop\n\n1. **Mana Exists:** Mana values are maintained at every 3D coordinate in the world\n2. **Mana Flows:** Mana automatically moves along gradients from high to low concentration\n3. **Mana Gathered:** Consumer blocks and entities collect mana from spherical regions around them\n4. **Mana Stored:** Collected mana is stored in finite-capacity containers\n5. **Mana Used:** Stored mana powers spells, crafting, or other mod-defined effects\n6. **Mana Created:** Creator blocks and events inject new mana into the system\n\n## Controls and Feedback\n\n**Controls:**\n- Primary input: None (automatic system)\n- Configuration: JSON config files for flow rates, sphere radii\n- Commands: `/mana debug` - shows mana values at player position\n\n**Feedback:**\n- **Visual:** Particle effects showing mana flow direction and intensity\n- **Visual:** Color-coded block overlays indicating mana density\n- **Text:** Debug output showing numeric mana values\n- **Text:** Chat messages for significant mana events (configurable)\n\n## Progression, Failure, and Restart\n\n**Progression:**\n- Mod developers integrate Mana Core API into their mods\n- Players experience mana mechanics through integrated mods\n- System scales with world size and entity count\n\n**Failure:**\n- Invalid coordinates or missing world: Logs error, continues operation\n- Overflow storage: Mana is discarded with warning\n- Negative mana: Clamped to zero with audit log\n"
+    },
+    {
+      "end": 75,
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "fee95cad55bc7b909082f773f12ed0bf1b3f2446a5976831c66763a6437f2f2c",
+      "start": 45,
+      "text": "\n| Module | Source Path | Loaded On | Dependencies |\n|--------|-------------|-----------|--------------|\n| Common | `src/main/java/com/manacore/` | Server + Client | Fabric API, Minecraft |\n| Client | `src/client/java/com/manacore/client/` | Client only | Common, Fabric Client API |\n\n**Enforcement:**\n- Common code MUST NOT import `net.minecraft.client.*`\n- Client code MUST be annotated with `@Environment(EnvType.CLIENT)`\n- Common initialization uses `ModInitializer`\n- Client initialization uses `ClientModInitializer`\n\n## Server Authority\n\n**Server owns:**\n- All mana values at every coordinate\n- Mana flow calculations\n- Mana gathering logic\n- Mana creation logic\n- Mana storage amounts\n- Consumer/creator registration\n- All game state changes\n\n**Client owns:**\n- Visualization rendering only\n- Particle effects\n- Block overlays\n- Debug HUD display\n- Input for debug commands\n\n**Synchronization:**\n"
+    },
+    {
+      "end": 225,
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "4eef8193fa5854d91b45ef4905e0f62cf1f6ae3572aff24dc7cd266378351b27",
+      "start": 150,
+      "text": "│   │   │   ├── events/\n│   │   │   │   ├── ManaFlowEvent.java\n│   │   │   │   ├── ManaGatherEvent.java\n│   │   │   │   └── ManaStoreEvent.java\n│   │   │   └── types/\n│   │   │       ├── ManaConsumer.java     # Interface\n│   │   │       ├── ManaCreator.java      # Interface\n│   │   │       └── ManaStorage.java      # Interface\n│   │   ├── core/\n│   │   │   ├── storage/\n│   │   │   │   ├── ChunkManaMap.java      # Sparse chunk storage\n│   │   │   │   └── ManaCoordinates.java   # Coordinate utilities\n│   │   │   ├── flow/\n│   │   │   │   ├── GradientCalculator.java\n│   │   │   │   └── FlowEngine.java\n│   │   │   ├── gather/\n│   │   │   │   └── SphericalGatherer.java\n│   │   │   └── ManaMath.java            # Math utilities\n│   │   ├── networking/\n│   │   │   ├── ManaNetworking.java      # Packet registration\n│   │   │   └── ManaPacketHandler.java   # Packet processing\n│   │   └── config/\n│   │       └── ManaConfig.java\n│   └── resources/\n│       ├── fabric.mod.json\n│       └── assets/manacore/\n│           └── lang/\n│               └── en_us.json\n└── client/\n    └── java/com/manacore/client/\n        ├── ManaCoreClient.java          # Client entrypoint\n        ├── visualization/\n        │   ├── particle/\n        │   │   └── ManaFlowParticle.java\n        │   ├── overlay/\n        │   │   └── ManaOverlay.java\n        │   └── ParticleManager.java\n        ├── hud/\n        │   └── DebugHUD.java\n        └── networking/\n            └── ClientManaPacketHandler.java\n\ntests/\n└── src/test/java/com/manacore/\n    ├── core/\n    │   ├── storage/\n    │   │   └── ChunkManaMapTest.java\n    │   └── flow/\n    │       └── GradientCalculatorTest.java\n    └── TestManaCore.java\n```\n\n## Test Seams\n\n### Unit Test Boundaries\n\n| Component | Test Strategy | Seam Location |\n|-----------|---------------|---------------|\n| ChunkManaMap | Direct instantiation | Constructor |\n| GradientCalculator | Pure function | Static methods |\n| FlowEngine | Mock dependencies | Interface injection |\n| SphericalGatherer | Parameterized tests | Public methods |\n| ManaAPI | Integration tests | Public API |\n\n### Automated Test Coverage\n\n**Required tests:**\n- `ChunkManaMapTest`: Add, get, remove mana at coordinates\n- `ChunkManaMapTest`: Sparse storage behavior\n- `GradientCalculatorTest`: Correct gradient direction\n- `GradientCalculatorTest`: Edge cases (equal values, boundaries)\n- `SphericalGathererTest`: Correct sphere collection\n- `SphericalGathererTest`: Radius configuration\n- `FlowEngineTest`: Mana movement logic\n- `FlowEngineTest`: Performance with many coordinates\n\n"
+    },
+    {
+      "end": 140,
+      "path": "docs/ACCEPTANCE.md",
+      "sha256": "85967e48d298c15622a30c0b0aa6bc2d4073222ac45e97c4f396f4f98cbd192a",
+      "start": 104,
+      "text": "### Journey 8: Storage Capacity Limit\n\n**ID:** MC-008\n**Preconditions:** Mana Collector with capacity=1000 at (10,64,10)\n**Action:** System attempts to add mana when storage is full\n**Observable:** Storage stops at 1000, no overflow\n**Verification:**\n- Storage value = 1000 (capped)\n- Server log: `Mana storage full, discarding excess`\n- No negative values or wrap-around\n**Authority:** Server\n**Evidence:** Server log, storage value remains at cap\n\n### Journey 9: Debug Command\n\n**ID:** MC-009\n**Preconditions:** Server running, player in world\n**Action:** Player executes `/mana debug` at position (x,y,z)\n**Observable:** Chat message showing mana value at position\n**Verification:**\n- Response format: `Mana at (x,y,z): <value>`\n- Value matches server state\n- No errors for valid coordinates\n- Error message for invalid coordinates\n**Authority:** Server (data), Client (display)\n**Evidence:** Chat output screenshot, server command processing log\n\n### Journey 10: Invalid Position Handling\n\n**ID:** MC-010\n**Preconditions:** Server running\n**Action:** Mod API queries mana at invalid position (null, out of bounds)\n**Observable:** Graceful error handling\n**Verification:**\n- No NPE or exception thrown\n- Return value: 0 mana\n- Server log: `Invalid position requested: <details>`\n"
+    }
+  ],
+  "task": {
+    "context": [
+      {
+        "end": 142,
+        "path": "AGENTS.md",
+        "start": 39
+      },
+      {
+        "end": 45,
+        "path": "docs/PRODUCT.md",
+        "start": 1
+      },
+      {
+        "end": 75,
+        "path": "docs/ARCHITECTURE.md",
+        "start": 45
+      },
+      {
+        "end": 225,
+        "path": "docs/ARCHITECTURE.md",
+        "start": 150
+      },
+      {
+        "end": 140,
+        "path": "docs/ACCEPTANCE.md",
+        "start": 104
+      }
+    ],
+    "done": [
+      "All four scoped files exist and compile with Java 25 without Minecraft or Fabric classes.",
+      "Unset positions read as zero; non-positive results are removed so storage remains sparse; mana never becomes negative or non-finite.",
+      "Coordinate helpers handle negative coordinates and chunk boundaries using floor division/modulus semantics.",
+      "ChunkManaMapTest is a no-dependency executable test whose main method covers get, set, add, remove, sparse cleanup, invalid values, negative coordinates, and chunk boundaries."
+    ],
+    "forbidden": [
+      "Do not write outside the four declared files, although the full target may be read.",
+      "Do not use Minecraft, Fabric, Forge, NeoForge, client, networking, persistence, mixin, package-manager, download, network, subagent, or MCP APIs.",
+      "Do not edit design, creative, build, mod-spec, agent-state, or repository instruction files.",
+      "Do not claim Gradle or Minecraft integration is complete."
+    ],
+    "goal": "Implement the first bounded Mod Engineer slice: pure Java coordinate utilities, mana math, sparse positional chunk storage, and a no-dependency executable test. The worker may inspect the full target directory but may write only the four declared files.",
+    "id": "mana-core-storage-implementation-devstral-tools",
+    "limits": {
+      "max_tool_calls": 30,
+      "max_verifiers": 1,
+      "model_context_tokens": 200000,
+      "model_output_tokens": 200000,
+      "model_timeout_seconds": 1800,
+      "output_chars": 16000,
+      "packet_chars": 200000,
+      "verifier_timeout_seconds": 120
+    },
+    "model": {
+      "capability": "coding",
+      "importance": "high",
+      "profile": "devstral-small"
+    },
+    "target": "initiatives/mc-mod-core",
+    "v": 1,
+    "verifiers": [
+      {
+        "argv": [
+          "{python}",
+          ".mc-mod-agents/tools/verify_storage_slice.py"
+        ],
+        "id": "pure-java-storage-test"
+      }
+    ],
+    "write_roots": [
+      "src/main/java/com/manacore/core/storage/ChunkManaMap.java",
+      "src/main/java/com/manacore/core/storage/ManaCoordinates.java",
+      "src/main/java/com/manacore/core/ManaMath.java",
+      "src/test/java/com/manacore/core/storage/ChunkManaMapTest.java"
+    ]
+  },
+  "task_sha256": "6f0b7a0ab80b52506b8bb07906d193e25e1c56bc709a1e539c7995c1305f8c9c",
+  "v": 1
+}

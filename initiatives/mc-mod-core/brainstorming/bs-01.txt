@@ -1,0 +1,1292 @@
+Hi! Please act as an AI architect.
+
+I'm about to create a minecraft mod with Mistral Medium 3.5 or devstral small as the model doing the coding - since that's where I have a subscription.
+
+Help me figure out how this can be successful.
+
+
+# ANSWER BY SOL
+
+<web>IN_PROGRESS</web><web>SEARCHING</web><web>COMPLETED</web><web>IN_PROGRESS</web><web>SEARCHING</web><web>COMPLETED</web>### Absolutely — let’s approach this as an engineering project, not “vibe coding”
+
+An AI model can write much of the code, but it cannot compensate for an ambiguous product, unstable architecture, or missing tests. Your job is to create an environment where the model receives **small, verifiable tasks** and immediate feedback.
+
+The successful pattern is:
+
+\[
+\text{Specification} \rightarrow \text{Small change} \rightarrow \text{Compile} \rightarrow \text{Test} \rightarrow \text{Review} \rightarrow \text{Commit}
+\]
+
+—not:
+
+\[
+\text{Large idea} \rightarrow \text{One enormous prompt} \rightarrow \text{Hope}
+\]
+
+---
+
+## 1. First define what “successful” means
+
+Before choosing a loader or model, write a one-page product brief.
+
+### Your mod brief should answer
+
+1. **What is the mod’s one-sentence pitch?**
+2. **Who is it for?**
+   - Single-player users?
+   - Multiplayer servers?
+   - Modpack authors?
+   - Technical players?
+3. **What is the smallest enjoyable release?**
+4. **Does it need custom rendering?**
+5. **Does it change world generation?**
+6. **Does it store persistent data?**
+7. **Must it work on dedicated servers?**
+8. **Does it integrate with other mods?**
+9. **Which Minecraft version and mod loader are targeted?**
+10. **What explicitly will not be in version 1?**
+
+A useful format:
+
+```markdown
+# Mod vision
+
+## Pitch
+One sentence describing the player experience.
+
+## Target player
+Who installs this and why?
+
+## Core loop
+1. Player does X.
+2. Game responds with Y.
+3. Player gains Z.
+4. This creates a reason to repeat X.
+
+## MVP
+- Feature A
+- Feature B
+- Feature C
+
+## Not in MVP
+- Feature D
+- Multiplayer integration with E
+- Advanced configuration
+
+## Technical constraints
+- Minecraft Java Edition 26.2
+- Fabric
+- Java version required by the selected toolchain
+- Must work on dedicated servers
+- No mixins unless justified
+```
+
+The **“not in MVP”** section is particularly important. Coding agents will happily expand scope unless constrained.
+
+---
+
+## 2. Recommended starting stack
+
+Unless your mod has a specific reason to require NeoForge, I would begin with:
+
+| Area | Recommendation |
+|---|---|
+| Edition | Minecraft Java Edition |
+| Loader | Fabric |
+| Language | Java |
+| IDE | IntelliJ IDEA |
+| Build system | Gradle wrapper supplied by the template |
+| Source control | Git + GitHub/GitLab |
+| AI interface | Mistral Vibe or an IDE agent using your Mistral subscription |
+| CI | GitHub Actions or equivalent |
+| Testing | JUnit for pure logic, GameTest/in-game tests where practical |
+| Formatting | Spotless or Checkstyle |
+| Releases | Tagged, reproducible Gradle builds |
+
+Fabric currently provides documentation for project creation, structure, networking, rendering, data generation, and building distributable JARs. Its documentation also provides a working reference project, which is extremely valuable for grounding an AI coding model. ([docs.fabricmc.net](https://docs.fabricmc.net/develop/?utm_source=openai))
+
+NeoForge is also valid, particularly when your target ecosystem or desired dependencies are NeoForge-oriented. It has an official getting-started workflow for creating, running, and testing a mod workspace. ([docs.neoforged.net](https://docs.neoforged.net/docs/gettingstarted/?utm_source=openai))
+
+### Choose NeoForge instead if
+
+- A critical dependency is NeoForge-only.
+- You are targeting NeoForge-heavy modpacks.
+- The mod’s community already expects NeoForge.
+- The APIs you require are substantially easier there.
+- You already understand Forge/NeoForge conventions.
+
+### Important version warning
+
+As of **August 2, 2026**, Minecraft uses calendar-based version numbering; the Fabric documentation is currently organized around **26.2**. Pick one exact Minecraft release and pin every dependency. Do not ask the model to “use the latest versions” repeatedly—it may create an incompatible mixture. ([docs.fabricmc.net](https://docs.fabricmc.net/develop/?utm_source=openai))
+
+Use a version matrix in the repository:
+
+```markdown
+# Supported environment
+
+- Minecraft: 26.2
+- Loader: Fabric
+- Fabric Loader: <exact version>
+- Fabric API: <exact version>
+- Java: <exact version>
+- Gradle: controlled by ./gradlew
+- Mappings: <exact version, if applicable>
+```
+
+---
+
+## 3. Model choice: architect versus implementer
+
+Your model names appear to reflect your subscription, but the current Mistral documentation also lists newer Devstral variants, including **Devstral Small 2**, and aliases such as `devstral-small-latest`. Mistral Medium 3 has been replaced by **Mistral Medium 3.5**. Verify which exact models your subscription exposes before configuring the agent. ([docs.mistral.ai](https://docs.mistral.ai/models/overview?form=MG0AV3&utm_source=openai))
+
+### Suggested division of labour
+
+#### Use Mistral Medium 3.5 for
+
+- Product decomposition
+- Architecture
+- Diagnosing complicated failures
+- Reviewing cross-cutting changes
+- Designing networking and persistence
+- Reviewing security and performance
+- Planning refactors
+- Comparing multiple implementation strategies
+
+#### Use Devstral Small for
+
+- Implementing one well-defined issue
+- Adding a block, item, recipe, command, or configuration option
+- Writing unit tests
+- Fixing compilation failures
+- Mechanical refactoring
+- Updating documentation
+- Adding data-generation providers
+- Investigating a small area of the repository
+
+### Practical rule
+
+> Use the strongest model to decide **what should change** and the coding model to perform **small changes**.
+
+If both are available at no meaningful additional cost, use Medium for planning/review and Devstral for implementation. If you must pick one, start with Devstral inside a strong agentic loop and escalate difficult architecture or debugging tasks to Medium.
+
+---
+
+## 4. Use an agent, not merely a chat window
+
+Mistral’s official Vibe CLI can inspect files, edit the repository, search code, execute builds, maintain a task list, ask questions, and delegate exploration to subagents. It also supports project-level `AGENTS.md` instructions. ([github.com](https://github.com/mistralai/mistral-vibe?utm_source=openai))
+
+That tool loop is more important than small differences between models:
+
+```text
+Read relevant code
+    ↓
+Propose a plan
+    ↓
+Make a limited edit
+    ↓
+Run Gradle compilation/tests
+    ↓
+Inspect errors
+    ↓
+Correct the implementation
+    ↓
+Show the diff
+```
+
+Use approval-based operation initially. Mistral Vibe includes `plan`, `default`, `accept-edits`, and `auto-approve` modes; avoid unrestricted auto-approval until the repository has reliable tests and Git protection. ([github.com](https://github.com/mistralai/mistral-vibe?utm_source=openai))
+
+A safe workflow is:
+
+```bash
+# Read-only investigation
+vibe --agent plan
+
+# Controlled implementation
+vibe --agent default
+```
+
+Mistral Vibe’s programmatic mode defaults to auto-approval when no agent is specified, so explicitly select an agent if you automate tasks. It also supports limits for turns, tokens, and price. ([github.com](https://github.com/mistralai/mistral-vibe?utm_source=openai))
+
+---
+
+## 5. Build an AI-friendly repository
+
+The model should not need to rediscover your rules in every session.
+
+### Suggested structure
+
+```text
+my-mod/
+├── AGENTS.md
+├── README.md
+├── CHANGELOG.md
+├── LICENSE
+├── docs/
+│   ├── PRODUCT.md
+│   ├── ARCHITECTURE.md
+│   ├── TESTING.md
+│   ├── COMPATIBILITY.md
+│   └── decisions/
+│       ├── 0001-use-fabric.md
+│       └── 0002-server-authoritative-state.md
+├── gradle/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   └── resources/
+│   ├── client/
+│   │   ├── java/
+│   │   └── resources/
+│   └── test/
+│       └── java/
+├── gradlew
+├── gradlew.bat
+├── build.gradle
+└── gradle.properties
+```
+
+Exact source-set names depend on the generated project, but the architectural principle is crucial:
+
+> Keep common/server logic separate from client-only rendering and UI code.
+
+This prevents dedicated-server crashes caused by loading client classes on the server.
+
+---
+
+## 6. Create a strict `AGENTS.md`
+
+Mistral Vibe loads project-specific instructions from `AGENTS.md`, and closer directory instructions can override broader ones. ([github.com](https://github.com/mistralai/mistral-vibe?utm_source=openai))
+
+Start with something like this:
+
+```markdown
+# Project instructions
+
+## Goal
+
+Develop a stable Minecraft Java Edition mod for:
+- Minecraft: 26.2
+- Loader: Fabric
+- Language: Java
+
+Never silently change these target versions.
+
+## Required workflow
+
+Before editing:
+1. Read docs/PRODUCT.md.
+2. Read docs/ARCHITECTURE.md.
+3. Inspect the relevant existing classes.
+4. State a short implementation plan.
+5. Identify client/server implications.
+
+After editing:
+1. Run the relevant Gradle compile task.
+2. Run automated tests.
+3. Run formatting/static analysis.
+4. Review the resulting diff.
+5. Report any untested behavior.
+
+## Change constraints
+
+- Make the smallest change that satisfies the task.
+- Do not add unrelated features.
+- Do not upgrade dependencies without explicit permission.
+- Do not invent APIs.
+- Check APIs against the pinned dependency sources or official docs.
+- Prefer documented loader APIs over mixins.
+- Do not add a mixin without explaining why a public API is insufficient.
+- Never reference client-only classes from common/server initialization.
+- Do not execute destructive Git commands.
+- Do not commit secrets or local configuration.
+
+## Architecture
+
+- Registration code only performs registration.
+- Game rules belong in domain/service classes.
+- Rendering and screens belong in client-only packages.
+- Network packets must validate all client-supplied input.
+- Persistent data must have an explicit schema and migration strategy.
+- Pure logic should not depend on Minecraft classes where avoidable.
+
+## Definition of done
+
+A task is complete only when:
+- The project compiles.
+- Relevant tests pass.
+- Formatting passes.
+- Dedicated-server compatibility has been considered.
+- User-visible behavior is documented.
+- No unrelated files were changed.
+```
+
+This file will probably improve results more than repeatedly rewriting prompts.
+
+---
+
+## 7. Architect for testability
+
+Minecraft code is difficult to test if every rule is buried inside event handlers and game classes.
+
+### Bad shape
+
+```java
+public void onPlayerInteraction(Player player, World world, BlockPos pos) {
+    // 150 lines containing:
+    // validation
+    // random calculations
+    // inventory updates
+    // persistence
+    // particles
+    // networking
+}
+```
+
+### Better shape
+
+```text
+Minecraft event adapter
+        ↓
+Use-case/service
+        ↓
+Pure domain rules
+        ↓
+Result
+        ↓
+Minecraft effects adapter
+```
+
+For example:
+
+```java
+public record RitualInput(
+    int nearbyCandles,
+    boolean isNight,
+    int playerLevel
+) {}
+
+public record RitualResult(
+    boolean successful,
+    int levelCost,
+    RewardType reward
+) {}
+
+public final class RitualRules {
+    public RitualResult evaluate(RitualInput input) {
+        // Pure Java logic
+    }
+}
+```
+
+The event handler translates Minecraft state into `RitualInput`, calls the pure logic, and applies the result.
+
+This lets the agent write and run fast JUnit tests without launching Minecraft:
+
+```java
+@Test
+void ritualFailsDuringDay() {
+    RitualInput input = new RitualInput(8, false, 30);
+
+    RitualResult result = rules.evaluate(input);
+
+    assertFalse(result.successful());
+}
+```
+
+AI-generated code becomes dramatically safer when most behavioural rules can be checked this way.
+
+---
+
+## 8. Split work into vertical slices
+
+Do not tell the agent:
+
+> Build the magic system.
+
+Instead, create issues such as:
+
+1. Register one inert test item.
+2. Add its translation and generated model.
+3. Add a `/mymod status` command.
+4. Create the pure spell-cost calculator.
+5. Add tests for spell costs.
+6. Add server-side spell activation.
+7. Add one validated client-to-server packet.
+8. Add particles on successful activation.
+9. Persist unlocked spells.
+10. Test save/reload behaviour.
+
+Each task should ideally:
+
+- Touch fewer than five files.
+- Have an observable acceptance criterion.
+- Compile independently.
+- Take one agent session.
+- Produce one Git commit.
+
+### Good task specification
+
+```markdown
+# Task: Add the copper focus item
+
+## Behaviour
+Register an item with ID `mymod:copper_focus`.
+
+## Scope
+- Register the item.
+- Add its English translation.
+- Generate or add its item model.
+- Add it to the existing creative group.
+
+## Constraints
+- Do not add any right-click behaviour.
+- Do not add recipes.
+- Do not change dependency versions.
+- Follow the existing item-registration pattern.
+
+## Acceptance criteria
+- `./gradlew build` succeeds.
+- The item appears in the intended creative group.
+- No client-only class is loaded by common initialization.
+```
+
+That is the level of specificity you want.
+
+---
+
+## 9. Establish hard quality gates
+
+The model must not be allowed to declare success based on plausible-looking code.
+
+### Minimum automated gates
+
+```bash
+./gradlew compileJava
+./gradlew test
+./gradlew build
+```
+
+Add whichever formatting and static-analysis tasks you configure:
+
+```bash
+./gradlew spotlessCheck
+./gradlew check
+```
+
+### Also maintain two smoke-test profiles
+
+#### Client smoke test
+
+- Game starts.
+- A world can be loaded.
+- Registries complete without errors.
+- New assets and translations resolve.
+- Primary feature works once.
+
+#### Dedicated-server smoke test
+
+- Server starts without client-class errors.
+- A player can connect.
+- Feature works with server authority.
+- Save/reload does not lose data.
+- Malformed or invalid packets do not crash the server.
+
+A mod that works in an integrated single-player server can still crash a dedicated server.
+
+---
+
+## 10. The most dangerous AI failure modes
+
+### Hallucinated APIs
+
+Minecraft modding APIs vary heavily by:
+
+- Minecraft version
+- Loader
+- Loader version
+- Mapping set
+- Fabric API or NeoForge version
+
+A method may be real but belong to another version.
+
+**Mitigation:**
+
+- Pin versions.
+- Give the agent the generated project.
+- Tell it to inspect dependency sources.
+- Use official documentation and the template reference project.
+- Compile after every meaningful change.
+- Never accept “this should compile.”
+
+### Fabric/NeoForge contamination
+
+The model may import examples from the wrong loader.
+
+**Mitigation:**
+
+```markdown
+This is a Fabric project. Never use Forge or NeoForge classes,
+annotations, event buses, registration patterns, or documentation.
+```
+
+Put that in `AGENTS.md`.
+
+### Client/server boundary errors
+
+Typical problems:
+
+- Importing renderer classes in common initialization
+- Trusting the client to award items
+- Mutating server state only on the client
+- Sending excessive packets
+- Accessing a world before it exists
+
+**Mitigation:** require every feature plan to include a short section titled **Sides and authority**.
+
+### Giant rewrites
+
+Agents sometimes replace working infrastructure instead of adapting it.
+
+**Mitigation:**
+
+- Limit task scope.
+- Require a plan before edits.
+- Review `git diff --stat`.
+- Reject unrelated changes.
+- Commit after every accepted slice.
+
+### Mixins used too early
+
+Mixins are powerful but highly sensitive to game internals.
+
+**Mitigation:** prefer:
+
+1. Loader API
+2. Events/hooks
+3. Access wideners when appropriate
+4. A narrowly targeted mixin as a last resort
+
+Require a written justification for each mixin.
+
+### Assets forgotten
+
+Java can compile while the feature is broken because of:
+
+- Missing translation keys
+- Wrong resource paths
+- Missing models or textures
+- Invalid JSON
+- Incorrect identifiers
+
+Include resources in every feature’s acceptance criteria.
+
+---
+
+## 11. A sensible architecture for a medium-sized mod
+
+```text
+com.yourname.mymod
+├── MyMod.java
+├── registry/
+│   ├── ModItems.java
+│   ├── ModBlocks.java
+│   ├── ModEntities.java
+│   └── ModComponents.java
+├── domain/
+│   ├── spell/
+│   ├── progression/
+│   └── ritual/
+├── service/
+│   ├── SpellService.java
+│   └── ProgressionService.java
+├── persistence/
+│   ├── PlayerProgressData.java
+│   └── WorldStateData.java
+├── network/
+│   ├── ModNetworking.java
+│   └── payload/
+├── command/
+├── integration/
+└── client/
+    ├── MyModClient.java
+    ├── render/
+    ├── screen/
+    └── model/
+```
+
+Do not force this structure onto a tiny mod, but preserve these boundaries:
+
+- **Registration:** declares game objects.
+- **Domain:** contains rules.
+- **Services:** coordinate use cases.
+- **Persistence:** stores state.
+- **Network:** crosses client/server boundaries.
+- **Client:** contains rendering, UI, keybindings, and client-only effects.
+- **Integration:** isolates optional mod compatibility.
+
+---
+
+## 12. Recommended implementation workflow
+
+### Phase 0 — Product discovery
+
+Produce:
+
+- `PRODUCT.md`
+- Explicit MVP
+- Player loop
+- Non-goals
+- Target version and loader
+- Three representative gameplay scenarios
+
+Do not code yet.
+
+### Phase 1 — Walking skeleton
+
+Create a project that:
+
+- Launches the client
+- Launches a dedicated server
+- Registers one trivial item
+- Builds in CI
+- Produces a JAR
+
+This proves the entire toolchain before real complexity appears.
+
+### Phase 2 — Architectural spike
+
+Implement the riskiest technical question in isolation:
+
+- Can the rendering effect work?
+- Can the required block state be persisted?
+- Can world generation be achieved?
+- Can the other mod’s API be integrated?
+- Can the server validate the action correctly?
+
+Throw away the spike if necessary. Do not build the whole product around an untested assumption.
+
+### Phase 3 — Vertical MVP slices
+
+Implement one complete player-visible behaviour at a time.
+
+Each slice should include:
+
+- Registration
+- Rules
+- Assets
+- Networking, if needed
+- Persistence, if needed
+- Tests
+- Documentation
+
+### Phase 4 — Hardening
+
+Test:
+
+- Dedicated server
+- New world
+- Existing world
+- Save and reload
+- Multiplayer
+- Invalid inputs
+- Missing optional dependencies
+- Configuration changes
+- Upgrade from the prior mod version
+
+### Phase 5 — Release
+
+Prepare:
+
+- Semantically versioned mod release
+- Changelog
+- Installation instructions
+- Exact compatibility statement
+- Known limitations
+- License
+- Source archive/repository
+- Clean build from a fresh clone
+
+---
+
+## 13. Prompts that work well
+
+### Planning prompt
+
+```text
+Act as the implementation planner for this repository.
+
+Read AGENTS.md, docs/PRODUCT.md, and docs/ARCHITECTURE.md.
+Then inspect the relevant source files.
+
+Plan the smallest implementation that satisfies issue #12.
+
+Your response must include:
+1. Existing code involved
+2. Files likely to change
+3. Client/server responsibilities
+4. Persistence or networking impact
+5. Tests to add
+6. Risks and uncertain APIs
+7. Step-by-step implementation plan
+
+Do not edit files yet.
+Do not propose unrelated refactoring.
+```
+
+### Implementation prompt
+
+```text
+Implement only steps 1–3 of the approved plan.
+
+Constraints:
+- Follow AGENTS.md.
+- Do not modify dependency versions.
+- Do not introduce mixins.
+- Follow existing repository patterns.
+- Keep game rules separate from registration code.
+- Run the relevant compile and test tasks afterward.
+
+If an API is uncertain, inspect the pinned dependency source instead of
+guessing. Stop and explain if the task requires architectural deviation.
+```
+
+### Debugging prompt
+
+```text
+The following Gradle task fails.
+
+First identify the earliest meaningful error rather than reacting to
+downstream errors. Inspect the implicated source and dependency API.
+
+Make the smallest correction possible. Do not suppress errors, weaken tests,
+or upgrade dependencies unless explicitly approved.
+
+After the correction:
+1. Re-run the failing task.
+2. Run related tests.
+3. Summarize root cause and changed files.
+```
+
+### Review prompt
+
+```text
+Review the current Git diff as a skeptical senior Minecraft mod developer.
+
+Check:
+- correctness against the issue
+- API compatibility with pinned versions
+- client/server class separation
+- server authority and packet validation
+- save compatibility
+- null/lifecycle assumptions
+- performance in tick/event handlers
+- missing assets and translations
+- missing tests
+- unrelated changes
+
+Do not edit files. Report findings by severity with file and line references.
+```
+
+---
+
+## 14. My concrete recommendation
+
+Start with this operating model:
+
+1. **Fabric + Java**, unless dependencies force NeoForge.
+2. Generate the project from the official template.
+3. Pin one exact Minecraft/loader/API combination.
+4. Use **Mistral Medium 3.5 for planning and review**.
+5. Use **Devstral Small for tightly scoped implementation**.
+6. Run the agent through **Mistral Vibe** or another tool-capable interface.
+7. Create `AGENTS.md`, `PRODUCT.md`, and `ARCHITECTURE.md` before feature work.
+8. Require compilation and tests after every task.
+9. Commit every accepted vertical slice.
+10. Keep the MVP to roughly **three core player-visible features**.
+
+The biggest predictor of success will not be whether Medium or Devstral writes a slightly better method. It will be whether you maintain:
+
+- Stable specifications
+- Small tasks
+- Pinned versions
+- Automated feedback
+- Human review
+- Strict client/server boundaries
+- Controlled scope
+
+---
+
+### Information I need to design the actual architecture
+
+Please provide:
+
+1. Your mod’s one-sentence concept
+2. Expected Minecraft version
+3. Fabric, NeoForge, or undecided
+4. Single-player, multiplayer, or both
+5. Main systems involved—items, mobs, world generation, UI, automation, magic, etc.
+6. Your Java experience
+7. Whether you want one release or long-term maintenance
+8. How your Mistral subscription exposes the models: Le Chat, Vibe CLI, API, IDE plugin, or another interface
+
+From that, the next useful deliverable would be a **specific MVP, package architecture, milestone plan, issue backlog, and ready-to-use `AGENTS.md`** for your mod.
+
+
+# ANSWER BY CLAUDE
+
+I'd be glad to help you architect this. Before I dive into recommendations, one important flag: I don't have reliable knowledge of "Mistral Medium 3.5" or the current state of Devstral Small — my training data has a cutoff, and given today's date (August 2026), there's likely been a lot of model iteration I'm not aware of. So I'll give you advice that's robust to *whatever* those models' actual capabilities are, and you can calibrate based on what you observe in practice.
+
+That said, the architectural principles for "shipping a Minecraft mod with a mid-tier coding model" are pretty stable, so let's get into it.
+
+## The core problem you're solving
+
+Mid-tier coding models are generally good at *local* code generation and bad at *global* reasoning about unfamiliar, deeply-nested APIs. Minecraft modding is almost pathologically hostile to the second category:
+
+- Massive, poorly-documented API surface (Forge/Fabric/NeoForge)
+- Version churn — code for 1.20 often doesn't work on 1.21
+- Obfuscation/mappings layers (Mojmap vs. Yarn vs. SRG)
+- Registry/lifecycle timing rules that fail silently or crash cryptically
+- Client/server split where getting it wrong causes desync, not a compile error
+
+A weaker model will confidently generate 1.16-era Forge code because that's what dominated its training data. This is the single biggest failure mode you'll hit.
+
+## Recommendations
+
+### 1. Pin your stack and put it in every prompt
+
+Decide up front: **Minecraft version, loader (Fabric/NeoForge/Forge), mappings, Java version, Gradle/loom version.** Write these into a `CONTEXT.md` or `.cursorrules`-style file that gets injected into every coding session. Something like:
+
+```
+Target: Minecraft 1.21.x, NeoForge, Mojang mappings, Java 21
+DO NOT use: @Mod.EventBusSubscriber annotations from Forge 1.16-1.18 style,
+ForgeRegistries direct registration, or any RegistryObject patterns.
+DO use: DeferredRegister with the modern lifecycle, IEventBus passed to @Mod ctor.
+```
+
+The "DO NOT" list is doing more work here than the "DO" list. You'll build it up as you catch the model reaching for stale patterns.
+
+### 2. Give the model ground truth, not memory
+
+This is the highest-leverage thing you can do. Rather than hoping the model remembers the API:
+
+- **Clone a reference mod** in your target version/loader and keep it in the workspace. Point the model at it: "match the registration pattern used in `reference/src/main/java/.../ModItems.java`."
+- **Have the decompiled/sourced Minecraft jar available** so the model can read actual method signatures rather than hallucinating them.
+- Fabric/NeoForge both publish official example mods — start from those templates rather than from scratch.
+
+A mid-tier model reading correct code and adapting it will outperform a frontier model recalling from memory.
+
+### 3. Make the feedback loop tight and automated
+
+The model needs to *find out it was wrong* quickly and cheaply.
+
+- Get `./gradlew build` running fast. Compile errors are your best friend — they're precise, and models are good at fixing them.
+- Set up `runClient` / `runServer` with a datapack/world that puts you in a test scenario in <20 seconds.
+- Consider **GameTest** (Fabric and NeoForge both support Mojang's GameTest framework). Automated in-game tests that a model can run and iterate against are enormously valuable — they convert "does this work?" from a manual 2-minute check into a scriptable assertion.
+
+If you only do one thing from this list, do GameTest for your core mechanics.
+
+### 4. Architect for small, isolated units of work
+
+Structure the mod so that features are additive and independent:
+
+```
+mymod/
+  registry/       # all DeferredRegister declarations, one file per type
+  content/
+    blocks/       # one file per block, self-contained
+    items/
+    entities/
+  network/        # packet definitions, isolated
+  client/         # renderers, screens — strictly client-only
+  data/           # datagen providers
+```
+
+The goal: any single task should be "create/modify one file, plus add one line to a registry file." That's a task shape mid-tier models handle well. Tasks that require touching six files with subtle ordering constraints are where they fall apart.
+
+Do the registry scaffolding and the client/server boundary design **yourself, once, carefully**. Then the model is filling in slots rather than making architectural decisions.
+
+### 5. Use datagen aggressively
+
+Minecraft mods need enormous amounts of JSON: recipes, loot tables, models, blockstates, tags, advancements. Hand-writing these is error-prone and models fumble the schemas.
+
+Instead, use the data generation system so JSON is produced from Java code the model can typecheck. `./gradlew runData` catching a mistake at compile time beats a silent missing-texture bug.
+
+### 6. Establish a "known-good" ratchet
+
+Commit early, commit often, and keep the build green. When the model produces something that compiles and works, commit immediately. Mid-tier models are prone to "fixing" things by breaking adjacent code — you want cheap rollback.
+
+Consider a pre-commit hook that runs `./gradlew build` and rejects broken commits.
+
+## Where to keep humans (you) in the loop
+
+Be deliberate about the division of labor. Reserve for yourself:
+
+- **Initial project setup and build config.** Gradle + loom/neogradle is finicky and failure here is opaque. Use an official template.
+- **Client/server split decisions.** Getting this wrong produces bugs that only show up in multiplayer, hours later.
+- **Registry lifecycle and event bus wiring.** Silent failures live here.
+- **Networking packet design.** Serialization bugs are nasty to debug.
+- **Performance-sensitive code** (anything in a tick loop or chunk-gen path).
+
+Delegate freely:
+
+- Individual block/item classes following an established pattern
+- Recipe/loot table datagen providers
+- GUI screens (given a reference)
+- Config definitions
+- Refactors with clear mechanical rules
+- Test writing
+
+## Suggested build order
+
+1. **Week 0:** You set up the project from an official template. Verify `runClient` works. Commit. Write `CONTEXT.md`.
+2. **Week 0.5:** You add one block and one item manually, wiring the full registry path. This is your reference pattern.
+3. **Then:** Hand the model "add block X following the pattern in ModBlocks/ExampleBlock." Verify it works. This validates your whole loop before you've invested much.
+4. **Scale up:** Content first (blocks, items, recipes — high volume, low risk), then mechanics, then anything touching networking or rendering.
+
+Deliberately front-load a *boring* feature to test the pipeline. Resist starting with the exciting centerpiece mechanic.
+
+## Prompting notes for weaker models
+
+- **One task per message.** Don't batch.
+- **Paste the actual error text**, not a summary.
+- **Ask for the file, not a diff.** Mid-tier models often generate malformed diffs.
+- **When it fails twice on the same thing, stop and give it more context** rather than re-prompting. Two failures usually means missing information, not insufficient effort.
+- **Ask it to state assumptions before coding** on anything non-trivial — cheap way to catch a wrong-version assumption before you've read 200 lines.
+
+## Questions that would sharpen this
+
+- What's the mod actually doing? Content pack (lots of blocks/items) vs. complex mechanic vs. worldgen vs. client-side rendering — these have very different risk profiles, and the last two are meaningfully harder for a mid-tier model.
+- Are you experienced with Java/Minecraft modding yourself, or is the model doing the heavy lifting on domain knowledge too? This changes how much scaffolding you need to build first.
+- Are you using these models through a chat interface, or in an agentic harness with file access and tool use? The recommendations around ground-truth context and tight feedback loops assume the model can read files and run builds — if you're copy-pasting into a chat window, we should restructure.
+- Solo project or team?
+
+Tell me more about the mod and I can get much more specific — particularly around where to draw the line on what you build by hand versus delegate.
+
+
+# ANSWER BY K
+
+Great project idea! Let me help you set this up for success. Here's a practical architecture:
+
+## 1. Pick the Right Modding Stack First
+
+This matters more than the model choice:
+- **Forge vs. Fabric vs. NeoForge**: Fabric has cleaner, simpler code that smaller models handle better. Forge/NeoForge has more boilerplate but more docs/examples online (which helps models). For AI-assisted dev, I'd recommend **Fabric** — less ceremony, fewer chances for the model to hallucinate APIs.
+- **Minecraft version**: Pin to a well-documented version (e.g., 1.20.x or 1.21.x). Bleeding-edge versions = less training data = more hallucinated APIs.
+- **Language**: Java, not Kotlin. More training data.
+
+## 2. Model Strategy
+
+- **Devstral Small** is optimized for agentic coding tasks (it's built for tool-use/swe-style workflows). Use it if you're running an agent loop that edits files, runs builds, reads errors.
+- **Mistral Medium 3.5** will likely be better at reasoning about design and debugging tricky logic.
+
+A good split: **Medium for architecture/planning/debugging, Devstral for executing file edits** — or just use whichever performs better in a quick test on a real task from your mod.
+
+## 3. Compensate for Model Weaknesses
+
+Neither model will reliably know the Fabric/Forge API from memory. So:
+
+- **Ground it with docs**: Paste relevant API signatures, the Yarn/Fabric wiki snippets, or example code into context. Retrieval beats memory.
+- **Provide a working template**: Start from the official Fabric example mod so the model extends working code instead of generating from scratch.
+- **Keep context tight**: Give it the 2–3 relevant files, not the whole project.
+
+## 4. Build a Feedback Loop (Critical)
+
+The single biggest success factor: **let the model see compiler errors.**
+
+```
+model writes code → ./gradlew build → feed errors back → repeat
+```
+
+Even a simple script that runs the build and pastes errors back into the prompt will dramatically improve outcomes. This is where Devstral's agentic training shines.
+
+## 5. Scope Your First Mod Ruthlessly
+
+Good first targets:
+- A new item or block with simple behavior
+- A command
+- A simple event listener (e.g., on block break)
+
+Avoid initially: world generation, custom rendering, networking, entity AI — these have the most API surface to hallucinate.
+
+## 6. Workflow I'd Recommend
+
+1. Set up Fabric example mod, confirm it builds and runs
+2. Write a one-paragraph spec of the feature yourself
+3. Ask the model for a **plan** (files to create/modify) before code
+4. Generate code file-by-file
+5. Build, feed errors back, iterate
+6. Test in-game with `./gradlew runClient`
+
+## Questions to sharpen the plan
+
+1. What does your mod actually do? (Scope drives everything)
+2. Are you running these models via API in an agent loop, or chat-style copy/paste?
+3. What's your Java/modding experience level? (Determines how much you can catch its mistakes)
+
+Tell me more about the mod concept and I can help you break it into model-friendly tasks.
+
+
+# FURTHER SOL
+
+### Yes—but I’d reverse the roles
+
+Use **Mistral Medium 3.5 as the lead architect/orchestrator**, and **Devstral Small as the implementation subagent**:
+
+```text
+You
+ ↓
+Medium 3.5 — defines tasks, reviews architecture, approves plans
+ ↓
+Devstral Small — edits files, builds, tests, fixes errors
+ ↓
+Medium 3.5 — reviews the diff
+```
+
+Medium is better positioned to maintain the overall design and decompose ambiguous features. Devstral should receive narrow, concrete coding tasks.
+
+Starting with Devstral and having it invoke Medium only for planning *can* work, but the weaker model would still control task selection, interpret Medium’s plan, and decide when work is complete. That defeats some of the benefit of using Medium.
+
+---
+
+### Configure a Devstral subagent in Mistral Vibe
+
+Vibe supports custom subagents through the `task` tool. An agent definition becomes delegatable when it contains:
+
+```toml
+agent_type = "subagent"
+```
+
+Each agent can specify its own `active_model`. ([github.com](https://github.com/mistralai/mistral-vibe?utm_source=openai))
+
+Create:
+
+```text
+.vibe/
+├── agents/
+│   ├── architect.toml
+│   └── implementer.toml
+└── prompts/
+    ├── architect.md
+    └── implementer.md
+```
+
+#### `.vibe/agents/architect.toml`
+
+```toml
+active_model = "mistral-medium-3.5"
+system_prompt_id = "architect"
+
+# Architect should normally inspect, plan, delegate, and review.
+disabled_tools = ["write_file", "search_replace"]
+```
+
+#### `.vibe/agents/implementer.toml`
+
+```toml
+agent_type = "subagent"
+active_model = "devstral-small-latest"
+system_prompt_id = "implementer"
+```
+
+Confirm the exact Devstral model identifier available under your subscription rather than assuming the alias.
+
+---
+
+### Architect prompt
+
+Create `.vibe/prompts/architect.md`:
+
+```markdown
+You are the lead architect for a Minecraft mod.
+
+Your responsibilities are to:
+
+1. Read AGENTS.md and the project documentation.
+2. Clarify ambiguous product requirements.
+3. Inspect the existing repository.
+4. Divide features into small, independently verifiable tasks.
+5. Delegate one implementation task at a time to the implementer subagent.
+6. Review its changes and test results.
+7. Reject unrelated changes or architectural violations.
+8. Decide whether the next task is safe to begin.
+
+Do not ask the implementer to build an entire feature in one task.
+
+Every delegated task must include:
+
+- objective
+- existing files to inspect
+- allowed scope
+- likely files to change
+- implementation constraints
+- client/server ownership
+- acceptance criteria
+- commands to run
+
+After the implementer finishes:
+
+1. Inspect the Git diff.
+2. inspect build and test results.
+3. identify correctness and architectural problems.
+4. delegate a narrowly scoped correction if required.
+5. ask the user for approval before broad or irreversible changes.
+
+Never allow the subagent to:
+
+- change dependency versions without approval
+- introduce a mixin without approval
+- use APIs from another mod loader
+- rewrite unrelated working code
+- skip tests to make the build pass
+- execute destructive Git commands
+```
+
+### Implementer prompt
+
+Create `.vibe/prompts/implementer.md`:
+
+```markdown
+You are the implementation subagent for a Minecraft mod.
+
+Implement only the task delegated by the architect.
+
+Before editing:
+
+1. Read AGENTS.md.
+2. Inspect every relevant existing file.
+3. Check whether the requested approach follows existing patterns.
+4. Report an obstacle rather than silently expanding scope.
+
+During implementation:
+
+- Make the smallest sufficient change.
+- Do not add unrelated functionality.
+- Do not change dependency versions.
+- Do not introduce mixins without explicit authorization.
+- Do not guess unfamiliar APIs.
+- Keep client-only code separate from common/server code.
+- Treat the server as authoritative.
+- Validate client-supplied data.
+
+After implementation:
+
+1. Run the specified compilation task.
+2. Run relevant tests.
+3. Run formatting or static checks.
+4. Inspect the resulting diff.
+5. Return:
+   - files changed
+   - behavior implemented
+   - commands executed
+   - test results
+   - assumptions
+   - remaining risks
+
+Do not define or begin the next task.
+Do not commit changes unless explicitly instructed.
+```
+
+---
+
+### Start the Medium architect
+
+Run Medium as the main agent:
+
+```bash
+vibe --agent architect
+```
+
+Then prompt it:
+
+```text
+Read AGENTS.md and all files under docs/.
+
+Inspect the current repository and determine its current state.
+
+Do not edit anything yet.
+
+Create:
+1. A short architectural assessment
+2. An MVP broken into milestones
+3. A dependency-ordered task backlog
+4. Acceptance criteria for the first task
+
+After presenting the backlog, wait for my approval before delegating
+the first task to the implementer subagent.
+```
+
+After approving its plan:
+
+```text
+Delegate only the first approved task to the implementer subagent.
+
+When it finishes, review the Git diff and test output yourself.
+Do not start task 2 until task 1 passes its acceptance criteria and
+I approve continuing.
+```
+
+Vibe’s main agent can delegate through approximately this tool operation:
+
+```text
+task(
+    agent="implementer",
+    task="Implement task MOD-001 using the following scope and acceptance criteria..."
+)
+```
+
+Vibe subagents operate independently, which helps prevent their implementation details from consuming the architect’s entire context. ([github.com](https://github.com/mistralai/mistral-vibe?utm_source=openai))
+
+---
+
+### A less expensive alternative
+
+Medium does not necessarily need to supervise every trivial edit. Use it at architectural checkpoints:
+
+1. **Medium** creates the milestone and first 5–10 tasks.
+2. **You approve** the plan.
+3. **Devstral** implements one task.
+4. Devstral builds and tests.
+5. **Medium** reviews after:
+   - A complete vertical slice
+   - A networking change
+   - A persistence change
+   - A mixin proposal
+   - A significant refactor
+   - A difficult failure
+
+For very mechanical tasks—translations, recipes, models, registration following an existing pattern—a full Medium review every time may be unnecessary.
+
+---
+
+### If you insist on Devstral as the main agent
+
+Then configure Medium as a **read-only architect subagent**:
+
+```toml
+# .vibe/agents/architect-reviewer.toml
+
+agent_type = "subagent"
+active_model = "mistral-medium-3.5"
+system_prompt_id = "architect-reviewer"
+
+disabled_tools = ["write_file", "search_replace"]
+```
+
+Tell Devstral:
+
+```text
+Before implementing any feature:
+
+1. Delegate requirement analysis and task decomposition to the
+   architect-reviewer subagent.
+2. Present its plan to me.
+3. Wait for approval.
+4. Implement only the first approved task.
+5. Run all required checks.
+6. Delegate a read-only diff review to architect-reviewer.
+7. Do not continue until review findings are resolved.
+```
+
+This is viable, but my recommendation remains:
+
+> **Medium owns the roadmap; Devstral owns individual patches; builds and tests decide whether patches are acceptable.**

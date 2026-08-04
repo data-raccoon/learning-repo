@@ -1,0 +1,157 @@
+{
+  "proposal_id": "mana-core-next-three-task-plan-medium-clean",
+  "tasks": [
+    {
+      "id": "mana-api-types",
+      "title": "Implement Mana API Type Interfaces",
+      "objective": "Create the three core API interfaces that define contracts for mana consumers, creators, and storage entities. These interfaces form the foundation for mod integration.",
+      "depends_on": ["mana-core-storage", "mana-core-mana-math", "mana-core-gradient-calculator", "mana-core-flow-engine", "mana-core-spherical-gatherer"],
+      "allowed_files": [
+        "src/main/java/com/manacore/core/api/types/ManaConsumer.java",
+        "src/main/java/com/manacore/core/api/types/ManaCreator.java",
+        "src/main/java/com/manacore/core/api/types/ManaStorage.java",
+        "src/test/java/com/manacore/core/api/types/ManaApiTypesTest.java"
+      ],
+      "forbidden_files": [
+        "src/main/java/com/manacore/core/storage/*",
+        "src/main/java/com/manacore/core/flow/*",
+        "src/main/java/com/manacore/core/gather/*",
+        "src/main/java/com/manacore/core/ManaMath.java"
+      ],
+      "constraints": [
+        "Interfaces must be pure Java with no Minecraft or Fabric dependencies",
+        "Interfaces must be in the com.manacore.core.api.types package",
+        "Do not add implementation classes, only interfaces",
+        "Do not modify any existing source files",
+        "Use only standard Java types in interface signatures"
+      ],
+      "client_server_considerations": {
+        "sides_affected": "both",
+        "authority": "server is authoritative for all mana operations",
+        "networking": "no"
+      },
+      "acceptance_criteria": [
+        "ManaConsumer.java defines methods for consumer behavior (e.g., gather radius, onManaReceived)",
+        "ManaCreator.java defines methods for creator behavior (e.g., injection radius, mana production rate)",
+        "ManaStorage.java defines methods for storage behavior (e.g., capacity, stored amount, insert/extract)",
+        "All interfaces compile with pure Java (no Minecraft imports)",
+        "Executable tests pass verifying interface contracts"
+      ],
+      "files_to_inspect": [
+        "docs/ARCHITECTURE.md"
+      ],
+      "suggested_write_roots": [
+        "src/main/java/com/manacore/core/api/types/ManaConsumer.java",
+        "src/main/java/com/manacore/core/api/types/ManaCreator.java",
+        "src/main/java/com/manacore/core/api/types/ManaStorage.java",
+        "src/test/java/com/manacore/core/api/types/ManaApiTypesTest.java"
+      ],
+      "suggested_verifiers": [
+        "javac -cp . src/main/java/com/manacore/core/api/types/*.java",
+        "java -cp . com.manacore.core.api.types.ApiTypesTest"
+      ],
+      "rationale": "The API type interfaces are the foundational contracts that enable mod integration. They must exist before any implementation of consumers, creators, or storage. These are pure Java interfaces with no dependencies on Minecraft, making them ideal for isolated testing. This task advances the MVP by providing the type system that example blocks and entities will implement."
+    },
+    {
+      "id": "mana-api-events",
+      "title": "Implement Mana Event Data Classes",
+      "objective": "Create the three event data classes for mana flow, gather, and store events. These enable event-driven integration for mods.",
+      "depends_on": ["mana-core-storage", "mana-core-mana-math", "mana-core-gradient-calculator", "mana-core-flow-engine", "mana-core-spherical-gatherer", "mana-api-types"],
+      "allowed_files": [
+        "src/main/java/com/manacore/core/api/events/ManaFlowEvent.java",
+        "src/main/java/com/manacore/core/api/events/ManaGatherEvent.java",
+        "src/main/java/com/manacore/core/api/events/ManaStoreEvent.java",
+        "src/test/java/com/manacore/core/api/events/ManaEventsTest.java"
+      ],
+      "forbidden_files": [
+        "src/main/java/com/manacore/core/storage/*",
+        "src/main/java/com/manacore/core/flow/*",
+        "src/main/java/com/manacore/core/gather/*",
+        "src/main/java/com/manacore/core/ManaMath.java",
+        "src/main/java/com/manacore/core/api/types/*"
+      ],
+      "constraints": [
+        "Event classes must be pure Java with no Minecraft or Fabric dependencies",
+        "Event classes must be in the com.manacore.core.api.events package",
+        "Use immutable data classes (records or final classes)",
+        "Do not add event bus or handler logic, only data classes",
+        "Do not modify any existing source files"
+      ],
+      "client_server_considerations": {
+        "sides_affected": "both",
+        "authority": "server is authoritative for event generation",
+        "networking": "no"
+      },
+      "acceptance_criteria": [
+        "ManaFlowEvent.java captures flow data (source/target positions, amount, direction)",
+        "ManaGatherEvent.java captures gather data (center, radius, amount gathered)",
+        "ManaStoreEvent.java captures storage data (entity/block ID, amount, operation type)",
+        "All event classes are immutable and compile with pure Java",
+        "Executable tests pass verifying event construction and field access"
+      ],
+      "files_to_inspect": [
+        "docs/ARCHITECTURE.md"
+      ],
+      "suggested_write_roots": [
+        "src/main/java/com/manacore/core/api/events/ManaFlowEvent.java",
+        "src/main/java/com/manacore/core/api/events/ManaGatherEvent.java",
+        "src/main/java/com/manacore/core/api/events/ManaStoreEvent.java",
+        "src/test/java/com/manacore/core/api/events/ManaEventsTest.java"
+      ],
+      "suggested_verifiers": [
+        "javac -cp . src/main/java/com/manacore/core/api/events/*.java",
+        "java -cp . com.manacore.core.api.events.ManaEventsTest"
+      ],
+      "rationale": "Event data classes enable event-driven architecture for mods to react to mana system changes. These are pure data structures with no behavior, making them simple to implement and test in isolation. This task depends on API types only if event fields reference those interfaces; otherwise it can be parallel. It advances the MVP by providing the data structures for the event system described in the architecture."
+    },
+    {
+      "id": "mana-config",
+      "title": "Implement Mana Configuration System",
+      "objective": "Create the server configuration class for mana system parameters including flow rates, gather radii, and storage limits.",
+      "depends_on": ["mana-core-storage", "mana-core-mana-math", "mana-core-gradient-calculator", "mana-core-flow-engine", "mana-core-spherical-gatherer"],
+      "allowed_files": [
+        "src/main/java/com/manacore/core/config/ManaConfig.java",
+        "src/test/java/com/manacore/core/config/ManaConfigTest.java"
+      ],
+      "forbidden_files": [
+        "src/main/java/com/manacore/core/storage/*",
+        "src/main/java/com/manacore/core/flow/*",
+        "src/main/java/com/manacore/core/gather/*",
+        "src/main/java/com/manacore/core/ManaMath.java",
+        "src/main/java/com/manacore/core/api/*"
+      ],
+      "constraints": [
+        "Config class must be pure Java with no Minecraft or Fabric dependencies",
+        "Config class must be in the com.manacore.core.config package",
+        "Configuration values must have sensible defaults",
+        "Do not implement file I/O or serialization, only the data class",
+        "Do not modify any existing source files"
+      ],
+      "client_server_considerations": {
+        "sides_affected": "server",
+        "authority": "server is authoritative for configuration",
+        "networking": "no"
+      },
+      "acceptance_criteria": [
+        "ManaConfig.java defines configuration fields for flow, gather, and storage parameters",
+        "All configuration values have non-negative defaults",
+        "Config class provides validation for all fields",
+        "Class compiles with pure Java (no Minecraft imports)",
+        "Executable tests pass verifying default values and validation"
+      ],
+      "files_to_inspect": [
+        "docs/ARCHITECTURE.md",
+        "docs/PRODUCT.md"
+      ],
+      "suggested_write_roots": [
+        "src/main/java/com/manacore/core/config/ManaConfig.java",
+        "src/test/java/com/manacore/core/config/ManaConfigTest.java"
+      ],
+      "suggested_verifiers": [
+        "javac -cp . src/main/java/com/manacore/core/config/*.java",
+        "java -cp . com.manacore.core.config.ManaConfigTest"
+      ],
+      "rationale": "Configuration system is essential for server-side tuning of mana parameters. This is a self-contained data class with validation logic, perfectly suited for isolated pure-Java implementation and testing. It has no dependencies on other new components, advancing the MVP by providing the parameterization needed for flexible server configuration."
+    }
+  ]
+}

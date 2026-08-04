@@ -1,0 +1,149 @@
+{
+  "v": 1,
+  "id": "mana-core-mod-engineer",
+  "goal": "Implement the approved Fabric 26.2 mod and its tests using the completed creative package.",
+  "target": "initiatives/mc-mod-core",
+  "model": {
+    "profile": "auto",
+    "capability": "coding",
+    "importance": "high"
+  },
+  "context": [
+    {
+      "path": ".mc-mod-agents/context/roles/mod-engineer.md",
+      "start": 1,
+      "end": 10000000
+    },
+    {
+      "path": ".mc-mod-agents/context/templates/handoff.md",
+      "start": 1,
+      "end": 10000000
+    },
+    {
+      "path": "docs/PRODUCT.md",
+      "start": 1,
+      "end": 10000000
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "start": 1,
+      "end": 10000000
+    },
+    {
+      "path": "docs/ACCEPTANCE.md",
+      "start": 1,
+      "end": 10000000
+    },
+    {
+      "path": "mod-spec.json",
+      "start": 1,
+      "end": 10000000
+    },
+    {
+      "path": "docs/style-guide.md",
+      "start": 1,
+      "end": 10000000
+    },
+    {
+      "path": "assets/asset-manifest.json",
+      "start": 1,
+      "end": 10000000
+    }
+  ],
+  "write_roots": [
+    "docs/IMPLEMENTATION.md",
+    "build.gradle",
+    "settings.gradle",
+    "gradle.properties",
+    "gradlew",
+    "gradlew.bat",
+    "gradle/wrapper/gradle-wrapper.jar",
+    "gradle/wrapper/gradle-wrapper.properties",
+    "src/main/resources/fabric.mod.json",
+    "src/main/java/com/manacore/ManaCore.java",
+    "src/main/java/com/manacore/api/ManaAPI.java",
+    "src/main/java/com/manacore/api/events/ManaFlowEvent.java",
+    "src/main/java/com/manacore/api/events/ManaGatherEvent.java",
+    "src/main/java/com/manacore/api/events/ManaStoreEvent.java",
+    "src/main/java/com/manacore/api/types/ManaConsumer.java",
+    "src/main/java/com/manacore/api/types/ManaCreator.java",
+    "src/main/java/com/manacore/api/types/ManaStorage.java",
+    "src/main/java/com/manacore/core/storage/ChunkManaMap.java",
+    "src/main/java/com/manacore/core/storage/ManaCoordinates.java",
+    "src/main/java/com/manacore/core/flow/GradientCalculator.java",
+    "src/main/java/com/manacore/core/flow/FlowEngine.java",
+    "src/main/java/com/manacore/core/gather/SphericalGatherer.java",
+    "src/main/java/com/manacore/core/ManaMath.java",
+    "src/main/java/com/manacore/networking/ManaNetworking.java",
+    "src/main/java/com/manacore/networking/ManaPacketHandler.java",
+    "src/main/java/com/manacore/config/ManaConfig.java",
+    "src/main/java/com/manacore/blocks/ManaGeneratorBlock.java",
+    "src/main/java/com/manacore/blocks/ManaCollectorBlock.java",
+    "src/main/java/com/manacore/blocks/ManaGeneratorBlockEntity.java",
+    "src/main/java/com/manacore/blocks/ManaCollectorBlockEntity.java",
+    "src/main/java/com/manacore/entities/ManaCrystalEntity.java",
+    "src/client/java/com/manacore/client/ManaCoreClient.java",
+    "src/client/java/com/manacore/client/visualization/particle/ManaFlowParticle.java",
+    "src/client/java/com/manacore/client/visualization/ParticleManager.java",
+    "src/client/java/com/manacore/client/visualization/overlay/ManaOverlay.java",
+    "src/client/java/com/manacore/client/hud/DebugHUD.java",
+    "src/client/java/com/manacore/client/networking/ClientManaPacketHandler.java",
+    "src/test/java/com/manacore/TestManaCore.java",
+    "src/test/java/com/manacore/core/storage/ChunkManaMapTest.java",
+    "src/test/java/com/manacore/core/flow/GradientCalculatorTest.java"
+  ],
+  "done": [
+    "Every declared engineering artifact exists as an individual file.",
+    "The implementation preserves common/client source-set isolation and server authority.",
+    "docs/IMPLEMENTATION.md maps behavior and tests to the approved acceptance contract.",
+    "All four trusted Gradle verifiers pass."
+  ],
+  "forbidden": [
+    "Do not edit approved design files, creative files, mod-spec.json, or agent state.",
+    "Do not download dependencies manually, change pinned versions, use Forge APIs, or add unjustified mixins."
+  ],
+  "limits": {
+    "packet_chars": 70000,
+    "output_chars": 16000,
+    "model_context_tokens": 8192,
+    "model_output_tokens": 2048,
+    "model_timeout_seconds": 600,
+    "max_tool_calls": 16,
+    "max_verifiers": 4,
+    "verifier_timeout_seconds": 900
+  },
+  "verifiers": [
+    {
+      "id": "compile-common",
+      "argv": [
+        "{python}",
+        ".mc-mod-agents/tools/run_gradle.py",
+        "compileJava"
+      ]
+    },
+    {
+      "id": "compile-client",
+      "argv": [
+        "{python}",
+        ".mc-mod-agents/tools/run_gradle.py",
+        "compileClientJava"
+      ]
+    },
+    {
+      "id": "unit-tests",
+      "argv": [
+        "{python}",
+        ".mc-mod-agents/tools/run_gradle.py",
+        "test"
+      ]
+    },
+    {
+      "id": "build",
+      "argv": [
+        "{python}",
+        ".mc-mod-agents/tools/run_gradle.py",
+        "build"
+      ]
+    }
+  ]
+}

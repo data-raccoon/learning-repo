@@ -1,0 +1,30 @@
+{
+  "v": 1,
+  "id": "mana-core-config-devstral",
+  "goal": "Implement Medium task mana-config as pure Java. Create record ManaConfig(double flowRate, int gatherRadius, double maxStorage) in com.manacore.core.config. Its canonical constructor accepts finite flowRate >= 0, gatherRadius >= 1, and finite maxStorage > 0, otherwise throws IllegalArgumentException. Add static defaults() returning exactly new ManaConfig(0.25, 3, 1000.0). Add executable ManaConfigTest covering defaults, custom values, and invalid boundaries.",
+  "target": "initiatives/mc-mod-core",
+  "model": {"profile": "devstral-small", "capability": "coding", "importance": "high"},
+  "context": [
+    {"path": "AGENTS.md", "start": 1, "end": 150},
+    {"path": ".mc-mod-agents/plans/10-next-three-tasks.json", "start": 120, "end": 280},
+    {"path": "src/main/java/com/manacore/core/api/events/ManaFlowEvent.java", "start": 1, "end": 160},
+    {"path": "docs/PRODUCT.md", "start": 1, "end": 130}
+  ],
+  "write_roots": [
+    "src/main/java/com/manacore/core/config/ManaConfig.java",
+    "src/test/java/com/manacore/core/config/ManaConfigTest.java"
+  ],
+  "allowed_commands": [],
+  "done": [
+    "The exact immutable config API compiles without Minecraft/Fabric imports.",
+    "Defaults and constructor validation match the specified values and boundaries.",
+    "The executable worker test and independent behavior contract pass."
+  ],
+  "forbidden": [
+    "Do not write outside the two exact files or modify previous tasks/completed slices.",
+    "Do not add serialization, file I/O, networking, Minecraft, Fabric, shell, subagents, MCP, downloads, or packages.",
+    "Do not invent additional config fields or mutable setters."
+  ],
+  "limits": {"packet_chars": 50000, "output_chars": 6000, "model_context_tokens": 100000, "model_session_tokens": 240000, "model_output_tokens": 50000, "model_timeout_seconds": 900, "max_tool_calls": 24, "max_verifiers": 1, "verifier_timeout_seconds": 120},
+  "verifiers": [{"id": "config-contract", "argv": ["{python}", ".mc-mod-agents/tools/verify_config_slice.py"]}]
+}

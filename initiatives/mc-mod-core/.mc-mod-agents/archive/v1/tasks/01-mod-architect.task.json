@@ -1,0 +1,46 @@
+{
+  "v": 1,
+  "id": "mana-core-mod-architect",
+  "goal": "Produce a small, testable Fabric 26.2 MVP design from the completed intent and supplied contracts.",
+  "target": "initiatives/mc-mod-core",
+  "model": {
+    "profile": "auto",
+    "capability": "architecture",
+    "importance": "critical"
+  },
+  "context": [
+    {"path": ".mc-mod-agents/intent.md", "start": 1, "end": 10000000},
+    {"path": ".mc-mod-agents/context/roles/mod-architect.md", "start": 1, "end": 10000000},
+    {"path": ".mc-mod-agents/context/templates/mod-brief.md", "start": 1, "end": 10000000},
+    {"path": ".mc-mod-agents/context/templates/acceptance-contract.md", "start": 1, "end": 10000000},
+    {"path": ".mc-mod-agents/context/templates/mod-spec.schema.json", "start": 1, "end": 10000000},
+    {"path": ".mc-mod-agents/context/templates/mod-spec.example.json", "start": 1, "end": 10000000}
+  ],
+  "write_roots": [
+    "docs/PRODUCT.md",
+    "docs/ARCHITECTURE.md",
+    "docs/ACCEPTANCE.md",
+    "mod-spec.json"
+  ],
+  "done": [
+    "All four design artifacts exist and contain no unresolved placeholders.",
+    "mod-spec.json uses the pinned Fabric 26.2 toolchain and lists individual files only.",
+    "Client/server authority, persistence, networking, and test seams are explicit."
+  ],
+  "forbidden": [
+    "Do not implement Java, Gradle, assets, or tests.",
+    "Do not change the pinned toolchain versions.",
+    "Do not use network access or introduce unapproved dependencies."
+  ],
+  "limits": {
+    "packet_chars": 100000,
+    "output_chars": 24000,
+    "model_context_tokens": 16384,
+    "model_output_tokens": 4096,
+    "model_timeout_seconds": 900,
+    "max_tool_calls": 24,
+    "max_verifiers": 0,
+    "verifier_timeout_seconds": 900
+  },
+  "verifiers": []
+}

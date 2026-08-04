@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "task_id": "mana-core-spherical-gatherer-devstral",
+  "packet_sha256": "99bcc75b8741cbdef556ba840daef7d6cf44c9f962d631f4a9b3beadc0c8d697",
+  "status": "done",
+  "summary": "Devstral implemented deterministic capped Euclidean-sphere gathering. The controller replaced a generated test that targeted a nonexistent result record; the corrected executable test and independent black-box contract passed.",
+  "changed": [
+    {
+      "path": "src/main/java/com/manacore/core/gather/SphericalGatherer.java",
+      "sha256": "a534437be8d60f601ef417b2c19363d46d95208d2caabaa88c6a25527a3837ca"
+    },
+    {
+      "path": "src/test/java/com/manacore/core/gather/SphericalGathererTest.java",
+      "sha256": "b7f81c910798f5adc0bf7cd08cc6603ff78f0319a961b5043d2f090d1b109476"
+    }
+  ],
+  "risks": [
+    "This slice returns gathered mana through a pure-Java seam; collector storage, server tick integration, and performance limits for unusually large radii remain out of scope."
+  ]
+}

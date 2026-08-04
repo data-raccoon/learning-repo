@@ -1,0 +1,12 @@
+{
+  "textures": ["mana-core:particle/mana_particle"],
+  "parameters": {
+    "override_lifetime": 60,
+    "override_fade": true,
+    "size": [0.125, 0.125],
+    "scale": 1.0,
+    "collision": false,
+    "lighting": "lit",
+    "blend": "additive"
+  }
+}

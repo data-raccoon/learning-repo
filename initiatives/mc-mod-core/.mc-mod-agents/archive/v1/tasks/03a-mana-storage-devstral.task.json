@@ -1,0 +1,67 @@
+{
+  "v": 1,
+  "id": "mana-core-storage-proposal-devstral",
+  "goal": "Produce a concrete implementation proposal for the first Mod Engineer slice: pure Java positional mana coordinate utilities, sparse chunk storage, math invariants, and focused unit tests. Specify class APIs, data representation, edge-case behavior, and test cases so the controlling agent can implement the slice without inventing behavior.",
+  "target": "initiatives/mc-mod-core",
+  "model": {
+    "profile": "devstral-small",
+    "capability": "coding",
+    "importance": "high"
+  },
+  "context": [
+    {
+      "path": ".mc-mod-agents/context/roles/mod-engineer.md",
+      "start": 1,
+      "end": 51
+    },
+    {
+      "path": "docs/PRODUCT.md",
+      "start": 1,
+      "end": 132
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "start": 45,
+      "end": 226
+    },
+    {
+      "path": "docs/ACCEPTANCE.md",
+      "start": 1,
+      "end": 67
+    },
+    {
+      "path": "mod-spec.json",
+      "start": 1,
+      "end": 63
+    }
+  ],
+  "write_roots": [
+    "src/main/java/com/manacore/core/storage/ChunkManaMap.java",
+    "src/main/java/com/manacore/core/storage/ManaCoordinates.java",
+    "src/main/java/com/manacore/core/ManaMath.java",
+    "src/test/java/com/manacore/core/storage/ChunkManaMapTest.java"
+  ],
+  "done": [
+    "The proposal defines implementable public APIs and internal representations for all four scoped files.",
+    "The proposal preserves sparse storage, zero-default reads, non-negative mana, coordinate/chunk boundary correctness, and server-safe pure logic.",
+    "The proposal enumerates focused tests for add, get, remove, clamping, sparse cleanup, negative coordinates, and chunk boundaries.",
+    "The proposal identifies unresolved ambiguities explicitly and does not invent Fabric or Minecraft APIs."
+  ],
+  "forbidden": [
+    "Do not propose changes outside the four write roots.",
+    "Do not change dependency or toolchain versions.",
+    "Do not use Forge, NeoForge, client-only classes, networking, persistence, or mixins.",
+    "Do not claim to have edited files, run commands, or verified the repository."
+  ],
+  "limits": {
+    "packet_chars": 50000,
+    "output_chars": 12000,
+    "model_context_tokens": 8192,
+    "model_output_tokens": 2048,
+    "model_timeout_seconds": 600,
+    "max_tool_calls": 1,
+    "max_verifiers": 0,
+    "verifier_timeout_seconds": 30
+  },
+  "verifiers": []
+}

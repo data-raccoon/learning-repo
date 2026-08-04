@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "mod_id": "mana-core",
+  "owners": {
+    "mod-architect": [
+      "docs/PRODUCT.md",
+      "docs/ARCHITECTURE.md",
+      "docs/ACCEPTANCE.md",
+      "mod-spec.json"
+    ],
+    "asset-producer": [
+      "docs/style-guide.md",
+      "assets/asset-manifest.json",
+      "src/main/resources/assets/mana-core/lang/en_us.json",
+      "src/client/resources/assets/mana-core/particles/mana_flow.json",
+      "src/client/resources/assets/mana-core/textures/particle/mana_particle.png"
+    ],
+    "mod-engineer": [
+      "docs/IMPLEMENTATION.md",
+      "build.gradle",
+      "settings.gradle",
+      "gradle.properties",
+      "gradlew",
+      "gradlew.bat",
+      "gradle/wrapper/gradle-wrapper.jar",
+      "gradle/wrapper/gradle-wrapper.properties",
+      "src/main/resources/fabric.mod.json",
+      "src/main/java/com/manacore/ManaCore.java",
+      "src/main/java/com/manacore/api/ManaAPI.java",
+      "src/main/java/com/manacore/api/events/ManaFlowEvent.java",
+      "src/main/java/com/manacore/api/events/ManaGatherEvent.java",
+      "src/main/java/com/manacore/api/events/ManaStoreEvent.java",
+      "src/main/java/com/manacore/api/types/ManaConsumer.java",
+      "src/main/java/com/manacore/api/types/ManaCreator.java",
+      "src/main/java/com/manacore/api/types/ManaStorage.java",
+      "src/main/java/com/manacore/core/storage/ChunkManaMap.java",
+      "src/main/java/com/manacore/core/storage/ManaCoordinates.java",
+      "src/main/java/com/manacore/core/flow/GradientCalculator.java",
+      "src/main/java/com/manacore/core/flow/FlowEngine.java",
+      "src/main/java/com/manacore/core/gather/SphericalGatherer.java",
+      "src/main/java/com/manacore/core/ManaMath.java",
+      "src/main/java/com/manacore/networking/ManaNetworking.java",
+      "src/main/java/com/manacore/networking/ManaPacketHandler.java",
+      "src/main/java/com/manacore/config/ManaConfig.java",
+      "src/main/java/com/manacore/blocks/ManaGeneratorBlock.java",
+      "src/main/java/com/manacore/blocks/ManaCollectorBlock.java",
+      "src/main/java/com/manacore/blocks/ManaGeneratorBlockEntity.java",
+      "src/main/java/com/manacore/blocks/ManaCollectorBlockEntity.java",
+      "src/main/java/com/manacore/entities/ManaCrystalEntity.java",
+      "src/client/java/com/manacore/client/ManaCoreClient.java",
+      "src/client/java/com/manacore/client/visualization/particle/ManaFlowParticle.java",
+      "src/client/java/com/manacore/client/visualization/ParticleManager.java",
+      "src/client/java/com/manacore/client/visualization/overlay/ManaOverlay.java",
+      "src/client/java/com/manacore/client/hud/DebugHUD.java",
+      "src/client/java/com/manacore/client/networking/ClientManaPacketHandler.java",
+      "src/test/java/com/manacore/TestManaCore.java",
+      "src/test/java/com/manacore/core/storage/ChunkManaMapTest.java",
+      "src/test/java/com/manacore/core/flow/GradientCalculatorTest.java"
+    ],
+    "mod-qa": [
+      ".mc-mod-agents/evidence/qa-report.json"
+    ]
+  }
+}

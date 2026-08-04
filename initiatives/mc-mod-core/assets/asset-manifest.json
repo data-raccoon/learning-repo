@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "mod_id": "mana-core",
+  "assets": [
+    {
+      "path": "src/main/resources/assets/mana-core/lang/en_us.json",
+      "checksum": "02e47cd19afb515cce8191e16e17443e9c2127a4d61d72c4859b1e06e520689d",
+      "size_bytes": 1795,
+      "provenance": "procedural",
+      "format": "json",
+      "placeholder": true,
+      "type": "translation",
+      "notes": "All English language strings for mana-core mod"
+    },
+    {
+      "path": "src/client/resources/assets/mana-core/particles/mana_flow.json",
+      "checksum": "12219daa1a5ce6754535673f9e941ff44618f90c642c90cb4a2260dce776ec89",
+      "size_bytes": 251,
+      "provenance": "procedural",
+      "format": "json",
+      "placeholder": true,
+      "type": "particle_definition",
+      "notes": "Fabric particle definition for mana flow visualization"
+    },
+    {
+      "path": "src/client/resources/assets/mana-core/textures/particle/mana_particle.png",
+      "checksum": "30dd2d0eae6e44106c708c9c53248790d02f454a12ab21b3b941f22ca83b7fa9",
+      "size_bytes": 66,
+      "provenance": "procedural",
+      "format": "png",
+      "placeholder": true,
+      "type": "texture",
+      "notes": "1x1 transparent PNG placeholder for mana particle sprite"
+    }
+  ]
+}

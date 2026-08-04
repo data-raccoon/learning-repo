@@ -1,0 +1,61 @@
+{
+  "v": 1,
+  "id": "mana-core-next-three-task-plan-medium-clean",
+  "goal": "Repair the existing three-task plan without changing its chosen API-types, event-records, and config slices. Replace every directory write root with exact new file paths. Add one exact executable no-dependency test file per task to both allowed_files and suggested_write_roots. Ensure every production file in allowed_files is also an exact suggested_write_root, roots are disjoint, task IDs are unique, and all existing task keys/content remain coherent. Overwrite only the declared JSON plan. Do not implement code or modify source, design, assets, pins, or agent state.",
+  "target": "initiatives/mc-mod-core",
+  "model": {
+    "profile": "mistral-medium-3.5",
+    "capability": "planning",
+    "importance": "high"
+  },
+  "context": [
+    {"path": "AGENTS.md", "start": 1, "end": 150},
+    {"path": "docs/PRODUCT.md", "start": 1, "end": 150},
+    {"path": "docs/ARCHITECTURE.md", "start": 150, "end": 300},
+    {"path": ".mc-mod-agents/results/06-gradient-calculator-devstral.result.json", "start": 1, "end": 80},
+    {"path": ".mc-mod-agents/results/07-flow-engine-devstral.result.json", "start": 1, "end": 80},
+    {"path": ".mc-mod-agents/results/08-spherical-gatherer-devstral.result.json", "start": 1, "end": 80},
+    {"path": ".mc-mod-agents/plans/10-next-three-tasks.json", "start": 1, "end": 260},
+    {"path": "src/main/java/com/manacore/core/ManaMath.java", "start": 1, "end": 260},
+    {"path": "src/main/java/com/manacore/core/storage/ChunkManaMap.java", "start": 1, "end": 260},
+    {"path": "src/main/java/com/manacore/core/storage/ManaCoordinates.java", "start": 1, "end": 260},
+    {"path": "src/main/java/com/manacore/core/flow/GradientCalculator.java", "start": 1, "end": 260},
+    {"path": "src/main/java/com/manacore/core/flow/FlowEngine.java", "start": 1, "end": 260},
+    {"path": "src/main/java/com/manacore/core/gather/SphericalGatherer.java", "start": 1, "end": 260}
+  ],
+  "write_roots": [
+    ".mc-mod-agents/plans/10-next-three-tasks.json"
+  ],
+  "allowed_commands": [],
+  "done": [
+    "The artifact is valid JSON with exactly three uniquely identified tasks.",
+    "Every task owns disjoint new production and executable test files and is independently pure-Java verifiable.",
+    "The tasks advance the approved MVP without duplicating completed source."
+  ],
+  "forbidden": [
+    "Do not write outside the declared plan artifact or implement code.",
+    "Do not propose edits to existing source, design, assets, pins, or agent state.",
+    "Do not use network, shell, repository tools, subagents, MCP, downloads, or package installation."
+  ],
+  "limits": {
+    "packet_chars": 80000,
+    "output_chars": 4000,
+    "model_context_tokens": 100000,
+    "model_session_tokens": 450000,
+    "model_output_tokens": 8192,
+    "model_timeout_seconds": 900,
+    "max_tool_calls": 24,
+    "max_verifiers": 1,
+    "verifier_timeout_seconds": 30
+  },
+  "verifiers": [
+    {
+      "id": "clean-next-three-plan-contract",
+      "argv": [
+        "{python}",
+        "-c",
+        "import json,pathlib; p=json.loads(pathlib.Path('.mc-mod-agents/plans/10-next-three-tasks.json').read_text(encoding='utf-8')); ts=p['tasks']; req={'id','title','objective','depends_on','allowed_files','forbidden_files','constraints','client_server_considerations','acceptance_criteria','files_to_inspect','suggested_write_roots','suggested_verifiers','rationale'}; assert len(ts)==3 and len({t['id'] for t in ts})==3 and all(set(t)==req and t['suggested_write_roots'] and set(t['suggested_write_roots'])<=set(t['allowed_files']) for t in ts); roots=[r for t in ts for r in t['suggested_write_roots']]; assert len(roots)==len(set(roots)); existing={x.as_posix() for x in pathlib.Path('.').glob('src/**/*') if x.is_file()}; assert not (set(roots)&existing)"
+      ]
+    }
+  ]
+}

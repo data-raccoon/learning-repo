@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "task_id": "mana-core-flow-engine-devstral",
+  "packet_sha256": "c55536ddb61ff52eb20883bf389d72f1d3231c80c0054af92d20252f52e11708",
+  "status": "done",
+  "summary": "Devstral implemented bounded single-threaded pair and explicit-edge mana flow. Worker tests and the independent conservation contract passed without controller source repair.",
+  "changed": [
+    {
+      "path": "src/main/java/com/manacore/core/flow/FlowEngine.java",
+      "sha256": "0d6f8b0c5e327f4e22dde67c3f11eb64b70116b9ecfb3b753c351c8e5ab84a27"
+    },
+    {
+      "path": "src/test/java/com/manacore/core/flow/FlowEngineTest.java",
+      "sha256": "8195dadfcd68ef2b3bf17b7c4284f41e3ecd2d9f7785e82966565fb426dce44b"
+    }
+  ],
+  "risks": [
+    "Flow execution is deliberately caller-supplied and single-threaded; Fabric tick integration and global active-position scheduling remain out of scope."
+  ]
+}

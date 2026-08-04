@@ -1,0 +1,210 @@
+{
+  "proposal_id": "mc-mod-core-14-mana-api-facade",
+  "title": "Implement ManaAPI Facade Class",
+  "objective": "Create the main public API facade that provides mod integration points for mana operations. This class exposes a unified interface for querying, modifying, gathering, and flowing mana using the existing pure Java components.",
+  "depends_on": [
+    "mana-core-storage",
+    "mana-core-mana-math",
+    "mana-core-gradient-calculator",
+    "mana-core-flow-engine",
+    "mana-core-spherical-gatherer",
+    "mana-api-types",
+    "mana-api-events",
+    "mana-config"
+  ],
+  "exact_files": [
+    "src/main/java/com/manacore/core/api/ManaAPI.java",
+    "src/test/java/com/manacore/core/api/ManaAPITest.java"
+  ],
+  "files_to_inspect": [
+    "docs/ARCHITECTURE.md",
+    "docs/PRODUCT.md",
+    "src/main/java/com/manacore/core/storage/ChunkManaMap.java",
+    "src/main/java/com/manacore/core/flow/FlowEngine.java",
+    "src/main/java/com/manacore/core/gather/SphericalGatherer.java",
+    "src/main/java/com/manacore/core/ManaMath.java",
+    "src/main/java/com/manacore/core/config/ManaConfig.java"
+  ],
+  "public_api": {
+    "ManaAPI": {
+      "signature": "public final class ManaAPI",
+      "methods": {
+        "getMana": {
+          "signature": "public static double getMana(int x, int y, int z)",
+          "returns": "The mana value at the specified world coordinates, or 0.0 if position is unset or invalid",
+          "contract": "Never throws; returns non-negative finite value; coordinates are any integer"
+        },
+        "setMana": {
+          "signature": "public static void setMana(int x, int y, int z, double value)",
+          "returns": "void",
+          "contract": "Sets mana at coordinates; non-positive or invalid values remove the position; coordinates are any integer; value must be finite"
+        },
+        "addMana": {
+          "signature": "public static double addMana(int x, int y, int z, double delta)",
+          "returns": "The new mana value at the position after adding delta",
+          "contract": "Non-finite deltas are ignored; result is clamped to non-negative; returns finite non-negative value"
+        },
+        "gatherMana": {
+          "signature": "public static double gatherMana(int centerX, int centerY, int centerZ, int radius, double maxTotal)",
+          "returns": "The total mana gathered from the spherical region",
+          "contract": "Radius must be non-negative; maxTotal must be positive and finite; gathers from positions within inclusive Euclidean sphere; never produces negative mana at any position; returns value in range [0, maxTotal]"
+        },
+        "flowMana": {
+          "signature": "public static double flowMana(int ax, int ay, int az, int bx, int by, int bz, double maxTransfer)",
+          "returns": "The amount of mana moved from higher to lower concentration",
+          "contract": "maxTransfer must be positive and finite; mana flows from higher to lower; conserves total mana; returns value in range [0, maxTransfer]"
+        },
+        "getConfig": {
+          "signature": "public static ManaConfig getConfig()",
+          "returns": "The current ManaConfig instance",
+          "contract": "Never returns null; returns immutable configuration"
+        },
+        "setConfig": {
+          "signature": "public static void setConfig(ManaConfig config)",
+          "returns": "void",
+          "contract": "Config must not be null; config must pass validation"
+        }
+      },
+      "behavior": "All methods are static; class is final and non-instantiable; all operations are thread-safe through delegation to underlying sparse storage"
+    }
+  },
+  "semantics": {
+    "getMana": "Reads from ChunkManaMap; unset positions return 0.0",
+    "setMana": "Writes to ChunkManaMap; non-positive values cause removal to maintain sparsity",
+    "addMana": "Delegates to ChunkManaMap.add; handles overflow by clamping to Double.MAX_VALUE",
+    "gatherMana": "Delegates to SphericalGatherer.gather with deterministic iteration order (X, then Y, then Z)",
+    "flowMana": "Delegates to FlowEngine.flowPair; uses GradientCalculator to determine direction",
+    "getConfig/setConfig": "Manages a singleton ManaConfig instance; setConfig validates before assignment"
+  },
+  "invalid_input_behavior": {
+    "getMana": "No invalid input possible - all integer coordinates are valid; returns 0.0 for unset",
+    "setMana": "Non-positive values remove position; non-finite values remove position; no exception thrown",
+    "addMana": "Non-finite delta is ignored (no-op); result clamped to non-negative",
+    "gatherMana": "Negative radius returns 0.0; non-positive or non-finite maxTotal returns 0.0",
+    "flowMana": "Non-positive or non-finite maxTransfer returns 0.0",
+    "setConfig": "Null config throws NullPointerException; invalid config throws IllegalArgumentException"
+  },
+  "deterministic_ordering": {
+    "gatherMana": "Iteration order is deterministic: X from (centerX-radius) to (centerX+radius), then Y, then Z; positions visited in this order are drained in that sequence",
+    "flowMana": "Direction determined by GradientCalculator which uses consistent signum logic; source/target selection is deterministic based on mana comparison",
+    "all_operations": "All operations produce identical results for identical inputs; no randomness or non-deterministic state"
+  },
+  "client_server": {
+    "sides_affected": "server",
+    "authority": "server is authoritative for all mana operations and state",
+    "networking": "no",
+    "integration_seam": "Pure Java class with no Minecraft/Fabric dependencies; can be used by mod code on either side but server owns the authoritative instance"
+  },
+  "acceptance_criteria": [
+    "ManaAPI.java is a final class with private constructor (non-instantiable)",
+    "All public methods are static and match the exact signatures specified",
+    "getMana delegates to ChunkManaMap.get and returns correct values",
+    "setMana delegates to ChunkManaMap.set and maintains sparsity",
+    "addMana delegates to ChunkManaMap.add and handles edge cases",
+    "gatherMana delegates to SphericalGatherer.gather with correct parameters",
+    "flowMana delegates to FlowEngine.flowPair with correct parameters",
+    "getConfig/setConfig manages a singleton ManaConfig with validation",
+    "All methods compile with pure Java (no Minecraft or Fabric imports)",
+    "Class uses only existing pure Java components (ChunkManaMap, ManaConfig, etc.)",
+    "ManaAPITest.java contains executable tests verifying all public API contracts"
+  ],
+  "verifier_cases": [
+    {
+      "case_id": "api-get-mana-unset",
+      "description": "getMana on unset position returns 0.0",
+      "input": "x=0, y=0, z=0 (no prior set)",
+      "expected_output": "0.0"
+    },
+    {
+      "case_id": "api-set-get-roundtrip",
+      "description": "setMana then getMana returns the set value",
+      "input": "setMana(10,20,30, 100.0) then getMana(10,20,30)",
+      "expected_output": "100.0"
+    },
+    {
+      "case_id": "api-set-nonpositive-removes",
+      "description": "setMana with non-positive value removes position",
+      "input": "setMana(5,5,5, 50.0) then setMana(5,5,5, -1.0) then getMana(5,5,5)",
+      "expected_output": "0.0"
+    },
+    {
+      "case_id": "api-add-positive",
+      "description": "addMana with positive delta increases value",
+      "input": "setMana(0,0,0, 10.0) then addMana(0,0,0, 5.0)",
+      "expected_output": "15.0"
+    },
+    {
+      "case_id": "api-add-negative-clamp",
+      "description": "addMana that would go negative clamps to 0",
+      "input": "setMana(0,0,0, 5.0) then addMana(0,0,0, -10.0) then getMana(0,0,0)",
+      "expected_output": "0.0"
+    },
+    {
+      "case_id": "api-add-nan-ignored",
+      "description": "addMana with NaN delta is ignored",
+      "input": "setMana(0,0,0, 10.0) then addMana(0,0,0, Double.NaN) then getMana(0,0,0)",
+      "expected_output": "10.0"
+    },
+    {
+      "case_id": "api-gather-simple",
+      "description": "gatherMana collects from single position within radius",
+      "input": "setMana(0,0,0, 50.0) then gatherMana(0,0,0, 1, 100.0)",
+      "expected_output": "50.0"
+    },
+    {
+      "case_id": "api-gather-cap",
+      "description": "gatherMana stops at maxTotal cap",
+      "input": "setMana(0,0,0, 50.0) then gatherMana(0,0,0, 1, 25.0)",
+      "expected_output": "25.0"
+    },
+    {
+      "case_id": "api-gather-outside-radius",
+      "description": "gatherMana ignores positions outside radius",
+      "input": "setMana(0,0,0, 50.0) then setMana(5,0,0, 50.0) then gatherMana(0,0,0, 2, 100.0)",
+      "expected_output": "50.0"
+    },
+    {
+      "case_id": "api-flow-higher-to-lower",
+      "description": "flowMana moves from higher to lower concentration",
+      "input": "setMana(0,0,0, 100.0) then setMana(1,0,0, 0.0) then flowMana(0,0,0, 1,0,0, 50.0)",
+      "expected_output": "50.0"
+    },
+    {
+      "case_id": "api-flow-equal-returns-zero",
+      "description": "flowMana with equal mana returns 0",
+      "input": "setMana(0,0,0, 50.0) then setMana(1,0,0, 50.0) then flowMana(0,0,0, 1,0,0, 50.0)",
+      "expected_output": "0.0"
+    },
+    {
+      "case_id": "api-flow-invalid-maxTransfer",
+      "description": "flowMana with non-positive maxTransfer returns 0",
+      "input": "flowMana(0,0,0, 1,0,0, -1.0)",
+      "expected_output": "0.0"
+    },
+    {
+      "case_id": "api-config-defaults",
+      "description": "getConfig returns non-null config with valid defaults",
+      "input": "getConfig()",
+      "expected_output": "ManaConfig with flowRate=0.25, gatherRadius=3, maxStorage=1000.0"
+    },
+    {
+      "case_id": "api-config-set-get",
+      "description": "setConfig then getConfig returns the set config",
+      "input": "setConfig(new ManaConfig(0.5, 5, 2000.0)) then getConfig()",
+      "expected_output": "ManaConfig with flowRate=0.5, gatherRadius=5, maxStorage=2000.0"
+    },
+    {
+      "case_id": "api-config-null-reject",
+      "description": "setConfig with null throws NullPointerException",
+      "input": "setConfig(null)",
+      "expected_output": "NullPointerException thrown"
+    },
+    {
+      "case_id": "api-negative-coordinates",
+      "description": "All operations work correctly with negative coordinates",
+      "input": "setMana(-10,-20,-30, 42.0) then getMana(-10,-20,-30)",
+      "expected_output": "42.0"
+    }
+  ],
+  "rationale": "The ManaAPI facade is the critical integration point referenced in ARCHITECTURE.md that enables mod developers to interact with the mana system. It advances PRODUCT.md by providing the 'API for mods to register custom consumers/creators', 'API for mods to query mana at positions', and 'API for mods to modify mana at positions'. As a pure Java class delegating to existing components (ChunkManaMap, SphericalGatherer, FlowEngine, ManaConfig), it can be implemented and tested in isolation without Minecraft/Fabric/Gradle dependencies. This is the smallest coherent MVP increment that unifies all previously implemented pure Java components into a single, testable public API surface."
+}
