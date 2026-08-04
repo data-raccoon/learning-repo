@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "project_id": "example-project",
+  "product": {
+    "promise": "[TBD: one sentence describing the user outcome]",
+    "primary_user": "[TBD: one primary user group]",
+    "journeys": ["[TBD: one concrete end-to-end user journey]"],
+    "mvp": ["[TBD: one required MVP capability]"],
+    "exclusions": ["[TBD: one explicit non-goal]"]
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "category": "runtime",
+      "statement": "[TBD: where and how the project must run]",
+      "status": "known",
+      "authority": "human"
+    }
+  ],
+  "constraints": {
+    "integrations": "[TBD or not_applicable]",
+    "data_sensitivity": "[TBD or not_applicable]",
+    "persistence": "[TBD or not_applicable]",
+    "availability": "[TBD or not_applicable]",
+    "scale": "[TBD: provide ranges, not vague adjectives]",
+    "security_compliance": "[TBD or not_applicable]",
+    "team_operations": "[TBD: skills and operational capacity]",
+    "budget_schedule": "[TBD: meaningful constraints]"
+  },
+  "decision_policy": {
+    "human_decides": ["Product scope", "External spend", "Deployment", "Data and security commitments"],
+    "model_may_decide": ["Internal module boundaries", "Test seams", "Reversible implementation details"]
+  }
+}

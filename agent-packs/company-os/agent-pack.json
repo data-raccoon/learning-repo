@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "company-os",
+  "kind": "operating-system",
+  "name": "Company OS",
+  "version": "1.0.0",
+  "description": "Combine supervised company governance, specialist roles, reusable skills, and durable venture records.",
+  "components": {
+    "agent_definitions": [
+      {"id": "ai-automation-engineer", "path": "agent-definitions/ai-automation-engineer.json", "description": "Portable AI automation engineering role."},
+      {"id": "assistenz", "path": "agent-definitions/assistenz.json", "description": "Portable founder-office assistance role."},
+      {"id": "brand-growth", "path": "agent-definitions/brand-growth.json", "description": "Portable brand and growth role."},
+      {"id": "chief-of-staff", "path": "agent-definitions/chief-of-staff.json", "description": "Portable chief-of-staff role."},
+      {"id": "customer-research", "path": "agent-definitions/customer-research.json", "description": "Portable customer research role."},
+      {"id": "data-analytics-engineer", "path": "agent-definitions/data-analytics-engineer.json", "description": "Portable data and analytics engineering role."},
+      {"id": "finance-capital-allocator", "path": "agent-definitions/finance-capital-allocator.json", "description": "Portable finance and capital allocation role."},
+      {"id": "legal-risk-governance", "path": "agent-definitions/legal-risk-governance.json", "description": "Portable legal, risk, and governance role."},
+      {"id": "market-intelligence", "path": "agent-definitions/market-intelligence.json", "description": "Portable market intelligence role."},
+      {"id": "operations-knowledge", "path": "agent-definitions/operations-knowledge.json", "description": "Portable operations and knowledge role."},
+      {"id": "platform-devops", "path": "agent-definitions/platform-devops.json", "description": "Portable platform and DevOps role."},
+      {"id": "portfolio-strategist", "path": "agent-definitions/portfolio-strategist.json", "description": "Portable portfolio strategy role."},
+      {"id": "qa-reliability", "path": "agent-definitions/qa-reliability.json", "description": "Portable QA and reliability role."},
+      {"id": "sales-partnerships", "path": "agent-definitions/sales-partnerships.json", "description": "Portable sales and partnerships role."},
+      {"id": "security-privacy", "path": "agent-definitions/security-privacy.json", "description": "Portable security and privacy role."},
+      {"id": "software-engineer", "path": "agent-definitions/software-engineer.json", "description": "Portable software engineering role."},
+      {"id": "technology-architect", "path": "agent-definitions/technology-architect.json", "description": "Portable technology architecture role."},
+      {"id": "venture-product-lead", "path": "agent-definitions/venture-product-lead.json", "description": "Portable venture and product leadership role."},
+      {"id": "web-experience-designer", "path": "agent-definitions/web-experience-designer.json", "description": "Portable web experience design role."}
+    ],
+    "skills": [
+      {"id": "council-decision", "path": "skills/council-decision/SKILL.md", "description": "Run a supervised council decision."},
+      {"id": "delivery-handoff", "path": "skills/delivery-handoff/SKILL.md", "description": "Create an evidence-backed delivery handoff."},
+      {"id": "initiative-planning", "path": "skills/initiative-planning/SKILL.md", "description": "Create a bounded initiative work order."},
+      {"id": "quality-gate", "path": "skills/quality-gate/SKILL.md", "description": "Evaluate acceptance evidence."},
+      {"id": "venture-intake", "path": "skills/venture-intake/SKILL.md", "description": "Turn an idea into a venture thesis."},
+      {"id": "weekly-operating-review", "path": "skills/weekly-operating-review/SKILL.md", "description": "Run the weekly operating review."}
+    ],
+    "workflows": [
+      {"id": "company-governance", "path": "AGENTS.md", "description": "Apply Founder authority, Work Orders, Council review, and approval gates."}
+    ],
+    "resources": [
+      {"id": "company-role-registry", "path": "company/agent-registry.md", "description": "Role cells, decision ownership, access, and outputs."},
+      {"id": "company-governance-records", "path": "company", "description": "Charter, decisions, templates, reports, and work orders."},
+      {"id": "venture-workspaces", "path": "ventures", "description": "Reusable venture evidence and decision structure."}
+    ]
+  },
+  "entrypoints": [
+    {"id": "run-company-process", "kind": "workflow", "component": "workflow:company-governance"},
+    {"id": "evaluate-council-decision", "kind": "skill", "component": "skill:council-decision"}
+  ],
+  "adapters": [
+    {"id": "codex", "path": "adapters/codex"},
+    {"id": "vibe", "path": "adapters/vibe"},
+    {"id": "vscode", "path": "adapters/vscode"}
+  ],
+  "verification": [
+    {"id": "structure", "argv": ["{python}", "agent-packs/company-os/scripts/validate_company_os.py"]},
+    {"id": "unit-tests", "argv": ["{python}", "-m", "unittest", "discover", "-s", "agent-packs/company-os/tests", "-v"]}
+  ]
+}

@@ -2,10 +2,38 @@
 
 ## Repository boundaries
 
-- `small-context-harness/` — default model registry, bounded task packets,
-  Mistral Vibe execution, durable evidence, and independent gates.
+- `agent-packs/` — canonical model- and IDE-neutral agent definitions, skills,
+  workflows, resources, and manifests.
+- `model-execution-harness/core/` — default model registry, bounded task
+  packets, Mistral Vibe execution, durable evidence, and independent gates.
+- `model-execution-harness/graph-runtime/` — advanced graphs, managed runtimes,
+  transactional materialization, rollback, and quarantine.
 - `.agents/skills/orchestrate-models/` — global instructions for using the
   default harness.
+
+## Vocabulary
+
+- A model is an inference engine such as Medium or Devstral.
+- An agent definition is inert role and authority text stored in an agent pack.
+- A skill is a reusable procedure stored in an agent pack or exposed through an
+  IDE adapter.
+- A worker is one bounded model execution created from a model, pack entry
+  point, task, tools, and limits.
+- An agent pack never selects a model or IDE. Keep those bindings in the
+  execution harness or an explicitly declared adapter.
+
+## Dot directories
+
+- Keep root `.agents/`, `.codex/`, `.continue/`, and `.vscode/` as thin
+  discovery adapters only. Each adapter must point to its canonical repository
+  source in a comment or its loaded instructions.
+- Do not create a repository-local `.vibe/`; Vibe model admission is user-global
+  and execution isolation belongs to the model execution harness.
+- Put package-specific IDE integrations in an explicit `adapters/` directory,
+  never in package-local dot folders.
+- Keep generated runtime state outside the repository. Dot-prefixed lifecycle
+  and historical evidence directories are data and must not be deleted merely
+  because of their names.
 
 ## Model delegation
 
@@ -13,7 +41,7 @@
   unless the user explicitly asks for delegation, sub-agents, worker models, or
   parallel agent work.
 - When the user explicitly requests delegation, use
-  `small-context-harness/harness.py` through the repo-local
+  `model-execution-harness/core/harness.py` through the repo-local
   `orchestrate-models` skill.
 - Delegation is one level deep. Only the root agent creates task packets.
 - Give every worker exactly one target directory, explicit `write_roots`, all
@@ -59,8 +87,8 @@ Windows 11, PowerShell. Avoid `&&`, `||`, and `;` in commands.
 Python interpreter for all scripts: `& "$env:USERPROFILE\.venvs\all\Scripts\python.exe"`. Never use bare `python`.
 
 ```powershell
-# small-context-harness/ — after changing the default harness or its skill
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" -m unittest discover -s small-context-harness\tests -v
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py inventory
+# model-execution-harness/core/ — after changing the default harness or its skill
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" -m unittest discover -s model-execution-harness\core\tests -v
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py inventory
 
 ```

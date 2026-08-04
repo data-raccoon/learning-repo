@@ -1,4 +1,5 @@
 {
+  // Thin VS Code adapter. Workspace policy is canonical in AGENTS.md.
   "python.defaultInterpreterPath": "${env:USERPROFILE}\\.venvs\\all\\Scripts\\python.exe",
   "python.terminal.activateEnvironment": true
 }

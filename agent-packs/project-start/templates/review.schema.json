@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectStart architecture review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_id", "design_sha256", "findings", "coverage", "recommendation"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project_id": {"type": "string"},
+    "design_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "category", "description", "evidence", "owner"],
+        "properties": {
+          "id": {"type": "string"},
+          "severity": {"enum": ["blocking", "major", "minor", "info"]},
+          "category": {"enum": ["requirements", "complexity", "boundaries", "data", "security", "operations", "testing", "traceability"]},
+          "description": {"type": "string"},
+          "evidence": {"type": "string"},
+          "owner": {"enum": ["human", "project-architect", "stack-pack-owner", "root-controller"]}
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": {"enum": ["supported", "unsupported", "not_applicable"]}
+    },
+    "recommendation": {"enum": ["PASS", "REVISE", "REJECT"]}
+  }
+}

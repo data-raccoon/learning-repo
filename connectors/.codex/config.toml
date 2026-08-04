@@ -1,3 +1,4 @@
+# Thin Codex adapter. Canonical connector metadata and policy: connectors/registry.json#tana
 [mcp_servers.tana]
 url = "https://home.tana.inc/mcp"
 auth = "oauth"

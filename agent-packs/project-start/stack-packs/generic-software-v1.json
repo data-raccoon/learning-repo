@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "generic-software-v1",
+  "summary": "Technology-neutral defaults for architecture discovery before a concrete stack pack is admitted.",
+  "components": {},
+  "allowed_dependency_families": [],
+  "forbidden_patterns": [
+    "Unpinned latest-version dependencies",
+    "Multiple deployables without an independent deployment requirement",
+    "A queue without a durability, latency, or retry requirement",
+    "A cache without a measured performance requirement",
+    "Credentials or secrets committed to the project",
+    "Generated binaries synthesized by a language model"
+  ],
+  "required_artifacts": [
+    "README.md",
+    "AGENTS.md",
+    "docs/PRODUCT.md",
+    "docs/ARCHITECTURE.md",
+    "docs/ACCEPTANCE.md",
+    "docs/decisions/ADR-0001-initial-architecture.md"
+  ],
+  "generator": {
+    "id": "documentation-only",
+    "mode": "plan-only",
+    "notes": "A concrete stack pack and trusted generator must be approved before source scaffolding."
+  },
+  "verification_profile": "documentation-contract-v1"
+}

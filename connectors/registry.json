@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "connectors": [
+    {
+      "id": "tana",
+      "transport": "streamable-http",
+      "url": "https://home.tana.inc/mcp",
+      "authentication": "oauth",
+      "policy": "connectors/README.md",
+      "adapters": ["connectors/.codex/config.toml"]
+    },
+    {
+      "id": "voxcpm2",
+      "transport": "streamable-http",
+      "url": "http://127.0.0.1:8765/mcp",
+      "authentication": "none",
+      "implementation": "local-models/voxcpm2-mcp",
+      "adapters": [".codex/config.toml", ".continue/mcpServers/voxcpm2.yaml"]
+    }
+  ]
+}

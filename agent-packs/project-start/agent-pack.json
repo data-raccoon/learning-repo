@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "project-start",
+  "kind": "workflow-pack",
+  "name": "Project Start",
+  "version": "1.0.0",
+  "description": "Turn human-owned intent into a typed, reviewed, and approved initial project architecture.",
+  "components": {
+    "agent_definitions": [
+      {"id": "project-discovery", "path": "agent-definitions/project-discovery.md", "description": "Normalize intent and surface blocking questions.", "capabilities": ["planning", "reasoning"]},
+      {"id": "project-architect", "path": "agent-definitions/project-architect.md", "description": "Produce one typed initial architecture.", "capabilities": ["architecture", "planning"]},
+      {"id": "architecture-reviewer", "path": "agent-definitions/architecture-reviewer.md", "description": "Independently review the architecture.", "capabilities": ["review", "reasoning"]}
+    ],
+    "skills": [],
+    "workflows": [
+      {"id": "project-start-lifecycle", "path": "manage.py", "description": "Validate, render, review, and approve the lifecycle."}
+    ],
+    "resources": [
+      {"id": "archetype-catalog", "path": "catalog", "description": "Admitted project archetypes."},
+      {"id": "stack-packs", "path": "stack-packs", "description": "Versioned implementation constraints."},
+      {"id": "contracts", "path": "templates", "description": "Schemas and deterministic document templates."}
+    ]
+  },
+  "entrypoints": [
+    {"id": "start-project", "kind": "workflow", "component": "workflow:project-start-lifecycle"}
+  ],
+  "verification": [
+    {"id": "unit-tests", "argv": ["{python}", "-m", "unittest", "discover", "-s", "agent-packs/project-start/tests", "-v"]}
+  ]
+}

@@ -1,3 +1,4 @@
+# Thin Codex adapter. Canonical connector metadata: connectors/registry.json#voxcpm2
 [mcp_servers.voxcpm2]
 url = "http://127.0.0.1:8765/mcp"
 enabled_tools = ["synthesize_speech"]

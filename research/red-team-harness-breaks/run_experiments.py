@@ -2,7 +2,7 @@
 """
 Red-Team Harness Break Experiment Runner
 =========================================
-Runs each RT-* job against the live agent-orchestrator and records whether the
+Runs each RT-* job against the live graph runtime and records whether the
 harness contains the attempted break.
 
 Usage (from workspace root):
@@ -37,7 +37,7 @@ from pathlib import Path
 # Bootstrap: ensure we can import agent_orchestrator from the workspace
 # ---------------------------------------------------------------------------
 WORKSPACE = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(WORKSPACE / "agent-orchestrator" / "src"))
+sys.path.insert(0, str(WORKSPACE / "model-execution-harness" / "graph-runtime" / "src"))
 
 from agent_orchestrator.contracts import load_job
 from agent_orchestrator.registry import Registry
@@ -177,9 +177,9 @@ EXPERIMENTS = [
 # ---------------------------------------------------------------------------
 
 def build_runner(workspace: Path) -> JobRunner:
-    config_dir = workspace / "agent-orchestrator" / "config"
+    config_dir = workspace / "model-execution-harness" / "graph-runtime" / "config"
     registry = Registry(config_dir)
-    return JobRunner(workspace, workspace / "agent-orchestrator", registry)
+    return JobRunner(workspace, workspace / "model-execution-harness" / "graph-runtime", registry)
 
 
 def _load_job_safe(path: Path):

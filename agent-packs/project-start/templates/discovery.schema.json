@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectStart discovery result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_id", "normalized_requirements", "conflicts", "blocking_questions", "assumptions", "candidate_archetypes", "recommendation"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project_id": {"type": "string"},
+    "normalized_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "statement", "status", "source_ids"],
+        "properties": {
+          "id": {"type": "string"},
+          "statement": {"type": "string"},
+          "status": {"enum": ["fact", "constraint", "preference", "model_decision"]},
+          "source_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        }
+      }
+    },
+    "conflicts": {"type": "array", "items": {"type": "string"}},
+    "blocking_questions": {"type": "array", "items": {"type": "string"}},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "candidate_archetypes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "fit", "reason"],
+        "properties": {
+          "id": {"type": "string"},
+          "fit": {"enum": ["strong", "possible", "weak"]},
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "recommendation": {"type": "string"}
+  }
+}

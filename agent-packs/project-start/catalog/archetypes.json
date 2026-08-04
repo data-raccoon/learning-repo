@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "archetypes": [
+    {
+      "id": "static-application",
+      "summary": "A build-time application with no authoritative runtime service.",
+      "use_when": ["Content or assets can be produced ahead of time", "No server-owned mutable state is required"],
+      "reject_when": ["Users require shared mutable state", "Secrets must be held by a server"],
+      "max_initial_modules": 4,
+      "defaults": ["One deployable artifact", "No database", "No background worker"]
+    },
+    {
+      "id": "single-service-api",
+      "summary": "One independently deployable service exposing a synchronous API.",
+      "use_when": ["One team owns one cohesive server capability", "Independent horizontal scaling is sufficient"],
+      "reject_when": ["No runtime server is needed", "Multiple services have no distinct ownership or scaling reason"],
+      "max_initial_modules": 6,
+      "defaults": ["One service", "One primary persistence boundary at most", "Synchronous request handling"]
+    },
+    {
+      "id": "modular-monolith",
+      "summary": "One deployable application with enforced internal module boundaries.",
+      "use_when": ["Several business capabilities must evolve together", "A small team needs simple deployment"],
+      "reject_when": ["Modules require independent regulatory isolation", "Independent deployment is already a proven requirement"],
+      "max_initial_modules": 8,
+      "defaults": ["One deployment", "Explicit module APIs", "Shared operational lifecycle"]
+    },
+    {
+      "id": "web-app-api-database",
+      "summary": "A browser client, one server API, and one primary database.",
+      "use_when": ["Interactive browser UX and server-owned state are both required"],
+      "reject_when": ["A static site suffices", "There is no server-owned state or secret"],
+      "max_initial_modules": 7,
+      "defaults": ["Thin client", "Server authorization", "One primary database"]
+    },
+    {
+      "id": "event-driven-worker",
+      "summary": "A bounded asynchronous processor consuming durable work items.",
+      "use_when": ["Work must survive request boundaries", "Retries or long-running processing are required"],
+      "reject_when": ["A synchronous call satisfies latency and reliability", "No durable delivery requirement exists"],
+      "max_initial_modules": 6,
+      "defaults": ["At-least-once handling", "Idempotency", "Dead-letter policy"]
+    },
+    {
+      "id": "cli-automation",
+      "summary": "A command-line program or local automation with explicit inputs and outputs.",
+      "use_when": ["The primary user is technical", "Local or CI execution is sufficient"],
+      "reject_when": ["Nontechnical users require a graphical interface", "Shared online state is central"],
+      "max_initial_modules": 5,
+      "defaults": ["No daemon", "Deterministic exit codes", "Machine-readable output option"]
+    },
+    {
+      "id": "library-package",
+      "summary": "A reusable package embedded into another process.",
+      "use_when": ["Consumers need an API rather than a standalone application"],
+      "reject_when": ["The project owns an operational runtime", "No stable consumer contract can be defined"],
+      "max_initial_modules": 5,
+      "defaults": ["Public API compatibility", "No hidden runtime service", "Consumer-controlled lifecycle"]
+    },
+    {
+      "id": "data-pipeline",
+      "summary": "A repeatable ingestion, transformation, validation, and publication flow.",
+      "use_when": ["Data moves through explicit stages", "Reprocessing and lineage matter"],
+      "reject_when": ["The main interaction is transactional CRUD", "No repeatable dataset transformation exists"],
+      "max_initial_modules": 7,
+      "defaults": ["Immutable inputs", "Stage checkpoints", "Data-quality gates"]
+    },
+    {
+      "id": "game-or-mod",
+      "summary": "An engine-hosted extension with strict runtime-side and asset boundaries.",
+      "use_when": ["A host engine owns lifecycle, rendering, or simulation"],
+      "reject_when": ["The project is a standalone application", "The engine and version are not pinned"],
+      "max_initial_modules": 8,
+      "defaults": ["Engine lifecycle adapters", "Pure domain rules", "Explicit client/server boundary"]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+# Thin Continue adapter. Canonical connector metadata: connectors/registry.json#voxcpm2
 name: VoxCPM2
 version: 0.1.0
 schema: v1

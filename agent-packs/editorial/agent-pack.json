@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "editorial",
+  "kind": "role-pack",
+  "name": "Editorial",
+  "version": "1.0.0",
+  "description": "Provide bounded editorial roles with shared evidence, authority, and finding conventions.",
+  "components": {
+    "agent_definitions": [
+      {"id": "developmental-editor", "path": "agent-definitions/developmental-editor.md", "description": "Review structure and development.", "capabilities": ["editing", "review"]},
+      {"id": "line-editor", "path": "agent-definitions/line-editor.md", "description": "Review prose at sentence and paragraph level.", "capabilities": ["editing", "review"]},
+      {"id": "copyeditor", "path": "agent-definitions/copyeditor.md", "description": "Review correctness and consistency.", "capabilities": ["editing", "review"]},
+      {"id": "proofreader", "path": "agent-definitions/proofreader.md", "description": "Perform final proof review.", "capabilities": ["editing", "review"]},
+      {"id": "sensitivity-reader", "path": "agent-definitions/sensitivity-reader.md", "description": "Perform sensitivity and authenticity review.", "capabilities": ["editing", "review"]}
+    ],
+    "skills": [],
+    "workflows": [
+      {"id": "editorial-selection", "path": "AGENTS.md", "description": "Select one role and enforce the editorial sequence."}
+    ],
+    "resources": []
+  },
+  "entrypoints": [
+    {"id": "review-editorial-content", "kind": "workflow", "component": "workflow:editorial-selection"}
+  ],
+  "verification": [
+    {"id": "pack-contract", "argv": ["{python}", "agent-packs/validate.py"]}
+  ]
+}

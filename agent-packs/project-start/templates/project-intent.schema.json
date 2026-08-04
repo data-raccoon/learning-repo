@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectStart human intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_id", "product", "requirements", "constraints", "decision_policy"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["promise", "primary_user", "journeys", "mvp", "exclusions"],
+      "properties": {
+        "promise": {"type": "string"},
+        "primary_user": {"type": "string"},
+        "journeys": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "mvp": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "exclusions": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "category", "statement", "status", "authority"],
+        "properties": {
+          "id": {"type": "string"},
+          "category": {"type": "string"},
+          "statement": {"type": "string"},
+          "status": {"enum": ["known", "unknown", "not_applicable", "model_may_decide"]},
+          "authority": {"enum": ["human", "model"]}
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["integrations", "data_sensitivity", "persistence", "availability", "scale", "security_compliance", "team_operations", "budget_schedule"],
+      "properties": {
+        "integrations": {"type": "string"},
+        "data_sensitivity": {"type": "string"},
+        "persistence": {"type": "string"},
+        "availability": {"type": "string"},
+        "scale": {"type": "string"},
+        "security_compliance": {"type": "string"},
+        "team_operations": {"type": "string"},
+        "budget_schedule": {"type": "string"}
+      }
+    },
+    "decision_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["human_decides", "model_may_decide"],
+      "properties": {
+        "human_decides": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "model_may_decide": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    }
+  }
+}

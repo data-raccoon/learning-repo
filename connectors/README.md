@@ -1,5 +1,9 @@
 # Tana connector
 
+Canonical connector endpoints and adapter locations are registered in
+`registry.json`. Dot-folder configurations are thin IDE adapters; do not treat
+them as independent sources of connector policy.
+
 This repository prepares a **least-privilege Codex tool surface** for Tana's
 hosted MCP server. The connection is project-scoped, uses Tana's OAuth flow, and
 does not store a Tana token in the repository.

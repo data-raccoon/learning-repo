@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-learn.local/schemas/agent-definition-v1.json",
+  "title": "Portable Agent Definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "name", "description", "instructions", "permissions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "name": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "instructions": {"type": "string", "minLength": 1},
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspace"],
+      "properties": {
+        "workspace": {"enum": ["read-only", "workspace-write"]}
+      }
+    }
+  }
+}

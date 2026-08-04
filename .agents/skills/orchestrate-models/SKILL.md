@@ -1,11 +1,11 @@
 ---
 name: orchestrate-models
-description: Route bounded planning and coding work through the repository-default small-context harness using registered Mistral Vibe models, durable artifacts, and independent gates.
+description: Route bounded planning and coding work through the repository-default model execution harness using registered Mistral Vibe models, durable artifacts, and independent gates.
 ---
 
 # Orchestrate Models
 
-Use `small-context-harness/harness.py` to offload planning and coding without
+Use `model-execution-harness/core/harness.py` to offload planning and coding without
 putting full worker responses or trajectories into the controlling agent's
 context. Workers write durable plans or implementation files directly to exact
 task `write_roots`. Keep full trajectories on disk and consume compact CLI
@@ -15,7 +15,7 @@ envelopes.
 
 1. Run `inventory` when provider readiness is unknown and `canary` after a
    provider, alias, or model change.
-2. Create one bounded task from `small-context-harness/examples/task.json` with
+2. Create one bounded task from `model-execution-harness/core/examples/task.json` with
    one target, one explicit profile, exact write roots, optional admitted
    command argv vectors, independent verifiers, and hard limits.
 3. Run `pack`, `route`, `accept`, and `snapshot` in order.
@@ -32,7 +32,7 @@ artifact path; do not ask for a chat-only proposal.
 Run the CLI on Windows with:
 
 ```powershell
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py <command>
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py <command>
 ```
 
 ## Safety boundaries
@@ -42,7 +42,7 @@ Run the CLI on Windows with:
   compensate for an incomplete packet.
 - Name the profile selected by the human controller. Automatic routing is
   disabled; the harness never substitutes or ranks models.
-- Keep shared model admission in `small-context-harness/models.json`; do not
+- Keep shared model admission in `model-execution-harness/core/models.json`; do not
   create target-local registry files for registered models.
 - Network, MCP, connectors, generic shells, and subagents remain disabled.
 - `limited_bash` executes only an exact task-declared argv vector admitted by
@@ -72,7 +72,7 @@ smaller caps can fail after a valid write but before read-back.
 
 ## Legacy exception
 
-Use `agent_orchestrator/orchestrate.py` only when the task explicitly needs a
+Use `model-execution-harness/graph-runtime/orchestrate.py` only when the task explicitly needs a
 feature the default harness does not provide: graphs, managed runtime lifecycle,
 transactional materialization, snapshots with rollback, or durable quarantine
 management. Apply its own README and contracts when taking this exception.
@@ -80,12 +80,12 @@ management. Apply its own README and contracts when taking this exception.
 ## Common commands
 
 ```powershell
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py inventory
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py canary --profile mistral-medium-3.5
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py pack task.json packet.json --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py route packet.json
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py accept packet.json ack.json --worker worker-id
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py snapshot task.json packet.json ack.json baseline.json --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py execute packet.json ack.json baseline.json result.json trajectory.json --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" small-context-harness\harness.py gate task.json packet.json ack.json result.json --baseline baseline.json --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py inventory
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py canary --profile mistral-medium-3.5
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py pack task.json packet.json --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py route packet.json
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py accept packet.json ack.json --worker worker-id
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py snapshot task.json packet.json ack.json baseline.json --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py execute packet.json ack.json baseline.json result.json trajectory.json --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py gate task.json packet.json ack.json result.json --baseline baseline.json --repo .
 ```
