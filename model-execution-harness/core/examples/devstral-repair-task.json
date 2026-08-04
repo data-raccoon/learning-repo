@@ -1,0 +1,28 @@
+{
+  "v": 2,
+  "id": "example-devstral-repair",
+  "kind": "repair",
+  "depends_on": ["example-devstral-code"],
+  "goal": "Repair one diagnosed defect in one exact file and rerun the admitted test loop until it passes.",
+  "target": "model-execution-harness/core",
+  "model": {"profile": "devstral-small", "capability": "coding", "importance": "high"},
+  "context": [{"path": "examples/target/README.md", "start": 1, "end": 80}],
+  "write_roots": ["examples/target/README.md"],
+  "allowed_commands": [["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"]],
+  "done": ["The named defect is fixed and both worker-loop tests and the independent verifier pass."],
+  "forbidden": ["Do not modify any file except the diagnosed repair target."],
+  "limits": {
+    "packet_chars": 40000,
+    "output_chars": 6000,
+    "model_context_tokens": 60000,
+    "model_session_tokens": 180000,
+    "model_output_tokens": 30000,
+    "model_timeout_seconds": 900,
+    "max_tool_calls": 16,
+    "max_verifiers": 1,
+    "verifier_timeout_seconds": 180
+  },
+  "verifiers": [
+    {"id": "core-tests", "argv": ["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"]}
+  ]
+}

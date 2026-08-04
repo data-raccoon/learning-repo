@@ -25,11 +25,12 @@ class Rejected(ValueError):
     """A contract or release-gate rejection."""
 
 
+CONTRACT_VERSION = 2
 TASK_FIELDS = {
-    "v", "id", "goal", "target", "model", "context", "write_roots", "done",
-    "forbidden", "limits", "verifiers",
+    "v", "id", "kind", "depends_on", "goal", "target", "model", "context",
+    "write_roots", "allowed_commands", "done", "forbidden", "limits",
+    "verifiers",
 }
-TASK_OPTIONAL_FIELDS = {"allowed_commands"}
 LIMIT_FIELDS = {
     "packet_chars", "output_chars", "model_context_tokens",
     "model_session_tokens", "model_output_tokens", "model_timeout_seconds",
@@ -47,6 +48,7 @@ SECRET_PATTERNS = (
     re.compile(r"(?i)\b(?:api[_-]?key|password|secret|token)\s*[:=]\s*[^\s]{8,}"),
 )
 BLOCKED_NAMES = {".env", "id_rsa", "id_ed25519"}
+TASK_KINDS = {"planning", "review", "coding", "repair"}
 
 
 def canonical_bytes(value: Any) -> bytes:
@@ -70,7 +72,11 @@ def digest_file(path: Path) -> str:
 def target_manifest(target: Path) -> list[dict[str, str]]:
     target = target.resolve()
     files: list[dict[str, str]] = []
-    for path in sorted(target.rglob("*")):
+    paths = sorted(
+        target.rglob("*"),
+        key=lambda item: item.relative_to(target).as_posix(),
+    )
+    for path in paths:
         relative = path.relative_to(target)
         label = relative.as_posix()
         if path.is_symlink():
@@ -153,19 +159,20 @@ def bounded_int(
 
 
 def validate_task(raw: Any) -> dict[str, Any]:
-    if type(raw) is not dict:
-        raise Rejected("task must be an object")
-    missing = TASK_FIELDS - set(raw)
-    unknown = set(raw) - TASK_FIELDS - TASK_OPTIONAL_FIELDS
-    if missing or unknown:
-        raise Rejected(
-            f"task field mismatch; missing={sorted(missing)}, unknown={sorted(unknown)}"
-        )
-    task = raw
-    if task["v"] != 1:
+    task = exact_fields(raw, TASK_FIELDS, "task")
+    if task["v"] != CONTRACT_VERSION:
         raise Rejected("unsupported task version")
     if type(task["id"]) is not str or not IDENTIFIER.fullmatch(task["id"]):
         raise Rejected("invalid task id")
+    if task["kind"] not in TASK_KINDS:
+        raise Rejected("invalid task kind")
+    depends_on = string_list(task["depends_on"], "depends_on", 64, 64)
+    if len(depends_on) != len(set(depends_on)):
+        raise Rejected("depends_on contains duplicates")
+    if task["id"] in depends_on:
+        raise Rejected("task cannot depend on itself")
+    if any(not IDENTIFIER.fullmatch(item) for item in depends_on):
+        raise Rejected("depends_on contains an invalid task id")
     nonempty_text(task["goal"], "goal", 1000)
     relative_path(task["target"], "target")
     model = exact_fields(
@@ -188,9 +195,18 @@ def validate_task(raw: Any) -> dict[str, Any]:
             raise Rejected(f"context[{index}] end precedes start")
     if type(task["write_roots"]) is not list or not 1 <= len(task["write_roots"]) <= 256:
         raise Rejected("write_roots must contain 1..256 paths")
+    normalized_roots: list[PurePosixPath] = []
     for index, item in enumerate(task["write_roots"]):
-        relative_path(item, f"write_roots[{index}]")
-    allowed_commands = task.get("allowed_commands", [])
+        root = relative_path(item, f"write_roots[{index}]")
+        if any(character in str(root) for character in "*?[]"):
+            raise Rejected(f"write_roots[{index}] must be an exact path")
+        normalized_roots.append(root)
+    if len(normalized_roots) != len(set(normalized_roots)):
+        raise Rejected("write_roots contains duplicates")
+    for index, root in enumerate(normalized_roots):
+        if any(root in other.parents or other in root.parents for other in normalized_roots[index + 1 :]):
+            raise Rejected("write_roots must not overlap")
+    allowed_commands = task["allowed_commands"]
     if type(allowed_commands) is not list or len(allowed_commands) > 16:
         raise Rejected("allowed_commands must contain at most 16 argv vectors")
     for index, argv in enumerate(allowed_commands):
@@ -230,6 +246,8 @@ def validate_task(raw: Any) -> dict[str, Any]:
         raise Rejected("verifiers must be a list")
     if len(task["verifiers"]) > limits["max_verifiers"]:
         raise Rejected("verifier count exceeds task limit")
+    if not task["verifiers"]:
+        raise Rejected("every task requires an independent verifier")
     verifier_ids: set[str] = set()
     for index, verifier in enumerate(task["verifiers"]):
         verifier = exact_fields(verifier, {"id", "argv"}, f"verifiers[{index}]")
@@ -244,6 +262,23 @@ def validate_task(raw: Any) -> dict[str, Any]:
         for arg_index, arg in enumerate(argv):
             if type(arg) is not str or len(arg) > 1000:
                 raise Rejected(f"invalid verifier argument {index}:{arg_index}")
+    if task["kind"] in {"coding", "repair"} and not allowed_commands:
+        raise Rejected("coding and repair tasks require worker-loop test commands")
+    minimums = {
+        "planning": (300_000, 24),
+        "review": (300_000, 20),
+        "coding": (300_000, 24),
+        "repair": (120_000, 10),
+    }
+    minimum_session, minimum_turns = minimums[task["kind"]]
+    if limits["model_session_tokens"] < minimum_session:
+        raise Rejected(
+            f"{task['kind']} tasks require at least {minimum_session} session tokens"
+        )
+    if limits["max_tool_calls"] < minimum_turns:
+        raise Rejected(
+            f"{task['kind']} tasks require at least {minimum_turns} tool turns"
+        )
     return task
 
 
@@ -275,7 +310,7 @@ def command_is_admitted(argv: list[str]) -> bool:
 
 def validate_packet(raw: Any) -> dict[str, Any]:
     packet = exact_fields(raw, {"v", "task", "task_sha256", "excerpts"}, "packet")
-    if packet["v"] != 1:
+    if packet["v"] != CONTRACT_VERSION:
         raise Rejected("unsupported packet version")
     task = validate_task(packet["task"])
     if type(packet["task_sha256"]) is not str or not HEX64.fullmatch(packet["task_sha256"]):
@@ -303,7 +338,7 @@ def validate_packet(raw: Any) -> dict[str, Any]:
 
 def validate_result(raw: Any) -> dict[str, Any]:
     result = exact_fields(raw, RESULT_FIELDS, "result")
-    if result["v"] != 1:
+    if result["v"] != CONTRACT_VERSION:
         raise Rejected("unsupported result version")
     nonempty_text(result["task_id"], "task_id", 64)
     if type(result["packet_sha256"]) is not str or not HEX64.fullmatch(result["packet_sha256"]):
@@ -328,7 +363,7 @@ def validate_result(raw: Any) -> dict[str, Any]:
 
 def validate_baseline(raw: Any) -> dict[str, Any]:
     baseline = exact_fields(raw, BASELINE_FIELDS, "baseline")
-    if baseline["v"] != 1:
+    if baseline["v"] != CONTRACT_VERSION:
         raise Rejected("unsupported baseline version")
     nonempty_text(baseline["task_id"], "baseline.task_id", 64)
     nonempty_text(baseline["worker"], "baseline.worker", 128)
@@ -363,11 +398,16 @@ def reject_likely_secret(path: PurePosixPath, text: str) -> None:
         raise Rejected(f"likely secret found in context file: {path}")
 
 
-def command_pack(task_path: Path, packet_path: Path, repo: Path) -> dict[str, Any]:
-    task = validate_task(read_json(task_path))
+def prepare_task_packet(raw_task: Any, repo: Path) -> tuple[dict[str, Any], int]:
+    task = validate_task(raw_task)
     target = resolve_inside(repo, relative_path(task["target"], "target"), "target")
     if not target.is_dir():
         raise Rejected(f"target directory does not exist: {task['target']}")
+    for index, value in enumerate(task["write_roots"]):
+        relative = relative_path(value, f"write_roots[{index}]")
+        candidate = resolve_inside(target, relative, f"write_roots[{index}]")
+        if candidate.exists() and not candidate.is_file():
+            raise Rejected(f"write_roots[{index}] must name a file: {relative}")
     excerpts = []
     total_chars = 0
     for index, source in enumerate(task["context"]):
@@ -394,7 +434,7 @@ def command_pack(task_path: Path, packet_path: Path, repo: Path) -> dict[str, An
             }
         )
     packet = {
-        "v": 1,
+        "v": CONTRACT_VERSION,
         "task": task,
         "task_sha256": digest_value(task),
         "excerpts": excerpts,
@@ -402,6 +442,69 @@ def command_pack(task_path: Path, packet_path: Path, repo: Path) -> dict[str, An
     packet_chars = len(canonical_bytes(packet).decode("utf-8"))
     if packet_chars > task["limits"]["packet_chars"]:
         raise Rejected("complete worker packet exceeds packet_chars")
+    return packet, total_chars
+
+
+def prepare_packet(task_path: Path, repo: Path) -> tuple[dict[str, Any], int]:
+    return prepare_task_packet(read_json(task_path), repo)
+
+
+def preflight_task(
+    raw_task: Any,
+    repo: Path,
+    registry_path: Path,
+) -> dict[str, Any]:
+    packet, excerpt_chars = prepare_task_packet(raw_task, repo)
+    task = packet["task"]
+    profiles = load_registry(registry_path)
+    selected = profiles.get(task["model"]["profile"])
+    if selected is None:
+        raise Rejected(f"unknown model profile: {task['model']['profile']}")
+    limits = task["limits"]
+    requested = {
+        "model_context_tokens": selected.context_tokens,
+        "model_session_tokens": selected.session_tokens,
+        "model_output_tokens": selected.output_tokens,
+    }
+    for field, available in requested.items():
+        if limits[field] > available:
+            raise Rejected(
+                f"{field} exceeds registered profile limit {available}: {limits[field]}"
+            )
+    packet_chars = len(canonical_bytes(packet).decode("utf-8"))
+    warnings = []
+    if packet_chars >= limits["packet_chars"] * 0.85:
+        warnings.append("packet budget is at least 85% utilized")
+    if limits["model_session_tokens"] < limits["model_context_tokens"] * 3:
+        warnings.append("session budget provides less than three context epochs")
+    return {
+        "status": "passed",
+        "task_id": task["id"],
+        "kind": task["kind"],
+        "profile": selected.id,
+        "target": task["target"],
+        "excerpts": len(packet["excerpts"]),
+        "excerpt_chars": excerpt_chars,
+        "packet_chars": packet_chars,
+        "packet_budget": limits["packet_chars"],
+        "worker_test_commands": len(task["allowed_commands"]),
+        "independent_verifiers": len(task["verifiers"]),
+        "warnings": warnings,
+    }
+
+
+def command_preflight(
+    task_path: Path,
+    repo: Path,
+    registry_path: Path,
+) -> dict[str, Any]:
+    return preflight_task(read_json(task_path), repo, registry_path)
+
+
+def command_pack(task_path: Path, packet_path: Path, repo: Path) -> dict[str, Any]:
+    packet, total_chars = prepare_packet(task_path, repo)
+    task = packet["task"]
+    packet_chars = len(canonical_bytes(packet).decode("utf-8"))
     write_json(packet_path, packet)
     return {
         "status": "packed",
@@ -410,7 +513,7 @@ def command_pack(task_path: Path, packet_path: Path, repo: Path) -> dict[str, An
         "excerpt_chars": total_chars,
         "packet_chars": packet_chars,
         "packet_budget": task["limits"]["packet_chars"],
-        "excerpts": len(excerpts),
+        "excerpts": len(packet["excerpts"]),
     }
 
 
@@ -421,7 +524,7 @@ def command_accept(
     nonempty_text(worker, "worker", 128)
     accepted = reject_reason is None
     ack = {
-        "v": 1,
+        "v": CONTRACT_VERSION,
         "task_id": packet["task"]["id"],
         "packet_sha256": digest_value(packet),
         "worker": worker,
@@ -462,13 +565,14 @@ def command_snapshot(
     else:
         raise Rejected("baseline must be stored outside the task target")
     baseline = {
-        "v": 1,
+        "v": CONTRACT_VERSION,
         "task_id": task["id"],
         "packet_sha256": packet_sha,
         "worker": ack["worker"],
         "target": task["target"],
         "files": target_manifest(target),
     }
+    validate_baseline(baseline)
     write_json(baseline_path, baseline)
     return {
         "status": "snapshotted",
@@ -672,7 +776,7 @@ def command_execute(
     if outside:
         risks.append("Worker changed files outside write_roots: " + ", ".join(outside))
     result = {
-        "v": 1,
+        "v": CONTRACT_VERSION,
         "task_id": task["id"],
         "packet_sha256": packet_sha,
         "status": "done" if success else "failed",
@@ -704,11 +808,118 @@ def command_execute(
     }
 
 
+def classify_failure(text: str) -> tuple[str, str]:
+    lowered = text.lower()
+    if "failed to create session directory" in lowered or "permissionerror" in lowered:
+        return "session-permission", "rerun with permission for the isolated Vibe home"
+    if "token limit exceeded" in lowered:
+        return "token-limit", "issue a fresh continuation or repair with a larger session budget"
+    if "turn limit" in lowered:
+        return "turn-limit", "issue a fresh continuation or repair with more tool turns"
+    if "verifier failed" in lowered:
+        return "verifier-failure", "diagnose the first verifier and reduce repair write scope"
+    if "outside write_roots" in lowered or "outside write roots" in lowered:
+        return "write-scope", "reject the output and correct the task boundary"
+    if "without changing a durable artifact" in lowered:
+        return "no-artifact", "require a durable artifact or use a non-mutating review workflow"
+    if "context slice starts after eof" in lowered:
+        return "context-eof", "correct the context slice and preflight again"
+    if "packet" in lowered and "exceed" in lowered:
+        return "packet-budget", "reduce context or raise the packet budget after review"
+    return "worker-failure", "inspect the compact result and first stderr diagnostic"
+
+
+def command_diagnose(
+    result_path: Path | None,
+    stderr_path: Path | None,
+) -> dict[str, Any]:
+    if result_path is None and stderr_path is None:
+        raise Rejected("diagnose requires --result or --stderr")
+    parts: list[str] = []
+    task_id = ""
+    if result_path is not None:
+        result = validate_result(read_json(result_path))
+        task_id = result["task_id"]
+        parts.extend(result["risks"])
+        parts.append(result["summary"])
+    if stderr_path is not None:
+        try:
+            parts.append(stderr_path.read_text(encoding="utf-8", errors="replace"))
+        except OSError as exc:
+            raise Rejected(f"cannot read stderr {stderr_path}: {exc}") from exc
+    text = "\n".join(parts).strip()
+    failure_kind, action = classify_failure(text)
+    first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    return {
+        "status": "diagnosed",
+        "task_id": task_id,
+        "failure_kind": failure_kind,
+        "recommended_action": action,
+        "detail": first_line[:500],
+    }
+
+
+def command_materialize_plan(
+    plan_path: Path,
+    output_dir: Path,
+    repo: Path,
+    registry_path: Path,
+) -> dict[str, Any]:
+    plan = exact_fields(read_json(plan_path), {"v", "id", "completed", "tasks"}, "plan")
+    if plan["v"] != CONTRACT_VERSION:
+        raise Rejected("unsupported plan version")
+    if type(plan["id"]) is not str or not IDENTIFIER.fullmatch(plan["id"]):
+        raise Rejected("invalid plan id")
+    completed = string_list(plan["completed"], "plan.completed", 256, 64)
+    if len(completed) != len(set(completed)) or any(
+        not IDENTIFIER.fullmatch(item) for item in completed
+    ):
+        raise Rejected("plan.completed contains invalid or duplicate task ids")
+    if type(plan["tasks"]) is not list or not plan["tasks"]:
+        raise Rejected("plan.tasks must be a non-empty list")
+    known = set(completed)
+    tasks = []
+    for index, raw_task in enumerate(plan["tasks"]):
+        task = validate_task(raw_task)
+        if task["id"] in known:
+            raise Rejected(f"duplicate plan task id: {task['id']}")
+        missing = sorted(set(task["depends_on"]) - known)
+        if missing:
+            raise Rejected(
+                f"plan task {task['id']} has unresolved dependencies: {', '.join(missing)}"
+            )
+        known.add(task["id"])
+        preflight_task(task, repo, registry_path)
+        tasks.append(task)
+    resolved_output = output_dir.resolve()
+    for task in tasks:
+        target = resolve_inside(repo, relative_path(task["target"], "target"), "target")
+        try:
+            resolved_output.relative_to(target.resolve())
+        except ValueError:
+            pass
+        else:
+            raise Rejected("materialized tasks must be stored outside every task target")
+    if output_dir.exists() and any(output_dir.iterdir()):
+        raise Rejected("materialize output directory must be absent or empty")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    written = []
+    for index, task in enumerate(tasks, start=1):
+        path = output_dir / f"{index:02d}-{task['id']}.task.json"
+        write_json(path, task)
+        written.append({"path": str(path), "sha256": digest_file(path)})
+    return {
+        "status": "materialized",
+        "plan_id": plan["id"],
+        "tasks": written,
+    }
+
+
 def validate_ack(raw: Any) -> dict[str, Any]:
     ack = exact_fields(
         raw, {"v", "task_id", "packet_sha256", "worker", "accepted", "reason"}, "ack"
     )
-    if ack["v"] != 1 or type(ack["accepted"]) is not bool:
+    if ack["v"] != CONTRACT_VERSION or type(ack["accepted"]) is not bool:
         raise Rejected("invalid acknowledgement")
     nonempty_text(ack["task_id"], "ack.task_id", 64)
     nonempty_text(ack["worker"], "ack.worker", 128)
@@ -722,7 +933,7 @@ def validate_ack(raw: Any) -> dict[str, Any]:
 
 
 def path_is_writable(path: PurePosixPath, roots: list[PurePosixPath]) -> bool:
-    return any(path == root or root in path.parents for root in roots)
+    return path in roots
 
 
 def expand_argv(argv: list[str]) -> list[str]:
@@ -895,6 +1106,94 @@ def command_gate(
     return output
 
 
+def command_run(
+    task_path: Path,
+    evidence_dir: Path,
+    worker: str,
+    repo: Path,
+    registry_path: Path,
+    endpoint: str,
+) -> dict[str, Any]:
+    preflight = command_preflight(task_path, repo, registry_path)
+    task = validate_task(read_json(task_path))
+    target = resolve_inside(repo, relative_path(task["target"], "target"), "target")
+    resolved_evidence = evidence_dir.resolve()
+    try:
+        resolved_evidence.relative_to(target.resolve())
+    except ValueError:
+        pass
+    else:
+        raise Rejected("run evidence must be stored outside the task target")
+    if evidence_dir.exists() and any(evidence_dir.iterdir()):
+        raise Rejected("run evidence directory must be absent or empty")
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    paths = {
+        name: evidence_dir / filename
+        for name, filename in {
+            "packet": "packet.json",
+            "route": "route.json",
+            "ack": "ack.json",
+            "baseline": "baseline.json",
+            "result": "result.json",
+            "trajectory": "trajectory.json",
+            "gate": "gate.json",
+            "run": "run.json",
+        }.items()
+    }
+    packed = command_pack(task_path, paths["packet"], repo)
+    routed = command_route(paths["packet"], registry_path, endpoint)
+    write_json(paths["route"], routed)
+    accepted = command_accept(paths["packet"], paths["ack"], worker, None)
+    snapshotted = command_snapshot(
+        task_path,
+        paths["packet"],
+        paths["ack"],
+        paths["baseline"],
+        repo,
+    )
+    executed = command_execute(
+        paths["packet"],
+        paths["ack"],
+        paths["baseline"],
+        paths["result"],
+        paths["trajectory"],
+        repo,
+        registry_path,
+        endpoint,
+    )
+    base = {
+        "task_id": task["id"],
+        "evidence": str(evidence_dir),
+        "preflight": preflight,
+        "packet_sha256": packed["packet_sha256"],
+        "route": routed,
+        "worker": accepted["worker"],
+        "baseline_sha256": snapshotted["baseline_sha256"],
+        "execution": executed,
+    }
+    if executed["status"] != "completed":
+        stderr = Path(executed["stderr"]) if executed.get("stderr") else None
+        diagnosis = command_diagnose(
+            paths["result"],
+            stderr if stderr is not None and stderr.is_file() else None,
+        )
+        output = {"status": "worker_failed", "stage": "execute", **base, "diagnosis": diagnosis}
+        write_json(paths["run"], output)
+        return output
+    gated = command_gate(
+        task_path,
+        paths["packet"],
+        paths["ack"],
+        paths["result"],
+        repo,
+        paths["baseline"],
+    )
+    write_json(paths["gate"], gated)
+    output = {"status": "passed", "stage": "gate", **base, "gate": gated}
+    write_json(paths["run"], output)
+    return output
+
+
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(description=__doc__)
     commands = root.add_subparsers(dest="command", required=True)
@@ -914,6 +1213,12 @@ def parser() -> argparse.ArgumentParser:
         "--ollama-endpoint", default="http://127.0.0.1:11434"
     )
     canary.add_argument("--timeout", type=int, default=120)
+    preflight = commands.add_parser("preflight")
+    preflight.add_argument("task", type=Path)
+    preflight.add_argument("--repo", type=Path, default=Path.cwd())
+    preflight.add_argument(
+        "--registry", type=Path, default=Path(__file__).with_name("models.json")
+    )
     pack = commands.add_parser("pack")
     pack.add_argument("task", type=Path)
     pack.add_argument("packet", type=Path)
@@ -957,6 +1262,27 @@ def parser() -> argparse.ArgumentParser:
     gate.add_argument("result", type=Path)
     gate.add_argument("--baseline", type=Path)
     gate.add_argument("--repo", type=Path, default=Path.cwd())
+    diagnose = commands.add_parser("diagnose")
+    diagnose.add_argument("--result", type=Path)
+    diagnose.add_argument("--stderr", type=Path)
+    materialize = commands.add_parser("materialize-plan")
+    materialize.add_argument("plan", type=Path)
+    materialize.add_argument("output", type=Path)
+    materialize.add_argument("--repo", type=Path, default=Path.cwd())
+    materialize.add_argument(
+        "--registry", type=Path, default=Path(__file__).with_name("models.json")
+    )
+    run = commands.add_parser("run")
+    run.add_argument("task", type=Path)
+    run.add_argument("evidence", type=Path)
+    run.add_argument("--worker", required=True)
+    run.add_argument("--repo", type=Path, default=Path.cwd())
+    run.add_argument(
+        "--registry", type=Path, default=Path(__file__).with_name("models.json")
+    )
+    run.add_argument(
+        "--ollama-endpoint", default="http://127.0.0.1:11434"
+    )
     return root
 
 
@@ -972,6 +1298,8 @@ def main(argv: list[str] | None = None) -> int:
                 args.ollama_endpoint,
                 args.timeout,
             )
+        elif args.command == "preflight":
+            output = command_preflight(args.task, args.repo, args.registry)
         elif args.command == "pack":
             output = command_pack(args.task, args.packet, args.repo)
         elif args.command == "accept":
@@ -997,7 +1325,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.registry,
                 args.ollama_endpoint,
             )
-        else:
+        elif args.command == "gate":
             output = command_gate(
                 args.task,
                 args.packet,
@@ -1006,11 +1334,26 @@ def main(argv: list[str] | None = None) -> int:
                 args.repo,
                 args.baseline,
             )
+        elif args.command == "diagnose":
+            output = command_diagnose(args.result, args.stderr)
+        elif args.command == "materialize-plan":
+            output = command_materialize_plan(
+                args.plan, args.output, args.repo, args.registry
+            )
+        else:
+            output = command_run(
+                args.task,
+                args.evidence,
+                args.worker,
+                args.repo,
+                args.registry,
+                args.ollama_endpoint,
+            )
     except (Rejected, ModelRejected, OSError) as exc:
         print(json.dumps({"status": "rejected", "reason": str(exc)}, sort_keys=True))
         return 2
     print(json.dumps(output, ensure_ascii=False, sort_keys=True))
-    return 0
+    return 2 if output.get("status") in {"failed", "worker_failed"} else 0
 
 
 if __name__ == "__main__":

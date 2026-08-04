@@ -1,0 +1,31 @@
+{
+  "v": 2,
+  "id": "example-medium-plan",
+  "kind": "planning",
+  "depends_on": [],
+  "goal": "Write a dependency-ordered v2 plan artifact containing complete packable Devstral tasks.",
+  "target": "model-execution-harness/core",
+  "model": {"profile": "mistral-medium-3.5", "capability": "planning", "importance": "high"},
+  "context": [
+    {"path": "README.md", "start": 1, "end": 220},
+    {"path": "task.schema.json", "start": 1, "end": 180}
+  ],
+  "write_roots": ["examples/target/plan.json"],
+  "allowed_commands": [],
+  "done": ["The plan is valid v2 JSON and contains complete dependency-ordered task objects."],
+  "forbidden": ["Do not implement code or write outside the exact plan file."],
+  "limits": {
+    "packet_chars": 120000,
+    "output_chars": 8000,
+    "model_context_tokens": 100000,
+    "model_session_tokens": 500000,
+    "model_output_tokens": 8192,
+    "model_timeout_seconds": 1800,
+    "max_tool_calls": 40,
+    "max_verifiers": 1,
+    "verifier_timeout_seconds": 120
+  },
+  "verifiers": [
+    {"id": "plan-json", "argv": ["{python}", "-c", "import json,pathlib; json.loads(pathlib.Path('examples/target/plan.json').read_text(encoding='utf-8'))"]}
+  ]
+}

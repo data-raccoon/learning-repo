@@ -4,11 +4,9 @@ A dependency-free task boundary and compact model-worker router designed to
 keep full trajectories out of the controlling agent's token context.
 
 ```text
-task --pack--> packet --route--> model --accept--> snapshot
-                                                  |
-                                              execute
-                                                  |
-                         durable files + trajectory + result --gate--> accepted
+v2 task --preflight--> run --pack/route/accept/snapshot/execute/gate--> accepted
+                         |
+                         +--> compact diagnosis + external evidence on failure
 ```
 
 The public tool set remains one CLI:
@@ -16,6 +14,9 @@ The public tool set remains one CLI:
 - `inventory` checks the declared registry against live Ollama tags and the
   installed Gemini `agy` and Mistral Vibe CLIs.
 - `canary` invokes one explicit profile with a fixed exact-response contract.
+- `preflight` validates the complete packet, context EOFs, exact-file roots,
+  profile capacity, worker-loop commands, verifier presence, and budget headroom
+  without writing an artifact.
 - `pack` resolves target-local file slices, rejects likely secrets, enforces a
   character budget, hashes every excerpt, and binds the packet to the task.
 - `route` validates the explicitly human-selected profile and never substitutes
@@ -29,6 +30,21 @@ The public tool set remains one CLI:
 - `gate` checks acknowledgement, task/packet identity, output size, the scope and
   digest of every reported artifact, optionally proves the complete target diff
   against a baseline, and then runs trusted verifiers without a shell.
+- `run` executes the complete lifecycle fail-fast and writes its compact index,
+  packet, acknowledgement, baseline, result, trajectory, and gate outside the
+  target.
+- `diagnose` classifies compact worker failures such as token, turn, permission,
+  packet, verifier, and write-scope failures.
+- `materialize-plan` validates dependency order and writes complete task objects
+  from a Medium-authored v2 plan into an external task directory.
+
+## Version 2 clean break
+
+Version 1 tasks and evidence are intentionally unsupported. Version 2 requires
+`kind`, `depends_on`, explicit `allowed_commands`, exact non-overlapping file
+write roots, and at least one independent verifier. Coding and repair tasks must
+also admit at least one worker-loop test command. There is no compatibility
+adapter; regenerate old tasks from the v2 templates.
 
 ## Why this shape
 
@@ -101,22 +117,25 @@ Planning is a write task: assign Medium an exact plan or task-definition path.
 Coding uses the same path with Devstral. In both cases the complete Vibe JSON
 trajectory is written outside the target and the CLI returns only compact
 metadata. Do not load the full trajectory into controller context by default.
-Use at least a 16k cumulative Vibe token budget for file-tool work; the live
-Medium smoke run measured roughly 10k tokens of system/tool-session overhead.
+Use the v2 task-kind minima and the larger recommended defaults below; small
+budgets can fail after a valid write but before test read-back and finalization.
 
-## Quick start
+## Controller-minimal quick start
 
 From this directory, using the repository's required Python interpreter:
 
 ```powershell
-Copy-Item examples\task.json task.json
+Copy-Item examples\devstral-code-task.json task.json
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py inventory
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py pack task.json packet.json --repo ..
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py route packet.json
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py accept packet.json ack.json --worker local-worker
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py snapshot task.json packet.json ack.json baseline.json --repo ..
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py execute packet.json ack.json baseline.json result.json trajectory.json --repo ..
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py gate task.json packet.json ack.json result.json --baseline baseline.json --repo ..
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py preflight task.json --repo ..
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py run task.json ..\..\..\.orchestration\run-001 --worker devstral-001 --repo ..
+```
+
+For a Medium-authored plan, validate and materialize its dependency-ordered
+tasks before running them:
+
+```powershell
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py materialize-plan plan.json ..\..\..\.orchestration\tasks --repo ..
 ```
 
 All commands emit one compact JSON object. Exit code `0` means success; `2`
@@ -124,8 +143,8 @@ means the contract or gate rejected the input.
 
 ## Contracts
 
-`task.schema.json`, `result.schema.json`, and `baseline.schema.json` document the
-public contracts.
+`task.schema.json`, `plan.schema.json`, `result.schema.json`, and
+`baseline.schema.json` document the v2 public contracts.
 Runtime validation is implemented with the Python standard library so the
 harness has no installation step.
 
@@ -134,8 +153,12 @@ Important task fields:
 - `target`: the only repository subtree visible to the task.
 - `model`: capability, importance, and one explicit human-selected profile.
 - `context`: exact target-relative files and inclusive line slices.
-- `write_roots`: up to 256 target-relative files or directories the worker may
-  change; prefer exact files over broad directories.
+- `kind`: `planning`, `review`, `coding`, or `repair`; it selects minimum
+  resource headroom and worker-loop requirements.
+- `depends_on`: task IDs that must already be completed when a plan is
+  materialized.
+- `write_roots`: exact, non-overlapping target-relative files. Directories and
+  globs are not writable roots in v2.
 - `allowed_commands`: optional exact argv vectors admitted by the global command
   policy and exposed through `limited_bash`.
 - `done`: concise, testable outcomes given to the worker.
@@ -144,7 +167,11 @@ Important task fields:
   tool-call, verifier, and timeout caps. The `packet_chars` cap covers the
   complete serialized worker packet, not just file excerpts.
 
-The `max_tool_calls` limit bounds the Vibe programmatic turn budget.
+The `max_tool_calls` limit bounds the Vibe programmatic turn budget. V2 minima
+are deliberately generous: planning 300k/24, review 300k/20, coding 300k/24,
+and repair 120k/10 for cumulative session tokens/tool turns. Recommended
+starting points are 500k/40 for Medium planning, 800k/60 for Devstral coding,
+and 180k/16 for focused Devstral repairs.
 
 ## Architecture decision
 

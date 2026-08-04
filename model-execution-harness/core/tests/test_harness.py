@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import hashlib
 import json
@@ -30,8 +30,10 @@ class HarnessTests(unittest.TestCase):
             "one\ntwo\nthree\nfour\n", encoding="utf-8"
         )
         self.task = {
-            "v": 1,
+            "v": harness.CONTRACT_VERSION,
             "id": "task-1",
+            "kind": "coding",
+            "depends_on": [],
             "goal": "Update an allowed artifact.",
             "target": "target",
             "model": {
@@ -40,17 +42,20 @@ class HarnessTests(unittest.TestCase):
                 "importance": "normal",
             },
             "context": [{"path": "input.txt", "start": 2, "end": 3}],
-            "write_roots": ["out"],
+            "write_roots": ["out/result.txt"],
+            "allowed_commands": [
+                ["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"]
+            ],
             "done": ["out/result.txt exists"],
             "forbidden": ["No network"],
             "limits": {
                 "packet_chars": 4000,
                 "output_chars": 4000,
                 "model_context_tokens": 4096,
-                "model_session_tokens": 16384,
+                "model_session_tokens": 300000,
                 "model_output_tokens": 256,
                 "model_timeout_seconds": 30,
-                "max_tool_calls": 5,
+                "max_tool_calls": 24,
                 "max_verifiers": 1,
                 "verifier_timeout_seconds": 10,
             },
@@ -138,7 +143,7 @@ class HarnessTests(unittest.TestCase):
         artifact.parent.mkdir()
         artifact.write_text("ok\n", encoding="utf-8")
         result = {
-            "v": 1,
+            "v": harness.CONTRACT_VERSION,
             "task_id": self.task["id"],
             "packet_sha256": harness.digest_value(packet),
             "status": "done",
@@ -166,7 +171,7 @@ class HarnessTests(unittest.TestCase):
         packet = self.pack_and_accept()
         artifact = self.target / "input.txt"
         result = {
-            "v": 1,
+            "v": harness.CONTRACT_VERSION,
             "task_id": self.task["id"],
             "packet_sha256": harness.digest_value(packet),
             "status": "done",
@@ -202,7 +207,7 @@ class HarnessTests(unittest.TestCase):
         artifact.parent.mkdir()
         artifact.write_text("ok\n", encoding="utf-8")
         result = {
-            "v": 1,
+            "v": harness.CONTRACT_VERSION,
             "task_id": self.task["id"],
             "packet_sha256": harness.digest_value(packet),
             "status": "done",
@@ -383,7 +388,7 @@ class HarnessTests(unittest.TestCase):
         artifact.write_text("ok\n", encoding="utf-8")
         (self.target / "out" / "extra.txt").write_text("unreported\n", encoding="utf-8")
         result = {
-            "v": 1,
+            "v": harness.CONTRACT_VERSION,
             "task_id": self.task["id"],
             "packet_sha256": harness.digest_value(packet),
             "status": "done",
@@ -397,7 +402,7 @@ class HarnessTests(unittest.TestCase):
             "risks": [],
         }
         write_json(self.result_path, result)
-        with self.assertRaisesRegex(harness.Rejected, "unreported changed paths"):
+        with self.assertRaisesRegex(harness.Rejected, "outside write_roots"):
             harness.command_gate(
                 self.task_path,
                 self.packet_path,
@@ -424,7 +429,7 @@ class HarnessTests(unittest.TestCase):
         write_json(
             target_result,
             {
-                "v": 1,
+                "v": harness.CONTRACT_VERSION,
                 "task_id": self.task["id"],
                 "packet_sha256": harness.digest_value(packet),
                 "status": "done",
@@ -459,7 +464,7 @@ class HarnessTests(unittest.TestCase):
         )
         (self.target / "input.txt").unlink()
         result = {
-            "v": 1,
+            "v": harness.CONTRACT_VERSION,
             "task_id": self.task["id"],
             "packet_sha256": harness.digest_value(packet),
             "status": "done",
@@ -510,7 +515,7 @@ class HarnessTests(unittest.TestCase):
         ack["packet_sha256"] = "0" * 64
         write_json(self.ack_path, ack)
         result = {
-            "v": 1,
+            "v": harness.CONTRACT_VERSION,
             "task_id": self.task["id"],
             "packet_sha256": harness.digest_value(packet),
             "status": "done",
@@ -527,6 +532,233 @@ class HarnessTests(unittest.TestCase):
                 self.result_path,
                 self.repo,
             )
+
+    def test_v1_task_is_rejected_without_compatibility_mode(self) -> None:
+        self.task["v"] = 1
+        write_json(self.task_path, self.task)
+        with self.assertRaisesRegex(harness.Rejected, "unsupported task version"):
+            harness.command_pack(self.task_path, self.packet_path, self.repo)
+
+    def test_target_manifest_uses_ordinal_posix_path_order(self) -> None:
+        (self.target / "__pycache__").mkdir()
+        (self.target / "__pycache__" / "cache.pyc").write_bytes(b"cache")
+        (self.target / "AGENTS.md").write_text("agent\n", encoding="utf-8")
+        (self.target / "README.md").write_text("readme\n", encoding="utf-8")
+        labels = [item["path"] for item in harness.target_manifest(self.target)]
+        self.assertEqual(sorted(labels), labels)
+        self.assertLess(labels.index("AGENTS.md"), labels.index("__pycache__/cache.pyc"))
+
+    def test_snapshot_output_self_validates_with_mixed_case_paths(self) -> None:
+        (self.target / "__pycache__").mkdir()
+        (self.target / "__pycache__" / "cache.pyc").write_bytes(b"cache")
+        (self.target / "AGENTS.md").write_text("agent\n", encoding="utf-8")
+        self.pack_and_accept()
+        harness.command_snapshot(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.repo,
+        )
+        harness.validate_baseline(harness.read_json(self.baseline_path))
+
+    def test_coding_task_requires_worker_loop_command(self) -> None:
+        self.task["allowed_commands"] = []
+        write_json(self.task_path, self.task)
+        with self.assertRaisesRegex(harness.Rejected, "worker-loop test commands"):
+            harness.command_pack(self.task_path, self.packet_path, self.repo)
+
+    def test_write_roots_must_be_exact_and_non_overlapping(self) -> None:
+        self.task["write_roots"] = ["out", "out/result.txt"]
+        write_json(self.task_path, self.task)
+        with self.assertRaisesRegex(harness.Rejected, "must not overlap"):
+            harness.command_pack(self.task_path, self.packet_path, self.repo)
+
+    def test_preflight_checks_registered_capacity_and_complete_packet(self) -> None:
+        self.task["model"] = {
+            "profile": "devstral-small",
+            "capability": "coding",
+            "importance": "high",
+        }
+        write_json(self.task_path, self.task)
+        output = harness.command_preflight(
+            self.task_path,
+            self.repo,
+            HERE / "models.json",
+        )
+        self.assertEqual("passed", output["status"])
+        self.assertEqual(1, output["worker_test_commands"])
+        self.assertEqual(1, output["independent_verifiers"])
+
+    def test_preflight_rejects_directory_write_root(self) -> None:
+        self.task["write_roots"] = ["out"]
+        (self.target / "out").mkdir()
+        self.task["model"] = {
+            "profile": "devstral-small",
+            "capability": "coding",
+            "importance": "high",
+        }
+        write_json(self.task_path, self.task)
+        with self.assertRaisesRegex(harness.Rejected, "must name a file"):
+            harness.command_preflight(self.task_path, self.repo, HERE / "models.json")
+
+    def test_materialize_plan_writes_dependency_ordered_tasks(self) -> None:
+        first = json.loads(json.dumps(self.task))
+        first["id"] = "first"
+        first["model"]["profile"] = "devstral-small"
+        first["model"]["capability"] = "coding"
+        second = json.loads(json.dumps(self.task))
+        second["id"] = "second"
+        second["model"]["profile"] = "devstral-small"
+        second["model"]["capability"] = "coding"
+        second["depends_on"] = ["first"]
+        second["write_roots"] = ["out/second.txt"]
+        plan_path = self.repo / "plan.json"
+        write_json(
+            plan_path,
+            {"v": harness.CONTRACT_VERSION, "id": "plan-1", "completed": [], "tasks": [first, second]},
+        )
+        output = harness.command_materialize_plan(
+            plan_path,
+            self.repo / "materialized",
+            self.repo,
+            HERE / "models.json",
+        )
+        self.assertEqual("materialized", output["status"])
+        self.assertEqual(2, len(output["tasks"]))
+        self.assertTrue((self.repo / "materialized" / "01-first.task.json").is_file())
+
+    def test_materialize_plan_rejects_unresolved_dependency(self) -> None:
+        task = json.loads(json.dumps(self.task))
+        task["model"]["profile"] = "devstral-small"
+        task["model"]["capability"] = "coding"
+        task["depends_on"] = ["missing"]
+        plan_path = self.repo / "plan.json"
+        write_json(
+            plan_path,
+            {"v": harness.CONTRACT_VERSION, "id": "plan-1", "completed": [], "tasks": [task]},
+        )
+        with self.assertRaisesRegex(harness.Rejected, "unresolved dependencies"):
+            harness.command_materialize_plan(
+                plan_path, self.repo / "tasks", self.repo, HERE / "models.json"
+            )
+
+    def test_materialize_plan_preflights_before_writing(self) -> None:
+        task = json.loads(json.dumps(self.task))
+        task["model"]["profile"] = "devstral-small"
+        task["model"]["capability"] = "coding"
+        task["context"][0]["start"] = 999
+        task["context"][0]["end"] = 999
+        plan_path = self.repo / "plan.json"
+        output_dir = self.repo / "tasks"
+        write_json(
+            plan_path,
+            {"v": harness.CONTRACT_VERSION, "id": "plan-1", "completed": [], "tasks": [task]},
+        )
+        with self.assertRaisesRegex(harness.Rejected, "starts after EOF"):
+            harness.command_materialize_plan(
+                plan_path, output_dir, self.repo, HERE / "models.json"
+            )
+        self.assertFalse(output_dir.exists())
+
+    def test_diagnose_classifies_token_limit(self) -> None:
+        stderr = self.repo / "stderr.txt"
+        stderr.write_text("Token limit exceeded: 241176 > 240000", encoding="utf-8")
+        output = harness.command_diagnose(None, stderr)
+        self.assertEqual("token-limit", output["failure_kind"])
+
+    @patch("harness.command_gate")
+    @patch("harness.command_execute")
+    @patch("harness.command_route")
+    def test_run_stops_before_gate_when_worker_fails(
+        self, command_route, command_execute, command_gate
+    ) -> None:
+        self.task["model"] = {
+            "profile": "devstral-small",
+            "capability": "coding",
+            "importance": "high",
+        }
+        write_json(self.task_path, self.task)
+        command_route.return_value = {"status": "routed", "profile": "devstral-small"}
+
+        def fail_execute(packet, ack, baseline, result, trajectory, *args):
+            packet_value = harness.read_json(packet)
+            write_json(
+                result,
+                {
+                    "v": harness.CONTRACT_VERSION,
+                    "task_id": self.task["id"],
+                    "packet_sha256": harness.digest_value(packet_value),
+                    "status": "failed",
+                    "summary": "Worker failed.",
+                    "changed": [],
+                    "risks": ["Token limit exceeded"],
+                },
+            )
+            return {"status": "worker_failed", "stderr": ""}
+
+        command_execute.side_effect = fail_execute
+        output = harness.command_run(
+            self.task_path,
+            self.repo / "evidence",
+            "worker-1",
+            self.repo,
+            HERE / "models.json",
+            "http://127.0.0.1:11434",
+        )
+        self.assertEqual("worker_failed", output["status"])
+        self.assertEqual("token-limit", output["diagnosis"]["failure_kind"])
+        command_gate.assert_not_called()
+
+    @patch("harness.command_execute")
+    @patch("harness.command_route")
+    def test_run_success_writes_compact_index_and_gate(
+        self, command_route, command_execute
+    ) -> None:
+        self.task["model"] = {
+            "profile": "devstral-small",
+            "capability": "coding",
+            "importance": "high",
+        }
+        write_json(self.task_path, self.task)
+        command_route.return_value = {"status": "routed", "profile": "devstral-small"}
+
+        def complete_execute(packet, ack, baseline, result, trajectory, *args):
+            artifact = self.target / "out" / "result.txt"
+            artifact.parent.mkdir()
+            artifact.write_text("ok\n", encoding="utf-8")
+            packet_value = harness.read_json(packet)
+            write_json(
+                result,
+                {
+                    "v": harness.CONTRACT_VERSION,
+                    "task_id": self.task["id"],
+                    "packet_sha256": harness.digest_value(packet_value),
+                    "status": "done",
+                    "summary": "Completed.",
+                    "changed": [
+                        {"path": "out/result.txt", "sha256": harness.digest_file(artifact)}
+                    ],
+                    "risks": [],
+                },
+            )
+            trajectory.write_text("[]", encoding="utf-8")
+            return {"status": "completed", "stderr": "", "changed_files": 1}
+
+        command_execute.side_effect = complete_execute
+        evidence = self.repo / "evidence"
+        output = harness.command_run(
+            self.task_path,
+            evidence,
+            "worker-1",
+            self.repo,
+            HERE / "models.json",
+            "http://127.0.0.1:11434",
+        )
+        self.assertEqual("passed", output["status"])
+        self.assertEqual("passed", output["gate"]["status"])
+        self.assertTrue((evidence / "run.json").is_file())
+        self.assertTrue((evidence / "gate.json").is_file())
 
     @patch("harness.run_model_canary")
     @patch("harness.model_inventory")

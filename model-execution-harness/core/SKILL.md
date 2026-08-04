@@ -21,26 +21,19 @@ output remains a compact hash-bound envelope.
    Use `canary --profile PROFILE_ID` after an install, model change, CLI upgrade,
    or account-session change.
 
-2. Create a task from `examples/task.json`. Keep one target directory, select
+2. Create a v2 task from the model-specific templates. Keep one target directory, select
    exact context slices, and declare `model.capability`, `importance`, and one
    explicit profile chosen by the human controller.
-3. Pack and route:
+3. Preflight, then use the fail-fast run command:
 
    ```powershell
-   & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py pack task.json packet.json --repo ..
-   & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py route packet.json
+   & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py preflight task.json --repo ..
+   & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py run task.json evidence\task-id --worker worker-id --repo ..
    ```
 
-4. Bind the packet, snapshot the target, and execute the selected worker:
-
-   ```powershell
-   & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py accept packet.json ack.json --worker worker-id
-   & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py snapshot task.json packet.json ack.json baseline.json --repo ..
-   & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" harness.py execute packet.json ack.json baseline.json result.json trajectory.json --repo ..
-   ```
-
-5. Run `gate --baseline`. Read only the compact execution envelope; keep the
-   complete trajectory on disk unless a narrow failure diagnostic requires it.
+4. Read only `run.json` and the compact CLI envelope. The command stops before
+   gate on worker failure and records a compact diagnosis. Keep the complete
+   trajectory on disk unless a narrow failure diagnostic requires it.
 
 ## Gate
 
@@ -66,7 +59,10 @@ Accept work only when the gate returns `"status": "passed"`.
 - `limited_bash` accepts only exact admitted argv vectors and executes them
   without a shell. Network, MCP, connectors, generic shells, and subagents are
   disabled.
-- Never widen `target`, `context`, or `write_roots` after dispatch.
+- Version 1 is removed. Regenerate tasks from the v2 templates; do not adapt old
+  packets, acknowledgements, baselines, or results.
+- Never widen `target`, `context`, or `write_roots` after dispatch. V2 roots are
+  exact files only; directories, globs, and overlapping roots are rejected.
 - The worker runner enforces file-tool `write_roots`; the baseline audit detects
   the complete target diff, including unreported writes.
 - Use a fresh isolated Vibe session per bounded task. Split whole-project
@@ -78,16 +74,20 @@ Accept work only when the gate returns `"status": "passed"`.
   200k compact, and 1M cumulative. The isolated Vibe session uses the lower of
   the profile threshold and task-admitted context. Treat the summary as lossy
   and keep authoritative task state in files.
-- Give coding tasks exact public APIs and exact-file write roots. Use a
+- Give coding tasks exact public APIs and exact-file write roots. Coding and
+  repair tasks must expose exact admitted test commands inside the worker loop. Use a
   root-authored executable contract; worker-authored tests are supporting
   evidence only.
+- Give Medium and Devstral enough room to finish their test/repair loops. Start
+  Medium planning at 500k cumulative tokens/40 turns, Devstral coding at
+  800k/60, and narrow repairs at 180k/16 unless measured evidence supports less.
 - Treat Vibe token/turn-limit exits as incomplete sessions, then inspect the
   baseline diff before deciding whether a narrow continuation or repair is
   needed. Do not discard valid scoped artifacts merely because final prose is
   absent.
 - Keep temporary configuration and logs outside the repository.
-- Give file-tool tasks at least a 16k cumulative Vibe token budget; the fixed
-  system/tool contract itself is substantial.
+- Use `materialize-plan` to turn a validated Medium plan into complete task
+  files, and use `diagnose` or the `run` envelope to derive a reduced repair.
 - Use file-relative paths; the harness rejects escapes and external symlinks.
 - Prefer line slices over whole files. Increase the packet budget only after a
   concrete missing-context failure.

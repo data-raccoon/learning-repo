@@ -1,0 +1,28 @@
+{
+  "v": 2,
+  "id": "example-devstral-code",
+  "kind": "coding",
+  "depends_on": ["example-medium-plan"],
+  "goal": "Implement one exact-file change and keep the worker test loop green.",
+  "target": "model-execution-harness/core",
+  "model": {"profile": "devstral-small", "capability": "coding", "importance": "high"},
+  "context": [{"path": "examples/target/README.md", "start": 1, "end": 80}],
+  "write_roots": ["examples/target/README.md"],
+  "allowed_commands": [["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"]],
+  "done": ["The exact requested file is updated and the admitted unit-test command passes in the worker loop."],
+  "forbidden": ["Do not widen scope, use network access, or change another file."],
+  "limits": {
+    "packet_chars": 60000,
+    "output_chars": 8000,
+    "model_context_tokens": 160000,
+    "model_session_tokens": 800000,
+    "model_output_tokens": 100000,
+    "model_timeout_seconds": 1800,
+    "max_tool_calls": 60,
+    "max_verifiers": 1,
+    "verifier_timeout_seconds": 180
+  },
+  "verifiers": [
+    {"id": "core-tests", "argv": ["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"]}
+  ]
+}

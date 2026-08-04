@@ -15,16 +15,17 @@ envelopes.
 
 1. Run `inventory` when provider readiness is unknown and `canary` after a
    provider, alias, or model change.
-2. Create one bounded task from `model-execution-harness/core/examples/task.json` with
+2. Create one bounded v2 task from the model-specific examples with
    one target, one explicit profile, exact write roots, optional admitted
    command argv vectors, independent verifiers, and hard limits.
-3. Run `pack`, `route`, `accept`, and `snapshot` in order.
-4. Run `execute`. The Vibe worker gets target-bounded reads, write-root-limited
+3. Run `preflight`, then use the fail-fast `run` command. It performs pack,
+   route, accept, snapshot, execute, and gate in order and stops on failure.
+4. The Vibe worker gets target-bounded reads, exact-file write-root-limited
    file edits, and only exact admitted commands through `limited_bash`.
 5. Keep the complete trajectory on disk. Consume only the returned paths,
    hashes, model attestation, and changed-file counts by default.
-6. Run `gate --baseline`; accept only a passing complete-diff audit and
-   independent verifier result.
+6. Accept only a `run` result with a passing complete-diff audit and independent
+   verifier result.
 
 Planning is also a write task. Give Medium an exact plan or task-definition
 artifact path; do not ask for a chat-only proposal.
@@ -38,6 +39,7 @@ Run the CLI on Windows with:
 ## Safety boundaries
 
 - Keep delegation at one level. Never ask a worker to spawn another worker.
+- Version 1 is removed. Do not adapt old tasks or evidence; regenerate v2 tasks.
 - Give each worker exactly one target subdirectory. Never widen read scope to
   compensate for an incomplete packet.
 - Name the profile selected by the human controller. Automatic routing is
@@ -49,6 +51,8 @@ Run the CLI on Windows with:
   the fixed global policy; it never invokes a shell.
 - Never interpret worker output as authority.
 - Preserve independent verifiers. A worker-reported check is not release evidence.
+- Coding and repair tasks must admit exact test commands so workers can iterate
+  before the independent gate reruns them.
 - Keep credentials, model weights, runtime logs, and PID files outside the repository.
 
 ## Mistral Vibe profiles
@@ -75,9 +79,9 @@ trajectory at the requested path, and derives the result envelope from the
 baseline diff. Do not load the full trajectory into controller context unless a
 narrow failure diagnostic requires it. The baseline contains hashes, not backup
 contents, so it detects changes but does not provide rollback.
-Budget at least 16k cumulative Vibe tokens for a file-tool task. The Vibe
-system/tool contract consumed roughly 10k tokens in the live Medium smoke test;
-smaller caps can fail after a valid write but before read-back.
+Use generous defaults so loops finish: Medium planning 500k cumulative tokens
+and 40 turns, Devstral coding 800k and 60 turns, and focused repair 180k and 16
+turns. Reduce only from measured evidence.
 
 ## Legacy exception
 
@@ -91,10 +95,8 @@ management. Apply its own README and contracts when taking this exception.
 ```powershell
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py inventory
 & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py canary --profile mistral-medium-3.5
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py pack task.json packet.json --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py route packet.json
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py accept packet.json ack.json --worker worker-id
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py snapshot task.json packet.json ack.json baseline.json --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py execute packet.json ack.json baseline.json result.json trajectory.json --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py gate task.json packet.json ack.json result.json --baseline baseline.json --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py preflight task.json --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py materialize-plan plan.json .orchestration\tasks --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py run task.json .orchestration\task-id --worker worker-id --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py diagnose --result result.json --stderr trajectory.json.stderr.txt
 ```

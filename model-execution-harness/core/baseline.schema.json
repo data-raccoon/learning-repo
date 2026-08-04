@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ai-learn.local/small-context-baseline-v1.json",
-  "title": "Small-context target baseline",
+  "$id": "https://ai-learn.local/bounded-worker-baseline-v2.json",
+  "title": "Bounded worker baseline v2",
   "type": "object",
   "additionalProperties": false,
   "required": ["v", "task_id", "packet_sha256", "worker", "target", "files"],
   "properties": {
-    "v": {"const": 1},
+    "v": {"const": 2},
     "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"},
     "packet_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "worker": {"type": "string", "minLength": 1, "maxLength": 128},

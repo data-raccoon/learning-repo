@@ -54,8 +54,11 @@
   worker. There is no public `invoke` command.
 - Treat planning as a write task: require Medium to save the proposal or task
   definition to an exact artifact path instead of returning it only in chat.
-- Use the workflow `pack`, `route`, `accept`, `snapshot`, `execute`, then
-  `gate --baseline`.
+- Use v2 tasks only. Run `preflight`, then the fail-fast `run` command, which
+  performs `pack`, `route`, `accept`, `snapshot`, `execute`, and baseline gate
+  internally. Regenerate old tasks instead of adapting v1 evidence.
+- Coding and repair tasks require exact-file `write_roots`, admitted worker-loop
+  tests, independent verifiers, and generous session/turn budgets.
 - Store acknowledgements, baselines, results, and full trajectories outside the
   target. Return only compact status, hashes, model attestation, changed-file
   counts, gate results, usage, cost, and artifact paths by default.
