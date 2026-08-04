@@ -4,7 +4,7 @@
   "goal": "Add one concise usage note to the target README without changing other files.",
   "target": "small-context-harness/examples/target",
   "model": {
-    "profile": "auto",
+    "profile": "devstral-small",
     "capability": "coding",
     "importance": "normal"
   },
@@ -17,6 +17,9 @@
   ],
   "write_roots": [
     "README.md"
+  ],
+  "allowed_commands": [
+    ["git", "diff", "--"]
   ],
   "done": [
     "README.md contains a Usage section.",

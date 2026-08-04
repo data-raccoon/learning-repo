@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from pathlib import Path
+from types import SimpleNamespace
 
 
 HERE = Path(__file__).resolve().parents[1]
@@ -34,7 +35,7 @@ class HarnessTests(unittest.TestCase):
             "goal": "Update an allowed artifact.",
             "target": "target",
             "model": {
-                "profile": "auto",
+                "profile": "ollama-ornith-9b",
                 "capability": "summarization",
                 "importance": "normal",
             },
@@ -66,6 +67,7 @@ class HarnessTests(unittest.TestCase):
         self.task_path = self.repo / "task.json"
         self.packet_path = self.repo / "packet.json"
         self.ack_path = self.repo / "ack.json"
+        self.baseline_path = self.repo / "baseline.json"
         self.result_path = self.repo / "result.json"
         write_json(self.task_path, self.task)
 
@@ -101,6 +103,12 @@ class HarnessTests(unittest.TestCase):
         self.task["context"] = [{"path": ".env", "start": 1, "end": 1}]
         write_json(self.task_path, self.task)
         with self.assertRaisesRegex(harness.Rejected, "secret"):
+            harness.command_pack(self.task_path, self.packet_path, self.repo)
+
+    def test_task_rejects_unadmitted_worker_command(self) -> None:
+        self.task["allowed_commands"] = [["powershell", "-Command", "whoami"]]
+        write_json(self.task_path, self.task)
+        with self.assertRaisesRegex(harness.Rejected, "not globally admitted"):
             harness.command_pack(self.task_path, self.packet_path, self.repo)
 
     def test_pack_caps_the_complete_packet(self) -> None:
@@ -174,6 +182,315 @@ class HarnessTests(unittest.TestCase):
                 self.repo,
             )
 
+    def test_baseline_gate_accepts_exact_reported_changes(self) -> None:
+        packet = self.pack_and_accept()
+        snapshot = harness.command_snapshot(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.repo,
+        )
+        artifact = self.target / "out" / "result.txt"
+        artifact.parent.mkdir()
+        artifact.write_text("ok\n", encoding="utf-8")
+        result = {
+            "v": 1,
+            "task_id": self.task["id"],
+            "packet_sha256": harness.digest_value(packet),
+            "status": "done",
+            "summary": "Created the exact artifact.",
+            "changed": [
+                {
+                    "path": "out/result.txt",
+                    "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+                }
+            ],
+            "risks": [],
+        }
+        write_json(self.result_path, result)
+        output = harness.command_gate(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.result_path,
+            self.repo,
+            self.baseline_path,
+        )
+        self.assertEqual("passed", output["status"])
+        self.assertEqual(1, output["baseline_audit"]["changed_paths"])
+        self.assertEqual(snapshot["baseline_sha256"], output["baseline_audit"]["sha256"])
+
+    @patch("harness.run_mistral_vibe_worker")
+    @patch("harness.select_model")
+    def test_execute_persists_trajectory_and_derives_result(
+        self, select_model, run_worker
+    ) -> None:
+        self.task["model"] = {
+            "profile": "devstral-small",
+            "capability": "coding",
+            "importance": "normal",
+        }
+        self.task["allowed_commands"] = [["git", "status", "--short"]]
+        write_json(self.task_path, self.task)
+        packet = self.pack_and_accept()
+        harness.command_snapshot(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.repo,
+        )
+        trajectory = self.repo / "trajectory.json"
+        select_model.return_value = (
+            SimpleNamespace(
+                id="devstral-small",
+                provider="mistral-vibe",
+                model="devstral-small",
+            ),
+            {},
+        )
+
+        def execute(*args, **kwargs):
+            artifact = self.target / "out" / "result.txt"
+            artifact.parent.mkdir()
+            artifact.write_text("ok\n", encoding="utf-8")
+            kwargs["trajectory_path"].write_text(
+                '[{"role":"assistant","content":"full trajectory"}]',
+                encoding="utf-8",
+            )
+            return {
+                "success": True,
+                "exit_code": 0,
+                "error": "",
+                "trajectory": str(kwargs["trajectory_path"]),
+                "trajectory_sha256": hashlib.sha256(
+                    kwargs["trajectory_path"].read_bytes()
+                ).hexdigest(),
+                "stderr": "",
+                "attestation": {"expected_model": "devstral-small", "matched": True},
+            }
+
+        run_worker.side_effect = execute
+        output = harness.command_execute(
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.result_path,
+            trajectory,
+            self.repo,
+            self.repo / "models.json",
+            "http://127.0.0.1:11434",
+        )
+        result = harness.read_json(self.result_path)
+        self.assertEqual("completed", output["status"])
+        self.assertEqual(1, output["changed_files"])
+        self.assertNotIn("full trajectory", json.dumps(output))
+        self.assertEqual("out/result.txt", result["changed"][0]["path"])
+        gated = harness.command_gate(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.result_path,
+            self.repo,
+            self.baseline_path,
+        )
+        self.assertEqual("passed", gated["status"])
+
+    @patch("harness.run_mistral_vibe_worker")
+    @patch("harness.select_model")
+    def test_execute_rejects_chat_only_completion(
+        self, select_model, run_worker
+    ) -> None:
+        self.task["model"] = {
+            "profile": "mistral-medium-3.5",
+            "capability": "planning",
+            "importance": "normal",
+        }
+        write_json(self.task_path, self.task)
+        self.pack_and_accept()
+        harness.command_snapshot(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.repo,
+        )
+        trajectory = self.repo / "trajectory.json"
+        select_model.return_value = (
+            SimpleNamespace(
+                id="mistral-medium-3.5",
+                provider="mistral-vibe",
+                model="mistral-medium-3.5",
+            ),
+            {},
+        )
+
+        def execute(*args, **kwargs):
+            kwargs["trajectory_path"].write_text("[]", encoding="utf-8")
+            return {
+                "success": True,
+                "exit_code": 0,
+                "error": "",
+                "trajectory": str(kwargs["trajectory_path"]),
+                "trajectory_sha256": hashlib.sha256(
+                    kwargs["trajectory_path"].read_bytes()
+                ).hexdigest(),
+                "stderr": "",
+                "attestation": {"expected_model": "mistral-medium-3.5", "matched": True},
+            }
+
+        run_worker.side_effect = execute
+        output = harness.command_execute(
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.result_path,
+            trajectory,
+            self.repo,
+            self.repo / "models.json",
+            "http://127.0.0.1:11434",
+        )
+        result = harness.read_json(self.result_path)
+        self.assertEqual("worker_failed", output["status"])
+        self.assertEqual("failed", result["status"])
+        self.assertIn("without changing a durable artifact", result["risks"][0])
+
+    def test_baseline_gate_rejects_unreported_change(self) -> None:
+        packet = self.pack_and_accept()
+        harness.command_snapshot(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.repo,
+        )
+        artifact = self.target / "out" / "result.txt"
+        artifact.parent.mkdir()
+        artifact.write_text("ok\n", encoding="utf-8")
+        (self.target / "out" / "extra.txt").write_text("unreported\n", encoding="utf-8")
+        result = {
+            "v": 1,
+            "task_id": self.task["id"],
+            "packet_sha256": harness.digest_value(packet),
+            "status": "done",
+            "summary": "Omitted one changed file.",
+            "changed": [
+                {
+                    "path": "out/result.txt",
+                    "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+                }
+            ],
+            "risks": [],
+        }
+        write_json(self.result_path, result)
+        with self.assertRaisesRegex(harness.Rejected, "unreported changed paths"):
+            harness.command_gate(
+                self.task_path,
+                self.packet_path,
+                self.ack_path,
+                self.result_path,
+                self.repo,
+                self.baseline_path,
+            )
+
+    def test_baseline_gate_ignores_validated_result_envelope_inside_target(self) -> None:
+        packet = self.pack_and_accept()
+        harness.command_snapshot(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.repo,
+        )
+        artifact = self.target / "out" / "result.txt"
+        artifact.parent.mkdir()
+        artifact.write_text("ok\n", encoding="utf-8")
+        target_result = self.target / ".state" / "result.json"
+        target_result.parent.mkdir()
+        write_json(
+            target_result,
+            {
+                "v": 1,
+                "task_id": self.task["id"],
+                "packet_sha256": harness.digest_value(packet),
+                "status": "done",
+                "summary": "Created the exact artifact.",
+                "changed": [
+                    {
+                        "path": "out/result.txt",
+                        "sha256": hashlib.sha256(artifact.read_bytes()).hexdigest(),
+                    }
+                ],
+                "risks": [],
+            },
+        )
+        output = harness.command_gate(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            target_result,
+            self.repo,
+            self.baseline_path,
+        )
+        self.assertEqual(1, output["baseline_audit"]["changed_paths"])
+
+    def test_baseline_gate_rejects_deleted_target_file(self) -> None:
+        packet = self.pack_and_accept()
+        harness.command_snapshot(
+            self.task_path,
+            self.packet_path,
+            self.ack_path,
+            self.baseline_path,
+            self.repo,
+        )
+        (self.target / "input.txt").unlink()
+        result = {
+            "v": 1,
+            "task_id": self.task["id"],
+            "packet_sha256": harness.digest_value(packet),
+            "status": "done",
+            "summary": "Deleted an input.",
+            "changed": [],
+            "risks": [],
+        }
+        write_json(self.result_path, result)
+        with self.assertRaisesRegex(harness.Rejected, "were deleted"):
+            harness.command_gate(
+                self.task_path,
+                self.packet_path,
+                self.ack_path,
+                self.result_path,
+                self.repo,
+                self.baseline_path,
+            )
+
+    def test_snapshot_rejects_baseline_inside_target(self) -> None:
+        self.pack_and_accept()
+        with self.assertRaisesRegex(harness.Rejected, "outside the task target"):
+            harness.command_snapshot(
+                self.task_path,
+                self.packet_path,
+                self.ack_path,
+                self.target / "baseline.json",
+                self.repo,
+            )
+
+    def test_snapshot_requires_matching_accepted_acknowledgement(self) -> None:
+        self.pack_and_accept()
+        ack = harness.read_json(self.ack_path)
+        ack["accepted"] = False
+        ack["reason"] = "worker declined"
+        write_json(self.ack_path, ack)
+        with self.assertRaisesRegex(harness.Rejected, "accepted acknowledgement"):
+            harness.command_snapshot(
+                self.task_path,
+                self.packet_path,
+                self.ack_path,
+                self.baseline_path,
+                self.repo,
+            )
+
     def test_gate_rejects_unbound_acknowledgement(self) -> None:
         packet = self.pack_and_accept()
         ack = harness.read_json(self.ack_path)
@@ -198,15 +515,15 @@ class HarnessTests(unittest.TestCase):
                 self.repo,
             )
 
-    @patch("harness.invoke_model")
+    @patch("harness.run_model_canary")
     @patch("harness.model_inventory")
-    def test_canary_requires_exact_response(self, inventory, invoke) -> None:
+    def test_canary_requires_exact_response(self, inventory, run_canary) -> None:
         inventory.return_value = {
             "profiles": [
                 {"id": "ollama-ministral-3-8b", "available": True}
             ]
         }
-        invoke.return_value = {
+        run_canary.return_value = {
             "text": "SMALL_CONTEXT_CANARY_OK",
             "usage": {"prompt_tokens": 10, "completion_tokens": 5},
             "attestation": {"matched": True},

@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "default": "auto",
+  "default": "human",
   "profiles": [
     {
       "id": "ollama-ministral-3-3b",
@@ -8,7 +8,6 @@
       "model": "ministral-3:3b",
       "digest": "f04aa1c738f64e13c625b82ae92504fc0260fa6723b509ed1ece0fa188179b1d",
       "status": "eligible",
-      "quality": 0.70,
       "context_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
@@ -26,7 +25,6 @@
       "model": "ministral-3:8b",
       "digest": "1922accd5827ebe6829e536369195db25eaf664528dc66206d646ea3bb386b71",
       "status": "eligible",
-      "quality": 0.76,
       "context_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
@@ -44,7 +42,6 @@
       "model": "ornith:9b",
       "digest": "a75697c145891910e312c95e4a9fc1ccb8653e5ef543b23b0403a4665b82fd91",
       "status": "eligible",
-      "quality": 0.80,
       "context_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
@@ -65,7 +62,6 @@
       "model": "gemma4:e4b",
       "digest": "c6eb396dbd5992bbe3f5cdb947e8bbc0ee413d7c17e2beaae69f5d569cf982eb",
       "status": "eligible",
-      "quality": 0.81,
       "context_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
@@ -85,7 +81,6 @@
       "model": "ministral-3:14b",
       "digest": "4760c35aeb9d9e9c6174c2492562c0b999e80a222804fd96b1915ab72bbcdcf7",
       "status": "eligible",
-      "quality": 0.83,
       "context_tokens": 8192,
       "output_tokens": 2048,
       "billing": "local-compute",
@@ -107,7 +102,6 @@
       "model": "gemini-3.5-flash-medium",
       "digest": "",
       "status": "eligible",
-      "quality": 0.90,
       "context_tokens": 16384,
       "output_tokens": 4096,
       "billing": "free-account-quota",
@@ -123,6 +117,45 @@
         "summarization"
       ],
       "notes": "Canonical ID from agy models; passed small-context-exact-response-v1 on 2026-07-25. External OS-keyring login; API and Vertex credentials are stripped."
+    },
+    {
+      "id": "devstral-small",
+      "provider": "mistral-vibe",
+      "model": "devstral-small",
+      "digest": "",
+      "status": "eligible",
+      "context_tokens": 200000,
+      "output_tokens": 200000,
+      "billing": "cloud-subscription",
+      "capabilities": [
+        "architecture",
+        "classification",
+        "coding",
+        "extraction",
+        "formatting",
+        "planning",
+        "reasoning",
+        "review",
+        "summarization"
+      ],
+      "notes": "Mistral Vibe CLI alias for devstral-small-latest (Devstral Small 2). Published provider metadata lists a 256k context window and 256k maximum output."
+    },
+    {
+      "id": "mistral-medium-3.5",
+      "provider": "mistral-vibe",
+      "model": "mistral-medium-3.5",
+      "digest": "",
+      "status": "eligible",
+      "context_tokens": 65536,
+      "output_tokens": 8192,
+      "billing": "cloud-subscription",
+      "capabilities": [
+        "architecture",
+        "planning",
+        "reasoning",
+        "review"
+      ],
+      "notes": "Mistral Vibe CLI alias for mistral-vibe-cli-latest. Use for bounded task definition, planning, architecture, and review proposals."
     }
   ]
 }

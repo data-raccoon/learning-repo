@@ -14,8 +14,9 @@ from typing import Any
 from model_runtime import (
     ModelRejected,
     inventory as model_inventory,
-    invoke as invoke_model,
     load_registry,
+    run_canary as run_model_canary,
+    run_mistral_vibe_worker,
     route as route_model,
 )
 
@@ -28,6 +29,7 @@ TASK_FIELDS = {
     "v", "id", "goal", "target", "model", "context", "write_roots", "done",
     "forbidden", "limits", "verifiers",
 }
+TASK_OPTIONAL_FIELDS = {"allowed_commands"}
 LIMIT_FIELDS = {
     "packet_chars", "output_chars", "model_context_tokens",
     "model_output_tokens", "model_timeout_seconds", "max_tool_calls",
@@ -36,6 +38,7 @@ LIMIT_FIELDS = {
 RESULT_FIELDS = {
     "v", "task_id", "packet_sha256", "status", "summary", "changed", "risks",
 }
+BASELINE_FIELDS = {"v", "task_id", "packet_sha256", "worker", "target", "files"}
 HEX64 = re.compile(r"^[a-f0-9]{64}$")
 IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 SECRET_PATTERNS = (
@@ -62,6 +65,19 @@ def digest_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(65536), b""):
             sha.update(chunk)
     return sha.hexdigest()
+
+
+def target_manifest(target: Path) -> list[dict[str, str]]:
+    target = target.resolve()
+    files: list[dict[str, str]] = []
+    for path in sorted(target.rglob("*")):
+        relative = path.relative_to(target)
+        label = relative.as_posix()
+        if path.is_symlink():
+            raise Rejected(f"target manifest contains a symbolic link: {label}")
+        if path.is_file():
+            files.append({"path": label, "sha256": digest_file(path)})
+    return files
 
 
 def read_json(path: Path) -> Any:
@@ -137,7 +153,15 @@ def bounded_int(
 
 
 def validate_task(raw: Any) -> dict[str, Any]:
-    task = exact_fields(raw, TASK_FIELDS, "task")
+    if type(raw) is not dict:
+        raise Rejected("task must be an object")
+    missing = TASK_FIELDS - set(raw)
+    unknown = set(raw) - TASK_FIELDS - TASK_OPTIONAL_FIELDS
+    if missing or unknown:
+        raise Rejected(
+            f"task field mismatch; missing={sorted(missing)}, unknown={sorted(unknown)}"
+        )
+    task = raw
     if task["v"] != 1:
         raise Rejected("unsupported task version")
     if type(task["id"]) is not str or not IDENTIFIER.fullmatch(task["id"]):
@@ -148,6 +172,8 @@ def validate_task(raw: Any) -> dict[str, Any]:
         task["model"], {"profile", "capability", "importance"}, "model"
     )
     nonempty_text(model["profile"], "model.profile", 128)
+    if model["profile"] == "auto":
+        raise Rejected("model.profile must name a human-selected profile")
     nonempty_text(model["capability"], "model.capability", 128)
     if model["importance"] not in {"low", "normal", "high", "critical"}:
         raise Rejected("model.importance is invalid")
@@ -160,10 +186,21 @@ def validate_task(raw: Any) -> dict[str, Any]:
         end = bounded_int(item["end"], f"context[{index}].end", 1, 10_000_000)
         if end < start:
             raise Rejected(f"context[{index}] end precedes start")
-    if type(task["write_roots"]) is not list or not 1 <= len(task["write_roots"]) <= 16:
-        raise Rejected("write_roots must contain 1..16 paths")
+    if type(task["write_roots"]) is not list or not 1 <= len(task["write_roots"]) <= 256:
+        raise Rejected("write_roots must contain 1..256 paths")
     for index, item in enumerate(task["write_roots"]):
         relative_path(item, f"write_roots[{index}]")
+    allowed_commands = task.get("allowed_commands", [])
+    if type(allowed_commands) is not list or len(allowed_commands) > 16:
+        raise Rejected("allowed_commands must contain at most 16 argv vectors")
+    for index, argv in enumerate(allowed_commands):
+        if type(argv) is not list or not 1 <= len(argv) <= 32:
+            raise Rejected(f"allowed_commands[{index}] must contain 1..32 strings")
+        for arg_index, arg in enumerate(argv):
+            if type(arg) is not str or not arg or len(arg) > 500:
+                raise Rejected(f"invalid allowed command argument {index}:{arg_index}")
+        if not command_is_admitted(argv):
+            raise Rejected(f"allowed_commands[{index}] is not globally admitted")
     if not string_list(task["done"], "done", 16, 500):
         raise Rejected("done must contain at least one criterion")
     string_list(task["forbidden"], "forbidden", 16, 300)
@@ -171,10 +208,10 @@ def validate_task(raw: Any) -> dict[str, Any]:
     bounded_int(limits["packet_chars"], "packet_chars", 256, 1_000_000)
     bounded_int(limits["output_chars"], "output_chars", 128, 1_000_000)
     bounded_int(
-        limits["model_context_tokens"], "model_context_tokens", 1024, 32_768
+        limits["model_context_tokens"], "model_context_tokens", 1024, 256_000
     )
     bounded_int(
-        limits["model_output_tokens"], "model_output_tokens", 32, 4096
+        limits["model_output_tokens"], "model_output_tokens", 32, 256_000
     )
     bounded_int(
         limits["model_timeout_seconds"], "model_timeout_seconds", 1, 3600
@@ -203,6 +240,32 @@ def validate_task(raw: Any) -> dict[str, Any]:
             if type(arg) is not str or len(arg) > 1000:
                 raise Rejected(f"invalid verifier argument {index}:{arg_index}")
     return task
+
+
+def command_is_admitted(argv: list[str]) -> bool:
+    if argv[:2] in (["git", "status"], ["git", "diff"]):
+        return True
+    if argv[0] in {"./gradlew", "gradlew", "gradlew.bat"}:
+        return len(argv) >= 2 and all(
+            item in {
+                "build", "test", "check", "compileJava", "compileTestJava",
+                "spotlessCheck", "--no-daemon", "--stacktrace", "--info",
+            }
+            for item in argv[1:]
+        )
+    if argv[:2] in (["npm", "test"], ["npm", "run"]):
+        return argv[:2] == ["npm", "test"] or (
+            len(argv) == 3 and argv[2] in {"test", "lint", "typecheck", "build"}
+        )
+    if argv[:2] == ["cargo", "test"]:
+        return all(item in {"--all", "--workspace", "--locked"} for item in argv[2:])
+    if argv[:2] == ["go", "test"]:
+        return len(argv) == 3 and argv[2] == "./..."
+    if argv[:2] == ["dotnet", "test"]:
+        return len(argv) == 2
+    if argv[0] == "{python}" and len(argv) >= 3 and argv[1] == "-m":
+        return argv[2] in {"unittest", "pytest"} and "-c" not in argv
+    return False
 
 
 def validate_packet(raw: Any) -> dict[str, Any]:
@@ -256,6 +319,36 @@ def validate_result(raw: Any) -> dict[str, Any]:
         if type(changed["sha256"]) is not str or not HEX64.fullmatch(changed["sha256"]):
             raise Rejected(f"invalid changed digest at index {index}")
     return result
+
+
+def validate_baseline(raw: Any) -> dict[str, Any]:
+    baseline = exact_fields(raw, BASELINE_FIELDS, "baseline")
+    if baseline["v"] != 1:
+        raise Rejected("unsupported baseline version")
+    nonempty_text(baseline["task_id"], "baseline.task_id", 64)
+    nonempty_text(baseline["worker"], "baseline.worker", 128)
+    if (
+        type(baseline["packet_sha256"]) is not str
+        or not HEX64.fullmatch(baseline["packet_sha256"])
+    ):
+        raise Rejected("invalid baseline packet digest")
+    relative_path(baseline["target"], "baseline.target")
+    if type(baseline["files"]) is not list or len(baseline["files"]) > 100_000:
+        raise Rejected("baseline.files must contain at most 100000 items")
+    seen: set[str] = set()
+    previous = ""
+    for index, item in enumerate(baseline["files"]):
+        item = exact_fields(item, {"path", "sha256"}, f"baseline.files[{index}]")
+        normalized = str(relative_path(item["path"], f"baseline.files[{index}].path"))
+        if normalized in seen:
+            raise Rejected(f"duplicate baseline path: {normalized}")
+        if previous and normalized < previous:
+            raise Rejected("baseline files must be sorted by path")
+        seen.add(normalized)
+        previous = normalized
+        if type(item["sha256"]) is not str or not HEX64.fullmatch(item["sha256"]):
+            raise Rejected(f"invalid baseline digest at index {index}")
+    return baseline
 
 
 def reject_likely_secret(path: PurePosixPath, text: str) -> None:
@@ -334,6 +427,54 @@ def command_accept(
     return {"status": "accepted" if accepted else "rejected", **ack}
 
 
+def command_snapshot(
+    task_path: Path,
+    packet_path: Path,
+    ack_path: Path,
+    baseline_path: Path,
+    repo: Path,
+) -> dict[str, Any]:
+    task = validate_task(read_json(task_path))
+    packet = validate_packet(read_json(packet_path))
+    ack = validate_ack(read_json(ack_path))
+    if packet["task_sha256"] != digest_value(task) or packet["task"] != task:
+        raise Rejected("task and packet do not match")
+    packet_sha = digest_value(packet)
+    if (
+        not ack["accepted"]
+        or ack["task_id"] != task["id"]
+        or ack["packet_sha256"] != packet_sha
+    ):
+        raise Rejected("snapshot requires the accepted acknowledgement for this packet")
+    target = resolve_inside(repo, relative_path(task["target"], "target"), "target")
+    if not target.is_dir():
+        raise Rejected(f"target directory does not exist: {task['target']}")
+    baseline_resolved = baseline_path.resolve()
+    try:
+        baseline_resolved.relative_to(target.resolve())
+    except ValueError:
+        pass
+    else:
+        raise Rejected("baseline must be stored outside the task target")
+    baseline = {
+        "v": 1,
+        "task_id": task["id"],
+        "packet_sha256": packet_sha,
+        "worker": ack["worker"],
+        "target": task["target"],
+        "files": target_manifest(target),
+    }
+    write_json(baseline_path, baseline)
+    return {
+        "status": "snapshotted",
+        "task_id": task["id"],
+        "packet_sha256": baseline["packet_sha256"],
+        "baseline": str(baseline_path),
+        "baseline_sha256": digest_value(baseline),
+        "files": len(baseline["files"]),
+    }
+
+
 def command_inventory(registry_path: Path, endpoint: str) -> dict[str, Any]:
     profiles = load_registry(registry_path)
     return model_inventory(profiles, ollama_endpoint=endpoint)
@@ -367,7 +508,7 @@ def command_canary(
         },
         "excerpts": [],
     }
-    result = invoke_model(
+    result = run_model_canary(
         selected,
         packet,
         endpoint=endpoint,
@@ -412,7 +553,6 @@ def command_route(
         "profile": selected.id,
         "provider": selected.provider,
         "model": selected.model,
-        "quality": selected.quality,
         "billing": selected.billing,
         "context_tokens": min(
             packet["task"]["limits"]["model_context_tokens"],
@@ -425,48 +565,121 @@ def command_route(
     }
 
 
-def command_invoke(
+def command_execute(
     packet_path: Path,
-    response_path: Path,
+    ack_path: Path,
+    baseline_path: Path,
+    result_path: Path,
+    trajectory_path: Path,
+    repo: Path,
     registry_path: Path,
     endpoint: str,
 ) -> dict[str, Any]:
     packet = validate_packet(read_json(packet_path))
+    ack = validate_ack(read_json(ack_path))
+    packet_sha = digest_value(packet)
+    if (
+        not ack["accepted"]
+        or ack["task_id"] != packet["task"]["id"]
+        or ack["packet_sha256"] != packet_sha
+    ):
+        raise Rejected("execute requires the accepted acknowledgement for this packet")
     selected, _ = select_model(packet, registry_path, endpoint)
+    if selected.provider != "mistral-vibe":
+        raise Rejected("execute requires a registered Mistral Vibe profile")
+    task = packet["task"]
+    target = resolve_inside(repo, relative_path(task["target"], "target"), "target")
+    if not target.is_dir():
+        raise Rejected(f"target directory does not exist: {task['target']}")
+    for label, path in (("baseline", baseline_path), ("result", result_path), ("trajectory", trajectory_path)):
+        try:
+            path.resolve().relative_to(target.resolve())
+        except ValueError:
+            pass
+        else:
+            raise Rejected(f"{label} must be stored outside the task target")
+    baseline = validate_baseline(read_json(baseline_path))
+    if (
+        baseline["task_id"] != task["id"]
+        or baseline["packet_sha256"] != packet_sha
+        or baseline["worker"] != ack["worker"]
+        or baseline["target"] != task["target"]
+    ):
+        raise Rejected("baseline is bound to another task, packet, or target")
+    before = {item["path"]: item["sha256"] for item in baseline["files"]}
+    current = {item["path"]: item["sha256"] for item in target_manifest(target)}
+    if current != before:
+        raise Rejected("target changed after snapshot and before execute")
     limits = packet["task"]["limits"]
-    result = invoke_model(
+    allowed_commands = [
+        expand_argv(argv) for argv in task.get("allowed_commands", [])
+    ]
+    worker = run_mistral_vibe_worker(
         selected,
         packet,
-        endpoint=endpoint,
+        target=target,
+        write_roots=task["write_roots"],
+        allowed_commands=allowed_commands,
+        trajectory_path=trajectory_path,
         context_tokens=limits["model_context_tokens"],
         output_tokens=limits["model_output_tokens"],
+        max_turns=limits["max_tool_calls"],
+        command_timeout=limits["verifier_timeout_seconds"],
         timeout=limits["model_timeout_seconds"],
     )
-    if len(result["text"]) > limits["output_chars"]:
-        raise Rejected("model response exceeds output_chars")
-    response = {
+    after = {item["path"]: item["sha256"] for item in target_manifest(target)}
+    changed_paths = sorted(
+        path for path in set(before) | set(after) if before.get(path) != after.get(path)
+    )
+    deleted = sorted(path for path in changed_paths if path not in after)
+    current_changes = [
+        {"path": path, "sha256": after[path]}
+        for path in changed_paths
+        if path in after
+    ]
+    write_roots = [relative_path(item, "write_root") for item in task["write_roots"]]
+    outside = sorted(
+        item["path"]
+        for item in current_changes
+        if not path_is_writable(PurePosixPath(item["path"]), write_roots)
+    )
+    success = worker["success"] and bool(current_changes) and not deleted and not outside
+    risks = []
+    if worker["error"]:
+        risks.append(worker["error"])
+    if not current_changes:
+        risks.append("Worker completed without changing a durable artifact.")
+    if deleted:
+        risks.append("Worker deleted target files: " + ", ".join(deleted))
+    if outside:
+        risks.append("Worker changed files outside write_roots: " + ", ".join(outside))
+    result = {
         "v": 1,
-        "task_id": packet["task"]["id"],
-        "packet_sha256": digest_value(packet),
+        "task_id": task["id"],
+        "packet_sha256": packet_sha,
+        "status": "done" if success else "failed",
+        "summary": (
+            f"Bounded worker completed with {len(current_changes)} changed file(s); "
+            "the full trajectory is stored separately."
+        ),
+        "changed": current_changes,
+        "risks": risks,
+    }
+    write_json(result_path, result)
+    return {
+        "status": "completed" if success else "worker_failed",
+        "task_id": task["id"],
+        "packet_sha256": packet_sha,
         "profile": selected.id,
         "provider": selected.provider,
         "model": selected.model,
-        "text": result["text"],
-        "usage": result["usage"],
-        "attestation": result["attestation"],
-    }
-    write_json(response_path, response)
-    return {
-        "status": "completed",
-        "task_id": response["task_id"],
-        "packet_sha256": response["packet_sha256"],
-        "profile": response["profile"],
-        "provider": response["provider"],
-        "model": response["model"],
-        "response": str(response_path),
-        "response_sha256": digest_value(response),
-        "usage": response["usage"],
-        "attestation": response["attestation"],
+        "changed_files": len(current_changes),
+        "result": str(result_path),
+        "result_sha256": digest_value(result),
+        "trajectory": worker["trajectory"],
+        "trajectory_sha256": worker["trajectory_sha256"],
+        "stderr": worker["stderr"],
+        "attestation": worker["attestation"],
     }
 
 
@@ -495,12 +708,75 @@ def expand_argv(argv: list[str]) -> list[str]:
     return [sys.executable if item == "{python}" else item for item in argv]
 
 
+def audit_baseline(
+    baseline_path: Path,
+    task: dict[str, Any],
+    packet_sha: str,
+    target: Path,
+    result_path: Path,
+    worker: str,
+    reported_paths: set[str],
+    write_roots: list[PurePosixPath],
+) -> dict[str, Any]:
+    baseline_resolved = baseline_path.resolve()
+    try:
+        baseline_resolved.relative_to(target.resolve())
+    except ValueError:
+        pass
+    else:
+        raise Rejected("baseline must be stored outside the task target")
+    baseline = validate_baseline(read_json(baseline_path))
+    if (
+        baseline["task_id"] != task["id"]
+        or baseline["packet_sha256"] != packet_sha
+        or baseline["worker"] != worker
+        or baseline["target"] != task["target"]
+    ):
+        raise Rejected("baseline is bound to another task, packet, or target")
+    before = {item["path"]: item["sha256"] for item in baseline["files"]}
+    current_files = target_manifest(target)
+    after = {item["path"]: item["sha256"] for item in current_files}
+    ignored: set[str] = set()
+    try:
+        ignored.add(result_path.resolve().relative_to(target.resolve()).as_posix())
+    except ValueError:
+        pass
+    actual = {
+        path
+        for path in set(before) | set(after)
+        if before.get(path) != after.get(path) and path not in ignored
+    }
+    deleted = sorted(path for path in actual if path in before and path not in after)
+    if deleted:
+        raise Rejected("target files were deleted since baseline: " + ", ".join(deleted))
+    outside = sorted(
+        path
+        for path in actual
+        if not path_is_writable(PurePosixPath(path), write_roots)
+    )
+    if outside:
+        raise Rejected("baseline found changes outside write_roots: " + ", ".join(outside))
+    unreported = sorted(actual - reported_paths)
+    if unreported:
+        raise Rejected("baseline found unreported changed paths: " + ", ".join(unreported))
+    unchanged = sorted(reported_paths - actual)
+    if unchanged:
+        raise Rejected("result reports paths unchanged from baseline: " + ", ".join(unchanged))
+    return {
+        "sha256": digest_value(baseline),
+        "files_before": len(before),
+        "files_after": len(after),
+        "changed_paths": len(actual),
+    }
+
+
 def command_gate(
     task_path: Path,
     packet_path: Path,
     ack_path: Path,
     result_path: Path,
     repo: Path,
+    baseline_path: Path | None = None,
 ) -> dict[str, Any]:
     task = validate_task(read_json(task_path))
     packet = validate_packet(read_json(packet_path))
@@ -527,6 +803,24 @@ def command_gate(
         relative_path(item, f"write_roots[{index}]")
         for index, item in enumerate(task["write_roots"])
     ]
+    reported_paths = {
+        str(relative_path(changed["path"], f"changed[{index}].path"))
+        for index, changed in enumerate(result["changed"])
+    }
+    baseline_audit = (
+        audit_baseline(
+            baseline_path,
+            task,
+            packet_sha,
+            target,
+            result_path,
+            ack["worker"],
+            reported_paths,
+            write_roots,
+        )
+        if baseline_path is not None
+        else None
+    )
     verified_files = []
     for index, changed in enumerate(result["changed"]):
         relative = relative_path(changed["path"], f"changed[{index}].path")
@@ -566,7 +860,7 @@ def command_gate(
         )
         if completed.returncode != 0:
             raise Rejected(f"verifier failed: {verifier['id']}")
-    return {
+    output = {
         "status": "passed",
         "task_id": task["id"],
         "packet_sha256": packet_sha,
@@ -575,6 +869,9 @@ def command_gate(
         "checks": checks,
         "risks": result["risks"],
     }
+    if baseline_audit is not None:
+        output["baseline_audit"] = baseline_audit
+    return output
 
 
 def parser() -> argparse.ArgumentParser:
@@ -605,6 +902,12 @@ def parser() -> argparse.ArgumentParser:
     accept.add_argument("ack", type=Path)
     accept.add_argument("--worker", required=True)
     accept.add_argument("--reject", dest="reject_reason")
+    snapshot = commands.add_parser("snapshot")
+    snapshot.add_argument("task", type=Path)
+    snapshot.add_argument("packet", type=Path)
+    snapshot.add_argument("ack", type=Path)
+    snapshot.add_argument("baseline", type=Path)
+    snapshot.add_argument("--repo", type=Path, default=Path.cwd())
     route = commands.add_parser("route")
     route.add_argument("packet", type=Path)
     route.add_argument(
@@ -613,13 +916,17 @@ def parser() -> argparse.ArgumentParser:
     route.add_argument(
         "--ollama-endpoint", default="http://127.0.0.1:11434"
     )
-    invoke = commands.add_parser("invoke")
-    invoke.add_argument("packet", type=Path)
-    invoke.add_argument("response", type=Path)
-    invoke.add_argument(
+    execute = commands.add_parser("execute")
+    execute.add_argument("packet", type=Path)
+    execute.add_argument("ack", type=Path)
+    execute.add_argument("baseline", type=Path)
+    execute.add_argument("result", type=Path)
+    execute.add_argument("trajectory", type=Path)
+    execute.add_argument("--repo", type=Path, default=Path.cwd())
+    execute.add_argument(
         "--registry", type=Path, default=Path(__file__).with_name("models.json")
     )
-    invoke.add_argument(
+    execute.add_argument(
         "--ollama-endpoint", default="http://127.0.0.1:11434"
     )
     gate = commands.add_parser("gate")
@@ -627,6 +934,7 @@ def parser() -> argparse.ArgumentParser:
     gate.add_argument("packet", type=Path)
     gate.add_argument("ack", type=Path)
     gate.add_argument("result", type=Path)
+    gate.add_argument("--baseline", type=Path)
     gate.add_argument("--repo", type=Path, default=Path.cwd())
     return root
 
@@ -649,20 +957,33 @@ def main(argv: list[str] | None = None) -> int:
             output = command_accept(
                 args.packet, args.ack, args.worker, args.reject_reason
             )
+        elif args.command == "snapshot":
+            output = command_snapshot(
+                args.task, args.packet, args.ack, args.baseline, args.repo
+            )
         elif args.command == "route":
             output = command_route(
                 args.packet, args.registry, args.ollama_endpoint
             )
-        elif args.command == "invoke":
-            output = command_invoke(
+        elif args.command == "execute":
+            output = command_execute(
                 args.packet,
-                args.response,
+                args.ack,
+                args.baseline,
+                args.result,
+                args.trajectory,
+                args.repo,
                 args.registry,
                 args.ollama_endpoint,
             )
         else:
             output = command_gate(
-                args.task, args.packet, args.ack, args.result, args.repo
+                args.task,
+                args.packet,
+                args.ack,
+                args.result,
+                args.repo,
+                args.baseline,
             )
     except (Rejected, ModelRejected, OSError) as exc:
         print(json.dumps({"status": "rejected", "reason": str(exc)}, sort_keys=True))

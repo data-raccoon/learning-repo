@@ -49,29 +49,29 @@ class ModelRuntimeTests(unittest.TestCase):
             ]
         }
 
-    def test_auto_route_prefers_weakest_eligible_local_profile(self) -> None:
-        selected = model_runtime.route(
-            self.profiles,
-            self.availability(),
-            {
-                "profile": "auto",
-                "capability": "summarization",
-                "importance": "normal",
-            },
-        )
-        self.assertEqual("ollama-ministral-3-8b", selected.id)
+    def test_auto_route_is_rejected(self) -> None:
+        with self.assertRaisesRegex(model_runtime.ModelRejected, "disabled"):
+            model_runtime.route(
+                self.profiles,
+                self.availability(),
+                {
+                    "profile": "auto",
+                    "capability": "summarization",
+                    "importance": "normal",
+                },
+            )
 
-    def test_critical_architecture_routes_to_gemini(self) -> None:
+    def test_explicit_profile_is_selected(self) -> None:
         selected = model_runtime.route(
             self.profiles,
             self.availability(),
             {
-                "profile": "auto",
+                "profile": "ollama-ministral-3-14b",
                 "capability": "architecture",
                 "importance": "critical",
             },
         )
-        self.assertEqual("gemini-auto-free", selected.id)
+        self.assertEqual("ollama-ministral-3-14b", selected.id)
 
     def test_explicit_profile_must_support_capability(self) -> None:
         with self.assertRaisesRegex(model_runtime.ModelRejected, "lacks capability"):
@@ -85,9 +85,22 @@ class ModelRuntimeTests(unittest.TestCase):
                 },
             )
 
+    def test_vibe_active_model_prefers_environment_override(self) -> None:
+        with patch.dict(
+            model_runtime.os.environ,
+            {"VIBE_ACTIVE_MODEL": "devstral-small", "USERPROFILE": "ignored"},
+            clear=True,
+        ):
+            self.assertEqual("devstral-small", model_runtime._vibe_active_model())
+
+    @patch("model_runtime._vibe_path", return_value=r"C:\tools\vibe.exe")
+    @patch(
+        "model_runtime._vibe_configured_models",
+        return_value={"devstral-small", "mistral-medium-3.5"},
+    )
     @patch("model_runtime._agy_path", return_value=r"C:\tools\agy.exe")
     @patch("model_runtime.ollama_inventory")
-    def test_inventory_checks_registered_ollama_digests(self, ollama, _agy) -> None:
+    def test_inventory_checks_registered_ollama_digests(self, ollama, _agy, _configured, _vibe) -> None:
         ollama.return_value = {
             "version": "test",
             "models": [
@@ -111,7 +124,7 @@ class ModelRuntimeTests(unittest.TestCase):
             "prompt_eval_count": 100,
             "eval_count": 12,
         }
-        result = model_runtime.invoke_ollama(
+        result = model_runtime.run_ollama_canary(
             profile,
             self.packet,
             endpoint="http://127.0.0.1:11434",
@@ -140,7 +153,7 @@ class ModelRuntimeTests(unittest.TestCase):
             {"GEMINI_API_KEY": "secret", "GOOGLE_CLOUD_PROJECT": "paid"},
             clear=True,
         ):
-            result = model_runtime.invoke_gemini(
+            result = model_runtime.run_gemini_canary(
                 profile, self.packet, timeout=30
             )
         command = run.call_args.args[0]
@@ -163,9 +176,62 @@ class ModelRuntimeTests(unittest.TestCase):
             stderr="Model ID stale not in local config, defaulting to CCPA",
         )
         with self.assertRaisesRegex(model_runtime.ModelRejected, "not honored"):
-            model_runtime.invoke_gemini(
+            model_runtime.run_gemini_canary(
                 self.profiles["gemini-auto-free"], self.packet, timeout=30
             )
+
+    @patch("model_runtime.subprocess.run")
+    @patch("model_runtime._vibe_path", return_value=r"C:\tools\vibe.exe")
+    @patch(
+        "model_runtime._vibe_configured_models", return_value={"devstral-small"}
+    )
+    def test_mistral_vibe_worker_enables_bounded_tools(
+        self, _configured, _vibe, run
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / "target"
+            target.mkdir()
+            config = root / "config.toml"
+            config.write_text('active_model = "devstral-small"\n', encoding="utf-8")
+            trajectory = root / "trajectory.json"
+            observed = {}
+
+            def execute(*args, **kwargs):
+                agent = Path(kwargs["env"]["VIBE_HOME"]) / "agents" / "small-context-worker.toml"
+                observed["agent"] = agent.read_text(encoding="utf-8")
+                observed["command"] = args[0]
+                observed["environment"] = kwargs["env"]
+                observed["prompt"] = kwargs["input"]
+                return SimpleNamespace(returncode=0, stdout="[]", stderr="")
+
+            run.side_effect = execute
+            packet = json.loads(json.dumps(self.packet))
+            packet["task"]["write_roots"] = ["out/result.txt"]
+            with patch("model_runtime._vibe_config_path", return_value=config):
+                result = model_runtime.run_mistral_vibe_worker(
+                    self.profiles["devstral-small"],
+                    packet,
+                    target=target,
+                    write_roots=["out/result.txt"],
+                    allowed_commands=[["git", "status", "--short"]],
+                    trajectory_path=trajectory,
+                    context_tokens=4096,
+                    output_tokens=128,
+                    max_turns=4,
+                    command_timeout=10,
+                    timeout=30,
+                )
+            observed["trajectory"] = trajectory.read_text(encoding="utf-8")
+        self.assertIn("write_file", observed["command"])
+        self.assertIn("limited_bash", observed["command"])
+        self.assertNotIn("--auto-approve", observed["command"])
+        self.assertIn('permission = "never"', observed["agent"])
+        self.assertIn("out\\\\result.txt", observed["agent"])
+        self.assertEqual("devstral-small", observed["environment"]["VIBE_ACTIVE_MODEL"])
+        self.assertIn("Work directly in the current directory", observed["prompt"])
+        self.assertTrue(result["success"])
+        self.assertEqual("[]", observed["trajectory"])
 
 
 if __name__ == "__main__":
