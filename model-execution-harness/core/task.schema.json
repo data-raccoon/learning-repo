@@ -35,14 +35,26 @@
       "minItems": 1,
       "maxItems": 24,
       "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["path", "start", "end"],
-        "properties": {
-          "path": {"type": "string", "minLength": 1},
-          "start": {"type": "integer", "minimum": 1},
-          "end": {"type": "integer", "minimum": 1}
-        }
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1}
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "start", "end"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "start": {"type": "integer", "minimum": 1},
+              "end": {"type": "integer", "minimum": 1}
+            }
+          }
+        ]
       }
     },
     "write_roots": {

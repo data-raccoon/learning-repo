@@ -6,7 +6,7 @@
   "goal": "Implement one exact-file change and keep the worker test loop green.",
   "target": "model-execution-harness/core",
   "model": {"profile": "devstral-small", "capability": "coding", "importance": "high"},
-  "context": [{"path": "examples/target/README.md", "start": 1, "end": 80}],
+  "context": [{"path": "examples/target/README.md"}],
   "write_roots": ["examples/target/README.md"],
   "allowed_commands": [["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"]],
   "done": ["The exact requested file is updated and the admitted unit-test command passes in the worker loop."],

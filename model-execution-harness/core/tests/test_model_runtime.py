@@ -113,6 +113,45 @@ class ModelRuntimeTests(unittest.TestCase):
         ):
             self.assertEqual("devstral-small", model_runtime._vibe_active_model())
 
+    def test_vibe_session_preflight_probes_user_log_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.dict(model_runtime.os.environ, {"USERPROFILE": directory}, clear=True):
+                result = model_runtime.check_vibe_session_directory()
+            self.assertEqual("passed", result["status"])
+            self.assertTrue(Path(result["session_root"]).is_dir())
+
+    def test_worker_prompt_lists_reference_without_copying_file_text(self) -> None:
+        packet = json.loads(json.dumps(self.packet))
+        packet["task"]["write_roots"] = ["out/result.txt"]
+        packet["excerpts"] = [{"path": "src/MeaningfulComponent.java", "sha256": "1" * 64}]
+        prompt = model_runtime.worker_execution_prompt(packet, [], Path(r"C:\target"))
+        self.assertIn("- src/MeaningfulComponent.java", prompt)
+        self.assertNotIn("# Design", prompt)
+
+    def test_vibe_usage_preserves_reported_tokens_and_cost(self) -> None:
+        trajectory = json.dumps(
+            [
+                {
+                    "turnId": "turn-1",
+                    "type": "message",
+                    "usage": {
+                        "input_tokens": 120,
+                        "output_tokens": 30,
+                        "total_tokens": 150,
+                        "cost_usd": 0.01,
+                    },
+                },
+                {"turnId": "turn-1", "type": "effect"},
+            ]
+        )
+        usage = model_runtime._vibe_usage(trajectory, "brief", 25)
+        self.assertTrue(usage["token_usage_available"])
+        self.assertEqual(120, usage["prompt_tokens"])
+        self.assertEqual(30, usage["completion_tokens"])
+        self.assertEqual(150, usage["cumulative_tokens"])
+        self.assertEqual(0.01, usage["cost_usd"])
+        self.assertEqual(1, usage["tool_calls"])
+
     @patch("model_runtime._vibe_path", return_value=r"C:\tools\vibe.exe")
     @patch(
         "model_runtime._vibe_configured_models",
@@ -264,12 +303,15 @@ class ModelRuntimeTests(unittest.TestCase):
         self.assertIn('permission = "never"', observed["agent"])
         self.assertIn("out\\\\result.txt", observed["agent"])
         self.assertEqual("devstral-small", observed["environment"]["VIBE_ACTIVE_MODEL"])
+        self.assertEqual("1", observed["environment"]["PYTHONDONTWRITEBYTECODE"])
         self.assertIn("auto_compact_threshold = 200000", observed["config"])
         self.assertIn("Work directly in the current directory", observed["prompt"])
         self.assertTrue(result["success"])
         self.assertEqual(256000, result["context_window_tokens"])
         self.assertEqual(1000000, result["session_token_budget"])
         self.assertEqual(200000, result["compaction_threshold_tokens"])
+        self.assertFalse(result["usage"]["token_usage_available"])
+        self.assertEqual("vibe-cli-not-reported", result["usage"]["source"])
         self.assertEqual("[]", observed["trajectory"])
 
 

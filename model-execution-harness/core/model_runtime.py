@@ -10,7 +10,9 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+import time
 import tomllib
 from typing import Any
 import urllib.error
@@ -146,6 +148,43 @@ def _vibe_configured_models() -> set[str]:
             if type(value) is str and value:
                 configured.add(value)
     return configured
+
+
+def check_vibe_session_directory() -> dict[str, str]:
+    """Prove Vibe can create its user-level session log before dispatch."""
+    user_profile = os.environ.get("USERPROFILE")
+    if not user_profile:
+        raise ModelRejected("USERPROFILE is unavailable")
+    session_root = Path(user_profile) / ".vibe" / "logs" / "session"
+    script = (
+        "import pathlib,shutil,sys,tempfile; "
+        "root=pathlib.Path(sys.argv[1]); root.mkdir(parents=True,exist_ok=True); "
+        "probe=tempfile.mkdtemp(prefix='preflight-',dir=root); shutil.rmtree(probe)"
+    )
+    environment = os.environ.copy()
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    try:
+        completed = subprocess.run(
+            [sys.executable, "-c", script, str(session_root)],
+            env=environment,
+            shell=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise ModelRejected(
+            f"cannot create a Vibe session under {session_root}: {exc}"
+        ) from exc
+    if completed.returncode:
+        detail = " ".join((completed.stderr or completed.stdout).split())[:500]
+        raise ModelRejected(
+            f"cannot create a Vibe session under {session_root}: {detail}"
+        )
+    return {"status": "passed", "session_root": str(session_root)}
 
 
 def _load_external_vibe_credentials(environment: dict[str, str]) -> None:
@@ -624,11 +663,17 @@ def worker_execution_prompt(
         "\n".join(f"- {json.dumps(item, ensure_ascii=False)}" for item in allowed_commands)
         or "- none"
     )
+    references = "\n".join(
+        f"- {item['path']}"
+        for item in packet["excerpts"]
+        if set(item) == {"path", "sha256"}
+    ) or "- none"
     excerpts = "\n".join(
         f"\n--- {item['path']} lines {item['start']}-{item['end']} "
         f"sha256:{item['sha256']} ---\n{item['text']}"
         for item in packet["excerpts"]
-    )
+        if "text" in item
+    ) or "\n- none"
     return f"""You are a bounded repository worker in a deterministic harness.
 Task id: {task['id']}
 Goal: {task['goal']}
@@ -646,6 +691,9 @@ Forbidden:
 Exact command argument vectors admitted through limited_bash:
 {commands}
 
+Required repository files to read before editing, in order:
+{references}
+
 Work directly in the current directory. You may inspect files with read_file and
 grep. Use edit or write_file only for the declared writable paths. Use
 limited_bash only with one exact admitted argv vector. Do not use the network,
@@ -659,6 +707,65 @@ an MSYS-style path such as `/C:/...`. Keep the final chat response brief because
 the complete trajectory is persisted by the harness.
 {excerpts}
 """
+
+
+def _last_numeric(value: Any, names: set[str]) -> int | float | None:
+    found: int | float | None = None
+    if type(value) is dict:
+        for key, item in value.items():
+            if key in names and type(item) in {int, float}:
+                found = item
+            nested = _last_numeric(item, names)
+            if nested is not None:
+                found = nested
+    elif type(value) is list:
+        for item in value:
+            nested = _last_numeric(item, names)
+            if nested is not None:
+                found = nested
+    return found
+
+
+def _vibe_usage(stdout: str, prompt: str, latency_ms: int) -> dict[str, Any]:
+    try:
+        trajectory = json.loads(stdout)
+    except json.JSONDecodeError:
+        trajectory = []
+    prompt_tokens = _last_numeric(trajectory, {"prompt_tokens", "input_tokens"})
+    completion_tokens = _last_numeric(
+        trajectory, {"completion_tokens", "output_tokens"}
+    )
+    cumulative_tokens = _last_numeric(
+        trajectory, {"total_tokens", "cumulative_tokens", "session_tokens"}
+    )
+    cost_usd = _last_numeric(trajectory, {"cost_usd", "total_cost_usd"})
+    entries = trajectory if type(trajectory) is list else []
+    turns = {
+        item.get("turnId")
+        for item in entries
+        if type(item) is dict and type(item.get("turnId")) is str
+    }
+    tool_calls = sum(
+        1
+        for item in entries
+        if type(item) is dict and item.get("type") == "effect"
+    )
+    token_usage_available = any(
+        item is not None
+        for item in (prompt_tokens, completion_tokens, cumulative_tokens)
+    )
+    return {
+        "token_usage_available": token_usage_available,
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "cumulative_tokens": cumulative_tokens,
+        "cost_usd": cost_usd,
+        "latency_ms": latency_ms,
+        "turns": len(turns),
+        "tool_calls": tool_calls,
+        "prompt_chars": len(prompt),
+        "source": "vibe-cli" if token_usage_available else "vibe-cli-not-reported",
+    }
 
 
 def _toml_string(value: str) -> str:
@@ -772,6 +879,7 @@ def run_mistral_vibe_worker(
     environment.update(
         {
             "VIBE_ACTIVE_MODEL": profile.model,
+            "PYTHONDONTWRITEBYTECODE": "1",
             "PYTHONIOENCODING": "utf-8",
             "PYTHONUTF8": "1",
             "SMALL_CONTEXT_ALLOWED_COMMANDS": json.dumps(allowed_commands),
@@ -823,11 +931,13 @@ def run_mistral_vibe_worker(
                 encoding="utf-8",
             )
             environment["VIBE_HOME"] = str(vibe_home)
+            prompt = worker_execution_prompt(packet, allowed_commands, target)
+            started = time.perf_counter()
             process = subprocess.run(
                 command,
                 cwd=target,
                 env=environment,
-                input=worker_execution_prompt(packet, allowed_commands, target),
+                input=prompt,
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
@@ -835,6 +945,7 @@ def run_mistral_vibe_worker(
                 timeout=timeout,
                 check=False,
             )
+            latency_ms = round((time.perf_counter() - started) * 1000)
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise ModelRejected(f"Vibe worker failed: {exc}") from exc
     trajectory_path.write_text(process.stdout, encoding="utf-8")
@@ -852,6 +963,7 @@ def run_mistral_vibe_worker(
         "trajectory": str(trajectory_path),
         "trajectory_sha256": trajectory_sha,
         "stderr": str(stderr_path) if process.stderr else "",
+        "usage": _vibe_usage(process.stdout, prompt, latency_ms),
         "context_window_tokens": min(profile.context_tokens, context_tokens),
         "session_token_budget": min(profile.session_tokens, session_tokens),
         "compaction_threshold_tokens": compaction_threshold,

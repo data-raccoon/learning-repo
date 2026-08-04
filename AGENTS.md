@@ -44,9 +44,13 @@
   `model-execution-harness/core/harness.py` through the repo-local
   `orchestrate-models` skill.
 - Delegation is one level deep. Only the root agent creates task packets.
-- Give every worker exactly one target directory, explicit `write_roots`, all
-  required context, independent verifiers, and hard limits.
-- Never widen a worker's read scope to compensate for an incomplete task packet.
+- Give every worker exactly one target directory, explicit `write_roots`, a
+  compact brief, ordered target-local file references, independent verifiers,
+  and hard limits. Prefer path-only `context` references; embed text only when
+  the brief itself is the authoritative artifact.
+- Keep worker-facing files cohesive and reasonably small. Split files by
+  meaningful domain boundary, not arbitrary token-sized fragments.
+- Never widen a worker's target to compensate for an incomplete file list.
 - Select the model profile explicitly; automatic routing and model substitution
   are disabled. Use `mistral-medium-3.5` for task definition, planning,
   architecture, and review, and `devstral-small` for coding.
@@ -54,6 +58,9 @@
   worker. There is no public `invoke` command.
 - Treat planning as a write task: require Medium to save the proposal or task
   definition to an exact artifact path instead of returning it only in chat.
+- Skip Medium when a controller-approved implementation-ready task already
+  exists. Medium must ground every architectural claim in named current APIs;
+  Devstral must reuse those APIs rather than duplicate their behavior.
 - Use v2 tasks only. Run `preflight`, then the fail-fast `run` command, which
   performs `pack`, `route`, `accept`, `snapshot`, `execute`, and baseline gate
   internally. Regenerate old tasks instead of adapting v1 evidence.
@@ -65,6 +72,10 @@
 - Accept worker output only after the complete-diff baseline audit and
   independent verifiers pass. The default baseline detects changes but does not
   contain backup data or provide rollback.
+- Review proportionally: read planning artifacts completely, inspect production
+  diffs, spot-check worker-authored tests, and open full trajectories only for
+  narrow failure diagnosis. Strong controller-authored contracts replace
+  redundant transcript and test inspection, not production-code review.
 - Allow worker commands only as exact task-declared argv vectors admitted by
   the global `limited_bash` policy; never provide a generic shell.
 

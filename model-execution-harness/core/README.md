@@ -14,11 +14,12 @@ The public tool set remains one CLI:
 - `inventory` checks the declared registry against live Ollama tags and the
   installed Gemini `agy` and Mistral Vibe CLIs.
 - `canary` invokes one explicit profile with a fixed exact-response contract.
-- `preflight` validates the complete packet, context EOFs, exact-file roots,
-  profile capacity, worker-loop commands, verifier presence, and budget headroom
-  without writing an artifact.
-- `pack` resolves target-local file slices, rejects likely secrets, enforces a
-  character budget, hashes every excerpt, and binds the packet to the task.
+- `preflight` validates the complete packet, referenced files, exact-file roots,
+  profile capacity, Vibe session-log writability, worker-loop commands, verifier
+  presence, and budget headroom.
+- `pack` resolves target-local path references and optional embedded slices,
+  rejects likely secrets, enforces a character budget, hashes every referenced
+  input, and binds the packet to the task.
 - `route` validates the explicitly human-selected profile and never substitutes
   or ranks models automatically.
 - `accept` validates the packet and creates an acknowledgement bound to its hash.
@@ -112,6 +113,11 @@ accepts only exact task-declared argv vectors admitted by the harness's fixed
 policy and executes them with `shell=False`; it performs no shell expansion,
 pipelines, redirects, or substitutions. Network, MCP, connectors, generic
 shells, and subagents are disabled.
+Path-only context references are the default: the prompt lists which files to
+read, and the worker loads them on demand. Embedded line slices remain available
+for a short authoritative brief but should not be used to copy broad source
+files into the initial prompt. Keep worker-facing files cohesive and small
+enough to read as meaningful components.
 
 Planning is a write task: assign Medium an exact plan or task-definition path.
 Coding uses the same path with Devstral. In both cases the complete Vibe JSON
@@ -152,7 +158,9 @@ Important task fields:
 
 - `target`: the only repository subtree visible to the task.
 - `model`: capability, importance, and one explicit human-selected profile.
-- `context`: exact target-relative files and inclusive line slices.
+- `context`: ordered target-relative path-only references by default; an item
+  may additionally specify inclusive `start`/`end` lines when a compact brief
+  must be embedded.
 - `kind`: `planning`, `review`, `coding`, or `repair`; it selects minimum
   resource headroom and worker-loop requirements.
 - `depends_on`: task IDs that must already be completed when a plan is
@@ -172,6 +180,12 @@ are deliberately generous: planning 300k/24, review 300k/20, coding 300k/24,
 and repair 120k/10 for cumulative session tokens/tool turns. Recommended
 starting points are 500k/40 for Medium planning, 800k/60 for Devstral coding,
 and 180k/16 for focused Devstral repairs.
+
+Execution envelopes include measured latency, prompt characters, tool calls,
+and turns. Token and cost fields are populated only when the Vibe CLI reports
+them; otherwise they remain explicit `null` values with
+`token_usage_available: false`. Session limits are budgets, never reported as
+realized consumption.
 
 ## Architecture decision
 

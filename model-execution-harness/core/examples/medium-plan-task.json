@@ -7,8 +7,8 @@
   "target": "model-execution-harness/core",
   "model": {"profile": "mistral-medium-3.5", "capability": "planning", "importance": "high"},
   "context": [
-    {"path": "README.md", "start": 1, "end": 220},
-    {"path": "task.schema.json", "start": 1, "end": 180}
+    {"path": "README.md"},
+    {"path": "task.schema.json"}
   ],
   "write_roots": ["examples/target/plan.json"],
   "allowed_commands": [],

@@ -6,7 +6,7 @@
   "goal": "Repair one diagnosed defect in one exact file and rerun the admitted test loop until it passes.",
   "target": "model-execution-harness/core",
   "model": {"profile": "devstral-small", "capability": "coding", "importance": "high"},
-  "context": [{"path": "examples/target/README.md", "start": 1, "end": 80}],
+  "context": [{"path": "examples/target/README.md"}],
   "write_roots": ["examples/target/README.md"],
   "allowed_commands": [["{python}", "-m", "unittest", "discover", "-s", "tests", "-v"]],
   "done": ["The named defect is fixed and both worker-loop tests and the independent verifier pass."],

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -13,6 +14,7 @@ from typing import Any
 
 from model_runtime import (
     ModelRejected,
+    check_vibe_session_directory,
     inventory as model_inventory,
     load_registry,
     run_canary as run_model_canary,
@@ -187,6 +189,12 @@ def validate_task(raw: Any) -> dict[str, Any]:
     if type(task["context"]) is not list or not 1 <= len(task["context"]) <= 24:
         raise Rejected("context must contain 1..24 slices")
     for index, item in enumerate(task["context"]):
+        if type(item) is not dict:
+            raise Rejected(f"context[{index}] must be an object")
+        fields = set(item)
+        if fields == {"path"}:
+            relative_path(item["path"], f"context[{index}].path")
+            continue
         item = exact_fields(item, {"path", "start", "end"}, f"context[{index}]")
         relative_path(item["path"], f"context[{index}].path")
         start = bounded_int(item["start"], f"context[{index}].start", 1, 10_000_000)
@@ -288,7 +296,8 @@ def command_is_admitted(argv: list[str]) -> bool:
     if argv[0] in {"./gradlew", "gradlew", "gradlew.bat"}:
         return len(argv) >= 2 and all(
             item in {
-                "build", "test", "check", "compileJava", "compileTestJava",
+                "build", "test", "check", "compileJava", "compileClientJava",
+                "compileTestJava",
                 "spotlessCheck", "--no-daemon", "--stacktrace", "--info",
             }
             for item in argv[1:]
@@ -319,10 +328,20 @@ def validate_packet(raw: Any) -> dict[str, Any]:
         raise Rejected("packet task digest mismatch")
     if type(packet["excerpts"]) is not list or len(packet["excerpts"]) != len(task["context"]):
         raise Rejected("packet excerpt count mismatch")
-    expected_fields = {"path", "start", "end", "sha256", "text"}
     for index, excerpt in enumerate(packet["excerpts"]):
-        excerpt = exact_fields(excerpt, expected_fields, f"excerpts[{index}]")
         source = task["context"][index]
+        if set(source) == {"path"}:
+            excerpt = exact_fields(excerpt, {"path", "sha256"}, f"excerpts[{index}]")
+            if excerpt["path"] != source["path"]:
+                raise Rejected(f"reference {index} does not match task path")
+            if type(excerpt["sha256"]) is not str or not HEX64.fullmatch(excerpt["sha256"]):
+                raise Rejected(f"reference {index} digest is invalid")
+            continue
+        excerpt = exact_fields(
+            excerpt,
+            {"path", "start", "end", "sha256", "text"},
+            f"excerpts[{index}]",
+        )
         if any(excerpt[key] != source[key] for key in ("path", "start", "end")):
             raise Rejected(f"excerpt {index} does not match task slice")
         if type(excerpt["text"]) is not str:
@@ -419,10 +438,19 @@ def prepare_task_packet(raw_task: Any, repo: Path) -> tuple[dict[str, Any], int]
             lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
         except (OSError, UnicodeError) as exc:
             raise Rejected(f"cannot read context file {relative}: {exc}") from exc
+        full_text = "".join(lines)
+        reject_likely_secret(relative, full_text)
+        if set(source) == {"path"}:
+            excerpts.append(
+                {
+                    "path": str(relative),
+                    "sha256": digest_file(path),
+                }
+            )
+            continue
         if source["start"] > len(lines):
             raise Rejected(f"context slice starts after EOF: {relative}")
         text = "".join(lines[source["start"] - 1 : source["end"]])
-        reject_likely_secret(relative, text)
         total_chars += len(text)
         excerpts.append(
             {
@@ -449,6 +477,30 @@ def prepare_packet(task_path: Path, repo: Path) -> tuple[dict[str, Any], int]:
     return prepare_task_packet(read_json(task_path), repo)
 
 
+def verify_packet_context(packet: dict[str, Any], target: Path) -> None:
+    """Bind path-only references and embedded slices to the snapshot state."""
+    for index, (source, packed) in enumerate(
+        zip(packet["task"]["context"], packet["excerpts"], strict=True)
+    ):
+        relative = relative_path(source["path"], f"context[{index}].path")
+        path = resolve_inside(target, relative, f"context[{index}].path")
+        if not path.is_file():
+            raise Rejected(f"context file does not exist at snapshot: {relative}")
+        if set(source) == {"path"}:
+            actual = digest_file(path)
+        else:
+            try:
+                lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+            except (OSError, UnicodeError) as exc:
+                raise Rejected(f"cannot read context file {relative}: {exc}") from exc
+            if source["start"] > len(lines):
+                raise Rejected(f"context slice starts after EOF: {relative}")
+            text = "".join(lines[source["start"] - 1 : source["end"]])
+            actual = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        if actual != packed["sha256"]:
+            raise Rejected(f"context changed after packet creation: {relative}")
+
+
 def preflight_task(
     raw_task: Any,
     repo: Path,
@@ -460,6 +512,12 @@ def preflight_task(
     selected = profiles.get(task["model"]["profile"])
     if selected is None:
         raise Rejected(f"unknown model profile: {task['model']['profile']}")
+    runtime_check = None
+    if selected.provider == "mistral-vibe":
+        try:
+            runtime_check = check_vibe_session_directory()
+        except ModelRejected as exc:
+            raise Rejected(f"Vibe runtime preflight failed: {exc}") from exc
     limits = task["limits"]
     requested = {
         "model_context_tokens": selected.context_tokens,
@@ -483,12 +541,14 @@ def preflight_task(
         "kind": task["kind"],
         "profile": selected.id,
         "target": task["target"],
-        "excerpts": len(packet["excerpts"]),
+        "context_references": sum(1 for item in task["context"] if set(item) == {"path"}),
+        "embedded_excerpts": sum(1 for item in task["context"] if set(item) != {"path"}),
         "excerpt_chars": excerpt_chars,
         "packet_chars": packet_chars,
         "packet_budget": limits["packet_chars"],
         "worker_test_commands": len(task["allowed_commands"]),
         "independent_verifiers": len(task["verifiers"]),
+        "runtime_check": runtime_check,
         "warnings": warnings,
     }
 
@@ -513,7 +573,8 @@ def command_pack(task_path: Path, packet_path: Path, repo: Path) -> dict[str, An
         "excerpt_chars": total_chars,
         "packet_chars": packet_chars,
         "packet_budget": task["limits"]["packet_chars"],
-        "excerpts": len(packet["excerpts"]),
+        "context_references": sum(1 for item in task["context"] if set(item) == {"path"}),
+        "embedded_excerpts": sum(1 for item in task["context"] if set(item) != {"path"}),
     }
 
 
@@ -557,6 +618,7 @@ def command_snapshot(
     target = resolve_inside(repo, relative_path(task["target"], "target"), "target")
     if not target.is_dir():
         raise Rejected(f"target directory does not exist: {task['target']}")
+    verify_packet_context(packet, target)
     baseline_resolved = baseline_path.resolve()
     try:
         baseline_resolved.relative_to(target.resolve())
@@ -804,6 +866,21 @@ def command_execute(
         "context_window_tokens": worker["context_window_tokens"],
         "session_token_budget": worker["session_token_budget"],
         "compaction_threshold_tokens": worker["compaction_threshold_tokens"],
+        "usage": worker.get(
+            "usage",
+            {
+                "token_usage_available": False,
+                "prompt_tokens": None,
+                "completion_tokens": None,
+                "cumulative_tokens": None,
+                "cost_usd": None,
+                "latency_ms": None,
+                "turns": None,
+                "tool_calls": None,
+                "prompt_chars": None,
+                "source": "worker-runtime-not-reported",
+            },
+        ),
         "attestation": worker["attestation"],
     }
 
@@ -1069,9 +1146,12 @@ def command_gate(
     timeout = task["limits"]["verifier_timeout_seconds"]
     for verifier in task["verifiers"]:
         try:
+            environment = os.environ.copy()
+            environment["PYTHONDONTWRITEBYTECODE"] = "1"
             completed = subprocess.run(
                 expand_argv(verifier["argv"]),
                 cwd=target,
+                env=environment,
                 shell=False,
                 capture_output=True,
                 text=True,

@@ -77,9 +77,12 @@ class LimitedBash(
         timeout = int(os.environ.get("SMALL_CONTEXT_COMMAND_TIMEOUT", "120"))
 
         def execute() -> subprocess.CompletedProcess[str]:
+            environment = os.environ.copy()
+            environment["PYTHONDONTWRITEBYTECODE"] = "1"
             return subprocess.run(
                 args.argv,
                 cwd=target,
+                env=environment,
                 shell=False,
                 capture_output=True,
                 text=True,

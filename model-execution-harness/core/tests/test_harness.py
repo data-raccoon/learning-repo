@@ -22,6 +22,11 @@ def write_json(path: Path, value: object) -> None:
 
 class HarnessTests(unittest.TestCase):
     def setUp(self) -> None:
+        self.vibe_preflight = patch(
+            "harness.check_vibe_session_directory",
+            return_value={"status": "passed", "session_root": "test"},
+        )
+        self.vibe_preflight.start()
         self.temp = tempfile.TemporaryDirectory()
         self.repo = Path(self.temp.name)
         self.target = self.repo / "target"
@@ -78,6 +83,7 @@ class HarnessTests(unittest.TestCase):
         write_json(self.task_path, self.task)
 
     def tearDown(self) -> None:
+        self.vibe_preflight.stop()
         self.temp.cleanup()
 
     def pack_and_accept(self) -> dict:
@@ -97,6 +103,34 @@ class HarnessTests(unittest.TestCase):
         self.assertLessEqual(summary["packet_chars"], summary["packet_budget"])
         self.assertNotIn("one", packet["excerpts"][0]["text"])
         self.assertNotIn("four", packet["excerpts"][0]["text"])
+
+    def test_pack_reference_contains_path_and_digest_without_source_text(self) -> None:
+        self.task["context"] = [{"path": "input.txt"}]
+        write_json(self.task_path, self.task)
+        summary = harness.command_pack(self.task_path, self.packet_path, self.repo)
+        packet = harness.read_json(self.packet_path)
+        self.assertEqual(
+            {"path", "sha256"},
+            set(packet["excerpts"][0]),
+        )
+        self.assertEqual("input.txt", packet["excerpts"][0]["path"])
+        self.assertEqual(0, summary["excerpt_chars"])
+        self.assertEqual(1, summary["context_references"])
+        self.assertEqual(0, summary["embedded_excerpts"])
+
+    def test_snapshot_rejects_reference_changed_after_pack(self) -> None:
+        self.task["context"] = [{"path": "input.txt"}]
+        write_json(self.task_path, self.task)
+        self.pack_and_accept()
+        (self.target / "input.txt").write_text("changed\n", encoding="utf-8")
+        with self.assertRaisesRegex(harness.Rejected, "context changed"):
+            harness.command_snapshot(
+                self.task_path,
+                self.packet_path,
+                self.ack_path,
+                self.baseline_path,
+                self.repo,
+            )
 
     def test_pack_rejects_path_escape(self) -> None:
         self.task["context"][0]["path"] = "../outside.txt"
@@ -589,6 +623,8 @@ class HarnessTests(unittest.TestCase):
         self.assertEqual("passed", output["status"])
         self.assertEqual(1, output["worker_test_commands"])
         self.assertEqual(1, output["independent_verifiers"])
+        self.assertEqual(0, output["context_references"])
+        self.assertEqual("passed", output["runtime_check"]["status"])
 
     def test_preflight_rejects_directory_write_root(self) -> None:
         self.task["write_roots"] = ["out"]

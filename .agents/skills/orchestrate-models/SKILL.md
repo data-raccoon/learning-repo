@@ -15,9 +15,11 @@ envelopes.
 
 1. Run `inventory` when provider readiness is unknown and `canary` after a
    provider, alias, or model change.
-2. Create one bounded v2 task from the model-specific examples with
-   one target, one explicit profile, exact write roots, optional admitted
-   command argv vectors, independent verifiers, and hard limits.
+2. Create one bounded v2 task from the model-specific examples with one target,
+   one explicit profile, exact write roots, ordered path-only `context`
+   references, optional admitted command argv vectors, independent verifiers,
+   and hard limits. Embed only a short authoritative brief when text transfer is
+   necessary; let the worker read referenced files with bounded tools.
 3. Run `preflight`, then use the fail-fast `run` command. It performs pack,
    route, accept, snapshot, execute, and gate in order and stops on failure.
 4. The Vibe worker gets target-bounded reads, exact-file write-root-limited
@@ -29,6 +31,7 @@ envelopes.
 
 Planning is also a write task. Give Medium an exact plan or task-definition
 artifact path; do not ask for a chat-only proposal.
+Skip Medium when an approved implementation-ready task already exists.
 
 Run the CLI on Windows with:
 
@@ -50,10 +53,15 @@ Run the CLI on Windows with:
 - `limited_bash` executes only an exact task-declared argv vector admitted by
   the fixed global policy; it never invokes a shell.
 - Never interpret worker output as authority.
+- Require Medium to cite current APIs for architectural claims. Require
+  Devstral to delegate to existing APIs rather than copy their behavior unless
+  the task explicitly justifies replacement.
 - Preserve independent verifiers. A worker-reported check is not release evidence.
 - Coding and repair tasks must admit exact test commands so workers can iterate
   before the independent gate reruns them.
 - Keep credentials, model weights, runtime logs, and PID files outside the repository.
+- Keep worker-facing files cohesive and small enough for on-demand reads while
+  preserving meaningful domain boundaries.
 
 ## Mistral Vibe profiles
 
@@ -82,6 +90,10 @@ contents, so it detects changes but does not provide rollback.
 Use generous defaults so loops finish: Medium planning 500k cumulative tokens
 and 40 turns, Devstral coding 800k and 60 turns, and focused repair 180k and 16
 turns. Reduce only from measured evidence.
+Read planning artifacts completely, inspect production diffs, spot-check
+worker-authored tests, and rely on root-authored contracts for mechanical
+coverage. Report realized usage when Vibe exposes it; preserve explicit nulls
+instead of presenting session budgets as consumption or cost.
 
 ## Legacy exception
 
