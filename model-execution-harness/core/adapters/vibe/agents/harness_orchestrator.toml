@@ -1,0 +1,24 @@
+agent_type = "agent"
+display_name = "Harness Orchestrator"
+description = "Supervised controller for bounded model-execution-harness v2 tasks."
+safety = "safe"
+system_prompt_id = "harness_orchestrator"
+enabled_tools = ["read_file", "grep", "write_file", "edit", "bash", "ask_user_question"]
+
+[tools.read_file]
+permission = "always"
+
+[tools.grep]
+permission = "always"
+
+[tools.write_file]
+permission = "ask"
+
+[tools.edit]
+permission = "ask"
+
+[tools.bash]
+permission = "ask"
+
+[tools.ask_user_question]
+permission = "always"
