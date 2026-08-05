@@ -21,6 +21,9 @@
 **/.env
 **/logs/
 
+# Generated model-orchestration runtime state.
+.orchestration/
+
 # Machine-local Mistral Vibe state.
 
 *.gguf
