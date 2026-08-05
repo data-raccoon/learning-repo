@@ -146,10 +146,19 @@ class ManagerTestCase(unittest.TestCase):
         with self.assertRaisesRegex(manage.MCModAgentsError, "fixed standard verifier"):
             self.manager._validate_spec(self.target)
 
-    def test_approval_binds_intent_and_context(self) -> None:
+    def test_approval_binds_design_contract_not_operational_context(self) -> None:
         self.approve()
         intent = self.target / ".mc-mod-agents/intent.md"
         intent.write_text(intent.read_text(encoding="utf-8") + "\nChanged after approval.\n", encoding="utf-8")
+        self.manager.materialize_build("project", PROFILE)
+
+    def test_approval_rejects_changed_design_contract(self) -> None:
+        self.approve()
+        architecture = self.target / "docs/ARCHITECTURE.md"
+        architecture.write_text(
+            architecture.read_text(encoding="utf-8") + "\nChanged after approval.\n",
+            encoding="utf-8",
+        )
         with self.assertRaisesRegex(manage.MCModAgentsError, "approval is stale"):
             self.manager.materialize_build("project", PROFILE)
 

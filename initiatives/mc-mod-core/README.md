@@ -37,7 +37,10 @@ All Python commands use the repository-required interpreter.
    After implementation, require exact changed-file hashes, independent
    root-authored verifiers, and `gate --baseline`. Worker-authored tests are
    supporting evidence only.
-4. Review the design and record human approval:
+4. Review the human-facing design contract and record one approval before broad
+   Asset/Engineering/QA materialization. The approval binds only `PRODUCT.md`,
+   `ARCHITECTURE.md`, `ACCEPTANCE.md`, and `mod-spec.json`; bounded planning and
+   repair work does not require re-approval:
 
    ```powershell
    & "$env:USERPROFILE\.venvs\all\Scripts\python.exe" initiatives\mc-mod\manage.py approve --target initiatives/my-mod

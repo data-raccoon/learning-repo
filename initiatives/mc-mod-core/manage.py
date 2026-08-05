@@ -49,11 +49,6 @@ CORE_ENGINEER_FILES = {
     "src/main/resources/fabric.mod.json",
 }
 APPROVED_DESIGN_PATHS = (
-    f"{STATE_NAME}/intent.md",
-    f"{STATE_NAME}/context/roles/mod-architect.md",
-    f"{STATE_NAME}/context/templates/mod-brief.md",
-    f"{STATE_NAME}/context/templates/acceptance-contract.md",
-    f"{STATE_NAME}/context/templates/mod-spec.schema.json",
     "docs/PRODUCT.md",
     "docs/ARCHITECTURE.md",
     "docs/ACCEPTANCE.md",
