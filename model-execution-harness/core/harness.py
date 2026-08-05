@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -1274,166 +1276,164 @@ def command_run(
     return output
 
 
+ORCHESTRATION_VERSION = 3
+ORCHESTRATION_STATES = {"ready", "completed", "blocked"}
+
+
+def orchestration_path(initiative: Path) -> Path:
+    return initiative / "orchestration.json"
+
+
+def read_orchestration(initiative: Path, repo: Path) -> dict[str, Any]:
+    initiative = initiative.resolve()
+    repo = repo.resolve()
+    try:
+        initiative.relative_to(repo)
+    except ValueError as exc:
+        raise Rejected("initiative must be inside the repository") from exc
+    raw = read_json(orchestration_path(initiative))
+    if type(raw) is not dict or set(raw) != {"v", "id", "tasks"}:
+        raise Rejected("orchestration.json must contain exactly v, id, and tasks")
+    if raw["v"] != ORCHESTRATION_VERSION:
+        raise Rejected("orchestration.json must use v=3")
+    nonempty_text(raw["id"], "orchestration id", 64)
+    if type(raw["tasks"]) is not list:
+        raise Rejected("orchestration tasks must be a list")
+    seen: set[str] = set()
+    target = initiative.relative_to(repo).as_posix()
+    for index, entry in enumerate(raw["tasks"]):
+        if type(entry) is not dict or set(entry) != {"id", "state", "task", "blocked"}:
+            raise Rejected(f"tasks[{index}] must contain exactly id, state, task, and blocked")
+        task_id = nonempty_text(entry["id"], f"tasks[{index}].id", 64)
+        if task_id in seen:
+            raise Rejected(f"duplicate orchestration task id: {task_id}")
+        seen.add(task_id)
+        if entry["state"] not in ORCHESTRATION_STATES:
+            raise Rejected(f"tasks[{index}].state is invalid")
+        if entry["blocked"] is not None and type(entry["blocked"]) is not str:
+            raise Rejected(f"tasks[{index}].blocked must be null or text")
+        task = validate_task(entry["task"])
+        if task["id"] != task_id:
+            raise Rejected(f"tasks[{index}].id must match task.id")
+        if task["target"] != target:
+            raise Rejected(f"tasks[{index}].task.target must equal {target}")
+    return raw
+
+
+def write_orchestration(initiative: Path, value: dict[str, Any]) -> None:
+    write_json(orchestration_path(initiative), value)
+
+
+def eligible_task(orchestration: dict[str, Any]) -> dict[str, Any]:
+    completed = {
+        entry["id"] for entry in orchestration["tasks"]
+        if entry["state"] == "completed"
+    }
+    ready = [
+        entry for entry in orchestration["tasks"]
+        if entry["state"] == "ready"
+        and all(dependency in completed for dependency in entry["task"]["depends_on"])
+    ]
+    if len(ready) != 1:
+        if not ready:
+            raise Rejected("no eligible task; inspect harness status")
+        raise Rejected("more than one eligible task; complete the plan's dependencies")
+    return ready[0]
+
+
+def command_status(initiative: Path, repo: Path) -> dict[str, Any]:
+    orchestration = read_orchestration(initiative, repo)
+    completed = {entry["id"] for entry in orchestration["tasks"] if entry["state"] == "completed"}
+    tasks = []
+    for entry in orchestration["tasks"]:
+        tasks.append({
+            "id": entry["id"],
+            "state": entry["state"],
+            "blocked": entry["blocked"],
+            "eligible": entry["state"] == "ready" and all(
+                dependency in completed for dependency in entry["task"]["depends_on"]
+            ),
+        })
+    return {"status": "ready", "initiative": orchestration["id"], "tasks": tasks}
+
+
+def command_controller_run(
+    initiative: Path, repo: Path, registry_path: Path, endpoint: str
+) -> dict[str, Any]:
+    initiative = initiative.resolve()
+    orchestration = read_orchestration(initiative, repo)
+    entry = eligible_task(orchestration)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + os.urandom(4).hex()
+    evidence = repo.resolve() / ".orchestration" / "evidence" / orchestration["id"] / entry["id"] / stamp
+    evidence.mkdir(parents=True, exist_ok=False)
+    worker = f"{orchestration['id']}-{entry['id']}"
+    with tempfile.TemporaryDirectory(prefix="harness-v3-task-") as directory:
+        task_path = Path(directory) / "task.json"
+        write_json(task_path, entry["task"])
+        output = command_run(task_path, evidence, worker, repo, registry_path, endpoint)
+    if output["status"] == "passed":
+        entry["state"] = "completed"
+        entry["blocked"] = None
+        status = "accepted"
+    else:
+        entry["state"] = "blocked"
+        diagnosis = output.get("diagnosis", {})
+        entry["blocked"] = diagnosis.get("failure_kind", output["status"])
+        status = "controller_decision_required"
+    write_orchestration(initiative, orchestration)
+    return {
+        "status": status,
+        "initiative": orchestration["id"],
+        "task": entry["id"],
+        "evidence": str(evidence),
+        "run": output,
+    }
+
+
+def command_approve(initiative: Path, task_id: str, repo: Path) -> dict[str, Any]:
+    orchestration = read_orchestration(initiative, repo)
+    for entry in orchestration["tasks"]:
+        if entry["id"] == task_id:
+            if entry["state"] != "blocked":
+                raise Rejected("only a blocked task can be approved for retry")
+            entry["state"] = "ready"
+            entry["blocked"] = None
+            write_orchestration(initiative, orchestration)
+            return {"status": "approved", "initiative": orchestration["id"], "task": task_id}
+    raise Rejected(f"unknown task: {task_id}")
+
+
 def parser() -> argparse.ArgumentParser:
-    root = argparse.ArgumentParser(description=__doc__)
+    root = argparse.ArgumentParser(description="V3 initiative orchestration")
     commands = root.add_subparsers(dest="command", required=True)
-    inventory = commands.add_parser("inventory")
-    inventory.add_argument(
-        "--registry", type=Path, default=Path(__file__).with_name("models.json")
-    )
-    inventory.add_argument(
-        "--ollama-endpoint", default="http://127.0.0.1:11434"
-    )
-    canary = commands.add_parser("canary")
-    canary.add_argument("--profile", required=True)
-    canary.add_argument(
-        "--registry", type=Path, default=Path(__file__).with_name("models.json")
-    )
-    canary.add_argument(
-        "--ollama-endpoint", default="http://127.0.0.1:11434"
-    )
-    canary.add_argument("--timeout", type=int, default=120)
-    preflight = commands.add_parser("preflight")
-    preflight.add_argument("task", type=Path)
-    preflight.add_argument("--repo", type=Path, default=Path.cwd())
-    preflight.add_argument(
-        "--registry", type=Path, default=Path(__file__).with_name("models.json")
-    )
-    pack = commands.add_parser("pack")
-    pack.add_argument("task", type=Path)
-    pack.add_argument("packet", type=Path)
-    pack.add_argument("--repo", type=Path, default=Path.cwd())
-    accept = commands.add_parser("accept")
-    accept.add_argument("packet", type=Path)
-    accept.add_argument("ack", type=Path)
-    accept.add_argument("--worker", required=True)
-    accept.add_argument("--reject", dest="reject_reason")
-    snapshot = commands.add_parser("snapshot")
-    snapshot.add_argument("task", type=Path)
-    snapshot.add_argument("packet", type=Path)
-    snapshot.add_argument("ack", type=Path)
-    snapshot.add_argument("baseline", type=Path)
-    snapshot.add_argument("--repo", type=Path, default=Path.cwd())
-    route = commands.add_parser("route")
-    route.add_argument("packet", type=Path)
-    route.add_argument(
-        "--registry", type=Path, default=Path(__file__).with_name("models.json")
-    )
-    route.add_argument(
-        "--ollama-endpoint", default="http://127.0.0.1:11434"
-    )
-    execute = commands.add_parser("execute")
-    execute.add_argument("packet", type=Path)
-    execute.add_argument("ack", type=Path)
-    execute.add_argument("baseline", type=Path)
-    execute.add_argument("result", type=Path)
-    execute.add_argument("trajectory", type=Path)
-    execute.add_argument("--repo", type=Path, default=Path.cwd())
-    execute.add_argument(
-        "--registry", type=Path, default=Path(__file__).with_name("models.json")
-    )
-    execute.add_argument(
-        "--ollama-endpoint", default="http://127.0.0.1:11434"
-    )
-    gate = commands.add_parser("gate")
-    gate.add_argument("task", type=Path)
-    gate.add_argument("packet", type=Path)
-    gate.add_argument("ack", type=Path)
-    gate.add_argument("result", type=Path)
-    gate.add_argument("--baseline", type=Path)
-    gate.add_argument("--repo", type=Path, default=Path.cwd())
-    diagnose = commands.add_parser("diagnose")
-    diagnose.add_argument("--result", type=Path)
-    diagnose.add_argument("--stderr", type=Path)
-    materialize = commands.add_parser("materialize-plan")
-    materialize.add_argument("plan", type=Path)
-    materialize.add_argument("output", type=Path)
-    materialize.add_argument("--repo", type=Path, default=Path.cwd())
-    materialize.add_argument(
-        "--registry", type=Path, default=Path(__file__).with_name("models.json")
-    )
-    run = commands.add_parser("run")
-    run.add_argument("task", type=Path)
-    run.add_argument("evidence", type=Path)
-    run.add_argument("--worker", required=True)
-    run.add_argument("--repo", type=Path, default=Path.cwd())
-    run.add_argument(
-        "--registry", type=Path, default=Path(__file__).with_name("models.json")
-    )
-    run.add_argument(
-        "--ollama-endpoint", default="http://127.0.0.1:11434"
-    )
+    for name in ("status", "run"):
+        command = commands.add_parser(name)
+        command.add_argument("initiative", type=Path)
+        command.add_argument("--repo", type=Path, default=Path.cwd())
+    run = commands.choices["run"]
+    run.add_argument("--registry", type=Path, default=Path(__file__).with_name("models.json"))
+    run.add_argument("--ollama-endpoint", default="http://127.0.0.1:11434")
+    approve = commands.add_parser("approve")
+    approve.add_argument("initiative", type=Path)
+    approve.add_argument("--task", required=True)
+    approve.add_argument("--repo", type=Path, default=Path.cwd())
     return root
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
-        if args.command == "inventory":
-            output = command_inventory(args.registry, args.ollama_endpoint)
-        elif args.command == "canary":
-            output = command_canary(
-                args.profile,
-                args.registry,
-                args.ollama_endpoint,
-                args.timeout,
-            )
-        elif args.command == "preflight":
-            output = command_preflight(args.task, args.repo, args.registry)
-        elif args.command == "pack":
-            output = command_pack(args.task, args.packet, args.repo)
-        elif args.command == "accept":
-            output = command_accept(
-                args.packet, args.ack, args.worker, args.reject_reason
-            )
-        elif args.command == "snapshot":
-            output = command_snapshot(
-                args.task, args.packet, args.ack, args.baseline, args.repo
-            )
-        elif args.command == "route":
-            output = command_route(
-                args.packet, args.registry, args.ollama_endpoint
-            )
-        elif args.command == "execute":
-            output = command_execute(
-                args.packet,
-                args.ack,
-                args.baseline,
-                args.result,
-                args.trajectory,
-                args.repo,
-                args.registry,
-                args.ollama_endpoint,
-            )
-        elif args.command == "gate":
-            output = command_gate(
-                args.task,
-                args.packet,
-                args.ack,
-                args.result,
-                args.repo,
-                args.baseline,
-            )
-        elif args.command == "diagnose":
-            output = command_diagnose(args.result, args.stderr)
-        elif args.command == "materialize-plan":
-            output = command_materialize_plan(
-                args.plan, args.output, args.repo, args.registry
-            )
+        if args.command == "status":
+            output = command_status(args.initiative, args.repo)
+        elif args.command == "approve":
+            output = command_approve(args.initiative, args.task, args.repo)
         else:
-            output = command_run(
-                args.task,
-                args.evidence,
-                args.worker,
-                args.repo,
-                args.registry,
-                args.ollama_endpoint,
-            )
+            output = command_controller_run(args.initiative, args.repo, args.registry, args.ollama_endpoint)
     except (Rejected, ModelRejected, OSError) as exc:
         print(json.dumps({"status": "rejected", "reason": str(exc)}, sort_keys=True))
         return 2
     print(json.dumps(output, ensure_ascii=False, sort_keys=True))
-    return 2 if output.get("status") in {"failed", "worker_failed"} else 0
+    return 2 if output.get("status") in {"failed", "worker_failed", "controller_decision_required"} else 0
 
 
 if __name__ == "__main__":

@@ -39,7 +39,10 @@ Every approved `mod-spec.json` must declare:
 - Individual Engineering files below the schema-approved source, test, configuration, and Gradle roots
 - Only the fixed root-controlled verifier IDs; workers never author executable verifier commands
 
-Changing the brief, acceptance contract, or mod specification after approval invalidates its SHA-256 manifest.
+Changing `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/ACCEPTANCE.md`, or
+`mod-spec.json` after approval invalidates the SHA-256 manifest required before
+broad Asset, Engineering, or QA materialization. Operational context, planning,
+repair, and bounded pure-Java tasks do not require re-approval.
 
 ## Technical Constraints
 
@@ -65,6 +68,23 @@ Changing the brief, acceptance contract, or mod specification after approval inv
 - Never reference client-only classes from common/server initialization.
 
 ## Required Workflow
+
+## Controller Startup
+
+Before running work, read `AGENTS.md` and `orchestration.json`, then use the
+repository controller:
+
+```powershell
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py status initiatives\mc-mod-core --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py run initiatives\mc-mod-core --repo .
+```
+
+`orchestration.json` is the sole workflow state. The harness selects the single
+eligible task, creates external evidence, performs validation and gating, and
+persists `completed` or `blocked` state. Do not create `NEXT-STEP.json`, task
+packets, manual worker IDs, or manual evidence directories. Only the root human
+may use `approve --task <id>` to retry a blocked task after its definition is
+corrected.
 
 ### Before Editing (for any agent)
 1. Read this `AGENTS.md`.

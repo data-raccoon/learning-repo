@@ -1,8 +1,0 @@
-{
-  "accepted": true,
-  "packet_sha256": "975045a8da999fcbad6303cc605e25dbff87c9756cc3f1445621afbf94ccce77",
-  "reason": "",
-  "task_id": "mana-core-gradient-calculator-devstral",
-  "v": 1,
-  "worker": "devstral-small-vibe-tools"
-}

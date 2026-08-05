@@ -817,6 +817,27 @@ class HarnessTests(unittest.TestCase):
         )
         self.assertEqual("passed", output["status"])
 
+    def test_v3_status_and_approval_use_one_initiative_manifest(self) -> None:
+        manifest_path = self.target / "orchestration.json"
+        manifest = {
+            "v": 3,
+            "id": "initiative-1",
+            "tasks": [{
+                "id": self.task["id"],
+                "state": "blocked",
+                "task": self.task,
+                "blocked": "token-limit",
+            }],
+        }
+        write_json(manifest_path, manifest)
+        status = harness.command_status(self.target, self.repo)
+        self.assertEqual("blocked", status["tasks"][0]["state"])
+        approved = harness.command_approve(self.target, self.task["id"], self.repo)
+        self.assertEqual("approved", approved["status"])
+        updated = harness.read_json(manifest_path)
+        self.assertEqual("ready", updated["tasks"][0]["state"])
+        self.assertIsNone(updated["tasks"][0]["blocked"])
+
 
 if __name__ == "__main__":
     unittest.main()

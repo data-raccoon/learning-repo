@@ -28,6 +28,7 @@ class ModelRuntimeTests(unittest.TestCase):
                 "goal": "Review the bounded design.",
                 "done": ["Identify one concrete risk."],
                 "forbidden": ["Do not claim file edits."],
+                "write_roots": ["review.md"],
             },
             "task_sha256": "0" * 64,
             "excerpts": [
@@ -127,6 +128,14 @@ class ModelRuntimeTests(unittest.TestCase):
         prompt = model_runtime.worker_execution_prompt(packet, [], Path(r"C:\target"))
         self.assertIn("- src/MeaningfulComponent.java", prompt)
         self.assertNotIn("# Design", prompt)
+
+    def test_worker_prompt_prioritizes_agent_rules_without_expanding_authority(self) -> None:
+        prompt = model_runtime.worker_execution_prompt(
+            self.packet, [["git", "status", "--short"]], Path(r"C:\target")
+        )
+        self.assertIn("read target-root `AGENTS.md`", prompt)
+        self.assertIn("this packet remains\nauthoritative for target scope", prompt)
+        self.assertIn("never construct a shell command, pipeline", prompt)
 
     def test_vibe_usage_preserves_reported_tokens_and_cost(self) -> None:
         trajectory = json.dumps(

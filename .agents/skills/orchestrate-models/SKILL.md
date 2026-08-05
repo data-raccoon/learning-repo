@@ -15,13 +15,11 @@ envelopes.
 
 1. Run `inventory` when provider readiness is unknown and `canary` after a
    provider, alias, or model change.
-2. Create one bounded v2 task from the model-specific examples with one target,
-   one explicit profile, exact write roots, ordered path-only `context`
-   references, optional admitted command argv vectors, independent verifiers,
-   and hard limits. Embed only a short authoritative brief when text transfer is
-   necessary; let the worker read referenced files with bounded tools.
-3. Run `preflight`, then use the fail-fast `run` command. It performs pack,
-   route, accept, snapshot, execute, and gate in order and stops on failure.
+2. Create one initiative-local `orchestration.json` with bounded task entries.
+   Each task has one target, one explicit profile, exact write roots, ordered
+   path-only `context` references, independent verifiers, and hard limits.
+3. Use controller `run`; it selects the sole eligible task and performs
+   validation, execution, evidence persistence, and gating.
 4. The Vibe worker gets target-bounded reads, exact-file write-root-limited
    file edits, and only exact admitted commands through `limited_bash`.
 5. Keep the complete trajectory on disk. Consume only the returned paths,
@@ -42,7 +40,8 @@ Run the CLI on Windows with:
 ## Safety boundaries
 
 - Keep delegation at one level. Never ask a worker to spawn another worker.
-- Version 1 is removed. Do not adapt old tasks or evidence; regenerate v2 tasks.
+- V3 is a clean break. Do not recreate `NEXT-STEP.json`, task packets, or
+  manually managed evidence directories.
 - Give each worker exactly one target subdirectory. Never widen read scope to
   compensate for an incomplete packet.
 - Name the profile selected by the human controller. Automatic routing is
@@ -104,11 +103,11 @@ management. Apply its own README and contracts when taking this exception.
 
 ## Common commands
 
+Read [HARNESS-QUICK-START.md](HARNESS-QUICK-START.md) before operating an
+initiative.
+
 ```powershell
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py inventory
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py canary --profile mistral-medium-3.5
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py preflight task.json --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py materialize-plan plan.json .orchestration\tasks --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py run task.json .orchestration\task-id --worker worker-id --repo .
-& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py diagnose --result result.json --stderr trajectory.json.stderr.txt
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py status initiatives\mc-mod-core --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py run initiatives\mc-mod-core --repo .
+& "$env:USERPROFILE\.venvs\all\Scripts\python.exe" model-execution-harness\core\harness.py approve initiatives\mc-mod-core --task task-id --repo .
 ```

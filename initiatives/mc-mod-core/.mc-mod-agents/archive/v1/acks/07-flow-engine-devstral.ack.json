@@ -1,8 +1,0 @@
-{
-  "accepted": true,
-  "packet_sha256": "c55536ddb61ff52eb20883bf389d72f1d3231c80c0054af92d20252f52e11708",
-  "reason": "",
-  "task_id": "mana-core-flow-engine-devstral",
-  "v": 1,
-  "worker": "devstral-small-vibe-tools"
-}
